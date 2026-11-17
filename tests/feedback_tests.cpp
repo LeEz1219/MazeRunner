@@ -1,6 +1,6 @@
 #define MAZERUNNER_HEADLESS
 #define MAZERUNNER_NO_MAIN
-#include "../src/mazerunnerV5.4.1.cpp"
+#include "../src/mazerunnerV5.4.2.cpp"
 #include <set>
 
 int checks=0;
@@ -11,6 +11,22 @@ Maze open_maze(int rows=31,int cols=31,std::ostream* logs=nullptr){
     m.grid[m.entrance]=PATH;m.grid[m.exit_cell]=EXIT;m.rebuild_graph();m.reset_game();return m;
 }
 Monster monster(int id,int cell,Millis next=140){Monster m;m.id=id;m.cell=cell;m.next_move=next;return m;}
+// Exact unit-cost A* used only as an independent oracle (moved out of the game in V5.4.2).
+bool astar(const Maze& m,int start,int goal,std::vector<int>& path,const std::vector<int>& blocked={}){
+    path.clear();
+    auto occupied=[&](int u){return std::find(blocked.begin(),blocked.end(),u)!=blocked.end();};
+    if(!m.walkable(start)||!m.walkable(goal)||occupied(start)||occupied(goal))return false;
+    struct Node{int u,g,h;bool operator<(const Node&b)const{if(g+h!=b.g+b.h)return g+h>b.g+b.h;if(h!=b.h)return h>b.h;return u>b.u;}};
+    std::vector<int> g(m.grid.size(),INF_DISTANCE),parent(m.grid.size(),-1);std::priority_queue<Node> open;
+    g[start]=0;open.push({start,0,m.manhattan(start,goal)});
+    while(!open.empty()){
+        Node current=open.top();open.pop();if(current.g!=g[current.u])continue;
+        if(current.u==goal){for(int u=goal;u>=0;u=parent[u])path.push_back(u);std::reverse(path.begin(),path.end());return true;}
+        for(int v:m.neighbors(current.u)){if(v<0||occupied(v))continue;int cost=current.g+1;if(g[v]<=cost)continue;
+            g[v]=cost;parent[v]=current.u;open.push({v,cost,m.manhattan(v,goal)});}
+    }
+    return false;
+}
 void check_overlay(const Maze& m){
     if(!m.auto_solve||m.outcome!=Outcome::Playing)return;
     require(!m.solution_overlay.empty(),"full overlay exists while playing");
@@ -25,29 +41,41 @@ void check_overlay(const Maze& m){
     }
 }
 void test_movement_contract(){
-    auto m=open_maze();m.player=m.id({27,27});m.monsters={monster(0,m.id({1,1}),10),monster(1,m.id({1,3}),100)};
+    auto m=open_maze();m.player=m.id({15,15});m.monsters={monster(0,m.id({11,13}),10),monster(1,m.id({1,1}),100)};
     auto first=m.monsters[0].cell;m.advance_to(300);
-    require(m.monsters[0].cell!=first,"monsters roam before first player movement");
+    require(m.monsters[0].cell==first&&m.monsters[1].cell==m.id({1,1}),"monsters wait for the player's first input");
+    require(!m.timer_started&&m.elapsed_ms==0,"waiting at the entrance is not timed");
     for(const auto& x:m.monsters)require(x.state==MonsterState::Patrolling&&x.hint.revision==0,"spawn has no player knowledge");
     require(m.move_player(0,1),"successful manual displacement");
-    for(const auto& x:m.monsters){
-        require(x.state==MonsterState::Hunting,"all distant monsters immediately hunt");
-        require(x.hint.revision==1&&x.hint.contains(m.point(m.player)),"hint includes player region");
-        require(x.hint.max_row-x.hint.min_row==4&&x.hint.max_col-x.hint.min_col==4,"hint gives 5x5 region");
-        require(x.planned_revision==0,"hint remains pending until own move");
-    }
-    m.advance_to(860-1);for(const auto&x:m.monsters)require(x.state==MonsterState::Hunting,"hunt stays active until timeout");
-    m.advance_to(860);for(const auto&x:m.monsters)require(x.state==MonsterState::Patrolling&&x.hint.revision==0,"exact idle deadline returns everyone to roaming");
-    require(m.move_player(0,-1),"resume movement");
-    for(const auto&x:m.monsters)require(x.state==MonsterState::Hunting&&x.hint.revision==2,"new movement resumes hunt");
-    m.advance_to(900);m.move_player(-1,0);m.advance_to(1420);
-    for(const auto&x:m.monsters)require(x.state==MonsterState::Hunting,"fresh movement extends timeout");
-    m.advance_to(1460);for(const auto&x:m.monsters)require(x.state==MonsterState::Patrolling,"extended timeout eventually expires");
+    require(m.monsters[0].next_move==310&&m.monsters[1].next_move==400,"release keeps spawn staggering relative to first input");
+    const auto& near=m.monsters[0];
+    require(m.manhattan(near.cell,m.player)<=m.hearing_radius(),"fixture monster is within hearing");
+    require(near.state==MonsterState::Hunting,"monster within hearing range hunts");
+    require(near.hint.revision==1&&near.hint.contains(m.point(m.player)),"hint includes player region");
+    require(near.hint.max_row-near.hint.min_row==4&&near.hint.max_col-near.hint.min_col==4,"hint gives 5x5 region");
+    require(near.planned_revision==0,"hint remains pending until own move");
+    require(m.manhattan(m.monsters[1].cell,m.player)>m.hearing_radius(),"fixture monster is out of hearing");
+    require(m.monsters[1].state==MonsterState::Patrolling&&m.monsters[1].hint.revision==0,"monster beyond hearing keeps roaming");
+    for(auto& x:m.monsters)x.next_move=NEVER;
+    const Millis scent=m.settings.scent_ms,search=m.settings.search_ms;
+    m.advance_to(300+scent-1);require(m.monsters[0].state==MonsterState::Hunting,"hunt stays active until timeout");
+    m.advance_to(300+scent);
+    require(m.monsters[0].state==MonsterState::Searching&&m.monsters[0].hint.revision==1,"exact scent deadline starts a search of the last clue area");
+    m.advance_to(300+scent+search-1);require(m.monsters[0].state==MonsterState::Searching,"search lasts the profile duration");
+    m.advance_to(300+scent+search);
+    require(m.monsters[0].state==MonsterState::Patrolling&&m.monsters[0].hint.revision==0,"search ends at its deadline");
+    Millis t=m.now;require(m.move_player(0,-1),"resume movement");
+    require(m.monsters[0].state==MonsterState::Hunting&&m.monsters[0].hint.revision==2,"new movement resumes hunt");
+    m.advance_to(t+40);m.move_player(-1,0);m.advance_to(t+40+scent-1);
+    require(m.monsters[0].state==MonsterState::Hunting,"fresh movement extends timeout");
+    m.advance_to(t+40+scent);require(m.monsters[0].state==MonsterState::Searching,"extended timeout eventually expires");
+    require(m.monsters[1].state==MonsterState::Patrolling,"distant monster never heard anything");
 }
 void test_no_exact_location_leak(){
     auto a=open_maze(),b=open_maze();a.player=a.id({11,11});b.player=b.id({13,13});
-    for(auto* m:{&a,&b})m->monsters={monster(0,m->id({1,1}),10),monster(1,m->id({1,3}),100)};
+    for(auto* m:{&a,&b})m->monsters={monster(0,m->id({5,5}),10),monster(1,m->id({5,7}),100)};
     a.move_player(0,1);b.move_player(0,1);
+    for(auto* m:{&a,&b})for(const auto& x:m->monsters)require(x.state==MonsterState::Hunting,"both monsters hear in both games");
     require(a.player!=b.player,"players at different cells");
     a.advance_to(500);b.advance_to(500);
     for(size_t i=0;i<a.monsters.size();++i){
@@ -57,24 +85,28 @@ void test_no_exact_location_leak(){
         require(x.hint.contains(a.point(x.target)),"hunting target stays inside hinted area");
         require(x.planned_revision==x.hint.revision,"staggered monster consumed latest hint");
     }
-    auto edge=open_maze(31,31);edge.player=edge.id({29,29});edge.monsters={monster(0,edge.id({1,1}),NEVER)};
+    auto edge=open_maze(31,31);edge.player=edge.id({29,29});edge.monsters={monster(0,edge.id({25,25}),NEVER)};
     edge.move_player(0,1);const auto& hint=edge.monsters[0].hint;
     require(hint.max_col-hint.min_col==4&&hint.max_row-hint.min_row==4,"edge hint keeps full uncertainty area");
     require(hint.contains(edge.point(edge.player)),"edge region includes player");
     auto hidden=open_maze(41,41);hidden.player=hidden.id({37,37});
-    hidden.grid[hidden.id({20,20})]=WALL;hidden.rebuild_graph();hidden.monsters={monster(0,hidden.id({1,1}),10)};
-    hidden.move_player(0,1);require(hidden.monsters[0].state==MonsterState::Hunting,"no sight/hearing range gate");
+    hidden.grid[hidden.id({20,20})]=WALL;hidden.rebuild_graph();
+    hidden.monsters={monster(0,hidden.id({1,1}),10),monster(1,hidden.id({33,33}),10)};
+    hidden.move_player(0,1);
+    require(hidden.monsters[0].state==MonsterState::Patrolling,"hearing range gates distant monsters");
+    require(hidden.monsters[1].state==MonsterState::Hunting,"nearby monster hears through walls");
 }
 void test_waits_and_invalid_moves(){
-    auto m=open_maze();m.player=m.id({11,11});m.monsters={monster(0,m.id({1,1}),NEVER)};
+    auto m=open_maze();m.player=m.id({11,11});m.monsters={monster(0,m.id({5,5}),NEVER)};
     m.move_player(0,1);int revision=static_cast<int>(m.monsters[0].hint.revision);
+    require(revision==1,"fixture monster heard the move");
     for(int v:m.neighbors(m.player))if(v>=0)m.grid[v]=WALL;
     m.rebuild_graph();m.advance_to(100);
     require(!m.move_player(0,1),"blocked movement rejected");
     require(static_cast<int>(m.monsters[0].hint.revision)==revision,"blocked input does not broadcast");
     m.set_auto_solve(true);m.advance_to(560);
     require(m.automatic_steps==0,"auto only waited");
-    require(m.monsters[0].state==MonsterState::Patrolling,"auto waits do not keep hunt alive");
+    require(m.monsters[0].state!=MonsterState::Hunting,"auto waits do not keep hunt alive");
     require(m.timer_started&&m.elapsed_ms==560,"waiting timer continues");
 }
 void test_complete_overlay(){
@@ -110,7 +142,7 @@ std::string snapshot(const Maze&m){std::ostringstream s;s<<m.player<<' '<<m.now<
     return s.str();}
 // Independent witness check: remove an edge from one path and look for another.
 bool independent_two_paths(Maze& m){
-    std::vector<int> path;if(!m.astar(m.entrance,m.exit_cell,path))return false;
+    std::vector<int> path;if(!astar(m,m.entrance,m.exit_cell,path))return false;
     for(size_t cut=1;cut<path.size();++cut){
         int a=path[cut-1],b=path[cut];std::vector<unsigned char>seen(m.grid.size(),0);std::queue<int>q;
         q.push(m.entrance);seen[m.entrance]=1;
@@ -147,9 +179,9 @@ void test_two_solution_generation(){
 }
 void test_wait_for_scent_loss(){
     std::ostringstream log;auto m=open_maze(31,31,&log);m.monsters={monster(0,m.exit_cell,NEVER)};
-    m.move_player(0,1);int position=m.player;m.set_auto_solve(true);m.advance_to(560);
-    require(m.player==position&&m.automatic_steps==0,"blocked route prefers standing still");
-    require(m.monsters[0].state==MonsterState::Patrolling,"waiting lets hunting scent expire");
+    m.player=m.id({27,27});m.move_player(0,1);int position=m.player;m.set_auto_solve(true);m.advance_to(560);
+    require(m.player==position&&m.automatic_steps==0,"route blocked by a nearby monster prefers standing still");
+    require(m.monsters[0].state!=MonsterState::Hunting,"waiting lets hunting scent expire");
     require(m.elapsed_ms==560,"waiting preserves elapsed clock");check_overlay(m);
     require(!m.overlay_avoids_monsters,"waiting retains full blocked overlay");
     require(log.str().find("standing still so monsters lose")!=std::string::npos,"waiting reason logged");
@@ -164,7 +196,7 @@ void test_regressions(){
         Maze m(9+seed%15,9+seed%17,seed,nullptr);m.generate(3);
         std::vector<int>blocked;for(auto x:m.monsters)blocked.push_back(x.cell);
         for(auto obstacles:std::vector<std::vector<int>>{{},blocked}){
-            std::vector<int>path;bool found=m.astar(m.player,m.exit_cell,path,obstacles);int d=bfs(m,m.player,m.exit_cell,obstacles);
+            std::vector<int>path;bool found=astar(m,m.player,m.exit_cell,path,obstacles);int d=bfs(m,m.player,m.exit_cell,obstacles);
             require(found==(d>=0),"A* reachability matches independent BFS");if(found)require(path.size()==static_cast<size_t>(d+1),"A* length optimal");
         }
         m.monsters.clear();int d=bfs(m,m.player,m.exit_cell);m.set_auto_solve(true);check_overlay(m);m.advance_to(100000);
@@ -183,9 +215,15 @@ void test_regressions(){
     }
 }
 void test_logs(){
-    std::ostringstream logs;Maze m(31,31,42,&logs);m.generate(2);m.move_player(0,1);m.advance_to(560);m.set_auto_solve(true);m.advance_to(600);m.set_auto_solve(false);
+    std::ostringstream logs;Maze m(31,31,42,&logs);m.generate(2);
+    for(int u=0;u<static_cast<int>(m.grid.size());++u)
+        if(m.walkable(u)&&m.manhattan(u,m.id({1,1}))>=3&&m.manhattan(u,m.id({1,1}))<=8){m.monsters[0].cell=u;break;}
+    m.move_player(0,1);m.advance_to(560);
+    auto solo=open_maze(15,15,&logs);solo.set_auto_solve(true);solo.advance_to(200);solo.set_auto_solve(false);
+    auto quiet=open_maze(15,15,&logs);quiet.player=quiet.id({7,7});quiet.monsters={monster(0,quiet.id({7,10}),NEVER)};
+    quiet.move_player(0,1);quiet.advance_to(quiet.settings.scent_ms+quiet.settings.search_ms);
     auto text=logs.str();
-    for(const char* marker:{"spawned at","Player MANUAL","Movement hint #","ROAMING -> HUNTING","HUNTING -> ROAMING","area target","Auto-solve activated","Full path to exit updated","Player AUTO","Auto-solve deactivated"})
+    for(const char* marker:{"spawned at","Player started | Monsters released","Player MANUAL","Movement hint #","Heard by","ROAMING -> HUNTING","HUNTING -> SEARCHING","SEARCHING -> ROAMING","area target","Auto-solve activated","Full path to exit updated","Player AUTO","Auto-solve deactivated"})
         require(text.find(marker)!=std::string::npos,marker);
     require(text.find('\r')==std::string::npos,"logs append without carriage-return overwrites");
     m.log_status();require(logs.str().find("Manual steps:")!=std::string::npos,"player statistics logged");

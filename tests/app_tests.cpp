@@ -1,6 +1,6 @@
 #define MAZERUNNER_NO_MAIN
 #define MAZERUNNER_APP_TEST
-#include "../src/mazerunnerV5.4.1.cpp"
+#include "../src/mazerunnerV5.4.2.cpp"
 #include "egl_test_context.h"
 #include <thread>
 
@@ -40,6 +40,9 @@ int main(){try{
         click(w,Control::Width);character_callback(&w,'2');character_callback(&w,'0');
         key(w,GLFW_KEY_ENTER);
         require(app.ui.screen==Screen::Setup&&app.ui.focus==Control::Start,"Enter commits field without starting");
+        click(w,Control::Height);key(w,GLFW_KEY_ESCAPE);
+        require(!app.ui.quit&&app.ui.screen==Screen::Setup&&app.ui.focus==Control::Start,"Esc leaves a text field without quitting");
+        key(w,GLFW_KEY_ESCAPE);require(!app.ui.quit&&app.ui.screen==Screen::Setup,"Esc on setup never quits");
         key(w,GLFW_KEY_ENTER);require(app.ui.screen==Screen::Loading,"keyboard Start enters loading");
         app.draw(1280,960);app.begin_generation();app.begin_generation();ready(app);
         require(app.maze->cols==21&&app.maze->rows==33&&app.maze->monsters.size()==5,"form transferred to maze");
@@ -53,6 +56,20 @@ int main(){try{
         require(app.maze->auto_solve,"G enables auto-solve");
         key(w,GLFW_KEY_G,0,GLFW_REPEAT);require(app.maze->auto_solve,"held key does not repeatedly toggle");
         click(w,Control::AutoSolve);require(!app.maze->auto_solve,"HUD toggles auto-solve off");
+        {   // Hold-to-move on an opened copy of the terrain, with no monsters.
+            auto& m=*app.maze;
+            for(int r=1;r<m.rows-1;++r)for(int c=1;c<m.cols-1;++c)m.grid[m.id({r,c})]=PATH;
+            m.rebuild_graph();m.monsters.clear();int start=m.player;
+            key(w,GLFW_KEY_D);require(m.player==start+1,"first press moves immediately");
+            app.tick(200);require(m.player==start+1,"hold waits for the repeat delay");
+            app.tick(20);require(m.player==start+2,"holding keeps walking");
+            app.tick(240);require(m.player==start+4,"repeat cadence is steady");
+            key(w,GLFW_KEY_D,0,GLFW_RELEASE);app.tick(500);require(m.player==start+4,"release stops walking");
+            key(w,GLFW_KEY_D,0,GLFW_REPEAT);require(m.player==start+4,"OS key-repeat events are ignored");
+            key(w,GLFW_KEY_S);focus_callback(&w,0);focus_callback(&w,1);click(w,Control::Resume);
+            int held=m.player;app.tick(1000);require(m.player==held,"focus loss cancels a held direction");
+            now=m.now;
+        }
         scroll_callback(&w,0,2);require(app.renderer->zoom_factor()>1,"mouse wheel zoom");
         key(w,GLFW_KEY_HOME);require(app.renderer->zoom_factor()==1,"Home fits map");
         focus_callback(&w,0);require(app.ui.screen==Screen::Paused,"focus loss pauses");

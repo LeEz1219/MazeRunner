@@ -1,10 +1,11 @@
 cmake_minimum_required(VERSION 3.20)
-project(MazeRunner VERSION 5.4.1 LANGUAGES CXX)
+project(MazeRunner VERSION 5.4.2 LANGUAGES CXX)
 
 # Configure out of source: cmake -S . -B build/cmake -DCMAKE_BUILD_TYPE=Release
 option(MAZERUNNER_BUILD_GRAPHICS "Build the GLFW/OpenGL game" ON)
 option(MAZERUNNER_BUILD_HEADLESS "Build the simulator without graphics dependencies" ON)
 option(MAZERUNNER_WARNINGS_AS_ERRORS "Treat compiler warnings as errors" OFF)
+option(MAZERUNNER_EGL_TESTS "Build real-OpenGL app/render tests with EGL (Linux, Mesa)" ON)
 include(CTest) # Defines BUILD_TESTING and enables CTest when requested.
 find_package(Threads REQUIRED)
 
@@ -13,20 +14,23 @@ if(NOT CMAKE_CONFIGURATION_TYPES AND NOT CMAKE_BUILD_TYPE)
 endif()
 
 # Accept either the extracted documentation bundle or a standalone source/file pair.
-if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/src/mazerunnerV5.4.1.cpp")
-    set(_maze_default_source "${CMAKE_CURRENT_SOURCE_DIR}/src/mazerunnerV5.4.1.cpp")
+set(_maze_file "mazerunnerV${PROJECT_VERSION}.cpp")
+if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/src/${_maze_file}")
+    set(_maze_default_source "${CMAKE_CURRENT_SOURCE_DIR}/src/${_maze_file}")
 else()
-    set(_maze_default_source "${CMAKE_CURRENT_SOURCE_DIR}/mazerunnerV5.4.1.cpp")
+    set(_maze_default_source "${CMAKE_CURRENT_SOURCE_DIR}/${_maze_file}")
 endif()
-set(MAZERUNNER_SOURCE "${_maze_default_source}" CACHE FILEPATH "MazeRunner V5.4.1 source file")
+set(MAZERUNNER_SOURCE "${_maze_default_source}" CACHE FILEPATH "MazeRunner V${PROJECT_VERSION} source file")
 if(NOT EXISTS "${MAZERUNNER_SOURCE}")
-    message(FATAL_ERROR "Source not found: ${MAZERUNNER_SOURCE}. Place mazerunnerV5.4.1.cpp beside CMakeLists.txt or under src/, or set MAZERUNNER_SOURCE.")
+    message(FATAL_ERROR "Source not found: ${MAZERUNNER_SOURCE}. Place ${_maze_file} beside CMakeLists.txt or under src/, or set MAZERUNNER_SOURCE.")
 endif()
 
 # Keep output paths identical for Makefiles, Ninja, and multi-configuration IDEs.
 function(maze_configure_target target output_name)
     target_compile_features(${target} PRIVATE cxx_std_17)
     target_link_libraries(${target} PRIVATE Threads::Threads)
+    # One version string everywhere; the source falls back to the same default.
+    target_compile_definitions(${target} PRIVATE MAZERUNNER_VERSION="${PROJECT_VERSION}")
     set_target_properties(${target} PROPERTIES
         CXX_EXTENSIONS OFF
         OUTPUT_NAME "${output_name}"
@@ -86,7 +90,7 @@ if(MAZERUNNER_BUILD_GRAPHICS)
 
     # Intentionally retain the console on Windows so player/monster logs remain visible.
     add_executable(mazerunner "${MAZERUNNER_SOURCE}")
-    maze_configure_target(mazerunner "mazerunnerV5.4.1")
+    maze_configure_target(mazerunner "mazerunnerV${PROJECT_VERSION}")
     target_link_libraries(mazerunner PRIVATE ${_maze_glfw} ${_maze_glew} OpenGL::GL)
     get_target_property(_maze_glfw_type ${_maze_glfw} TYPE)
     if(WIN32 AND _maze_glfw_type STREQUAL "SHARED_LIBRARY")
@@ -105,28 +109,55 @@ if(BUILD_TESTING)
     # Do not add MAZERUNNER_SOURCE as a second translation unit here.
     if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/tests/ui_tests.cpp")
         get_filename_component(_maze_selected_source "${MAZERUNNER_SOURCE}" REALPATH)
-        get_filename_component(_maze_test_source "${CMAKE_CURRENT_SOURCE_DIR}/src/mazerunnerV5.4.1.cpp" REALPATH)
+        get_filename_component(_maze_test_source "${CMAKE_CURRENT_SOURCE_DIR}/src/${_maze_file}" REALPATH)
         if(NOT _maze_selected_source STREQUAL _maze_test_source)
-            message(FATAL_ERROR "Bundled tests include src/mazerunnerV5.4.1.cpp. Use that source or set BUILD_TESTING=OFF when selecting a different MAZERUNNER_SOURCE.")
+            message(FATAL_ERROR "Bundled tests include src/${_maze_file}. Use that source or set BUILD_TESTING=OFF when selecting a different MAZERUNNER_SOURCE.")
         endif()
         add_executable(maze-regressions tests/ui_tests.cpp)
         maze_configure_target(maze-regressions "maze-regressions")
         add_test(NAME gameplay-and-ui COMMAND maze-regressions)
         set_tests_properties(gameplay-and-ui PROPERTIES TIMEOUT 300)
+
+        # Real-OpenGL suites: offscreen EGL (Mesa surfaceless) with injected GLFW
+        # callbacks. They need libEGL/libGL but no GLFW, GLEW, or display server.
+        if(MAZERUNNER_EGL_TESTS AND UNIX AND NOT APPLE)
+            find_library(MAZERUNNER_EGL_LIBRARY NAMES EGL libEGL.so.1)
+            find_library(MAZERUNNER_GL_LIBRARY NAMES GL libGL.so.1)
+            if(MAZERUNNER_EGL_LIBRARY AND MAZERUNNER_GL_LIBRARY)
+                file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/artifacts/screenshots")
+                foreach(_suite IN ITEMS render app)
+                    if(_suite STREQUAL "render")
+                        set(_stubs "${CMAKE_CURRENT_SOURCE_DIR}/tests/support/egl")
+                    else()
+                        set(_stubs "${CMAKE_CURRENT_SOURCE_DIR}/tests/support/app")
+                    endif()
+                    add_executable(maze-${_suite}-tests tests/${_suite}_tests.cpp)
+                    maze_configure_target(maze-${_suite}-tests "maze-${_suite}-tests")
+                    target_include_directories(maze-${_suite}-tests PRIVATE "${_stubs}")
+                    target_link_libraries(maze-${_suite}-tests PRIVATE "${MAZERUNNER_EGL_LIBRARY}" "${MAZERUNNER_GL_LIBRARY}")
+                    add_test(NAME ${_suite}-egl COMMAND maze-${_suite}-tests)
+                    set_tests_properties(${_suite}-egl PROPERTIES TIMEOUT 600
+                        WORKING_DIRECTORY "${CMAKE_BINARY_DIR}")
+                endforeach()
+            else()
+                message(STATUS "EGL/GL libraries not found; skipping real-OpenGL app/render tests.")
+            endif()
+        endif()
     else()
         message(STATUS "Portable test sources are absent; building the standalone game/simulator only.")
     endif()
 
     if(TARGET maze-headless)
         add_test(NAME cli-help COMMAND maze-headless --help)
+        string(REPLACE "." "\\." _maze_version_regex "${PROJECT_VERSION}")
         set_tests_properties(cli-help PROPERTIES
-            PASS_REGULAR_EXPRESSION "Maze Runner V5\\.4\\.1" TIMEOUT 30)
+            PASS_REGULAR_EXPRESSION "Maze Runner V${_maze_version_regex}" TIMEOUT 30)
         foreach(size IN ITEMS 33 63 101)
             foreach(difficulty IN ITEMS low medium high)
                 add_test(NAME "smoke-${size}-${difficulty}" COMMAND maze-headless
                     --simulate ${size} ${size} 10 42 1000 --difficulty ${difficulty} --quiet)
                 set_tests_properties("smoke-${size}-${difficulty}" PROPERTIES
-                    PASS_REGULAR_EXPRESSION "Maze Runner V5\\.4\\.1.*${size}x${size}.*monsters=10"
+                    PASS_REGULAR_EXPRESSION "Maze Runner V${_maze_version_regex}.*${size}x${size}.*monsters=10"
                     TIMEOUT 300)
             endforeach()
         endforeach()
