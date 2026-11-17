@@ -1,4 +1,4 @@
-#include "visual_tests.cpp"
+#include "v542_tests.cpp"
 
 void test_setup_inputs(){
     UiState ui;int r=0,c=0,n=0;
@@ -71,7 +71,7 @@ void test_screen_transitions(){
     ui.activate(Control::Quit);require(ui.quit,"Quit is available without terminal");
 }
 int main(){try{
-    require(visual_regression_main()==0,"all previous regression tests");
+    require(v542_regression_main()==0,"all previous regression tests");
     test_setup_inputs();test_pointer_and_keyboard_focus();test_screen_transitions();
     std::cout<<"PASS: setup validation, all controls, text input, bounds, DPI hit testing, keyboard navigation, and screen transitions.\n";
 }catch(const std::exception& e){std::cerr<<e.what()<<'\n';return 1;}}

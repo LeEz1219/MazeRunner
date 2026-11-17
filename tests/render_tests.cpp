@@ -1,6 +1,6 @@
 #define MAZERUNNER_NO_MAIN
 #define MAZERUNNER_RENDER_TEST
-#include "../src/mazerunnerV5.4.1.cpp"
+#include "../src/mazerunnerV5.4.2.cpp"
 #include <fstream>
 extern "C" {
 void* eglGetPlatformDisplay(unsigned,void*,const std::intptr_t*);

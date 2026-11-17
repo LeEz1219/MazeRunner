@@ -30,7 +30,7 @@ void test_difficulty_input(){
 
 void test_movement_and_hint_profiles(){
     for(auto d:{Difficulty::Low,Difficulty::Medium,Difficulty::High}){
-        auto m=fixture(d);m.player=m.id({25,25});m.monsters={monster(0,m.id({1,1}),NEVER)};
+        auto m=fixture(d);m.player=m.id({25,25});m.monsters={monster(0,m.id({20,20}),NEVER)};
         m.move_player(0,1);
         require(m.monsters[0].state==MonsterState::Hunting&&m.monsters[0].hint.revision==1,"first movement alerts every difficulty immediately");
         require(m.monsters[0].hint.max_row-m.monsters[0].hint.min_row+1==m.settings.hint_area_size,"normal hint uses selected area");
@@ -46,10 +46,13 @@ void test_movement_and_hint_profiles(){
         require(m.monsters[0].state==MonsterState::Hunting,"scent tracks last displacement, not last report");
         require(m.monsters[0].hint.revision==revision,"no delayed hint flush while stationary");
         m.advance_to(240+m.settings.scent_ms);
-        require(m.monsters[0].state==MonsterState::Patrolling,"profile scent expires at exact deadline");
+        require(m.monsters[0].state==MonsterState::Searching,"profile scent expires at exact deadline");
         m.move_player(0,-1);require(m.monsters[0].state==MonsterState::Hunting&&m.monsters[0].hint.revision>revision,"first resumed movement immediately alerts again");
         auto moving=fixture(d);moving.player=moving.id({45,45});
-        auto x=monster(0,moving.id({1,1}),100);x.target=moving.id({1,40});x.next_replan=NEVER;moving.monsters={x};
+        auto x=monster(0,moving.id({1,1}),100);x.target=moving.id({1,40});x.next_replan=NEVER;
+        auto frozen=fixture(d);frozen.player=frozen.id({45,45});frozen.monsters={x};
+        frozen.advance_to(1000);require(frozen.monsters[0].cell==x.cell&&frozen.monsters[0].next_move==100,"monsters stay frozen until the first input");
+        moving.monsters={x};require(moving.move_player(0,-1),"first input releases monsters");
         moving.advance_to(99);require(moving.monsters[0].cell==x.cell,"monster waits for its deadline");
         moving.advance_to(100);require(moving.monsters[0].cell==moving.id({1,2}),"monster moves at deadline");
         require(moving.monsters[0].next_move==100+moving.settings.monster_move_ms,"monster schedules selected interval");
@@ -59,9 +62,9 @@ void test_movement_and_hint_profiles(){
         threat.monsters={monster(0,threat.id({25,26}),10),monster(1,threat.exit_cell,NEVER)};
         auto route=threat.plan_auto_route();require(route.size()>1&&route[1]!=threat.player,"imminent threat overrides scent wait at every speed");
         auto waiting=fixture(d);waiting.monsters={monster(0,waiting.exit_cell,NEVER)};
-        waiting.move_player(0,1);int start=waiting.player;waiting.set_auto_solve(true);
+        waiting.player=waiting.id({47,47});waiting.move_player(0,1);int start=waiting.player;waiting.set_auto_solve(true);
         waiting.advance_to(waiting.settings.scent_ms);
-        require(waiting.player==start&&waiting.monsters[0].state==MonsterState::Patrolling,"auto wait sheds profile-specific scent");
+        require(waiting.player==start&&waiting.monsters[0].state!=MonsterState::Hunting,"auto wait sheds profile-specific scent");
         waiting.advance_to(2*waiting.settings.scent_ms+40);
         require(waiting.player!=start,"profile wait budget is bounded");
         bool reached=false;
@@ -70,7 +73,7 @@ void test_movement_and_hint_profiles(){
             if(waiting.auto_recovery_target()==waiting.player){
                 int rested=waiting.player;Millis arrived=waiting.now;
                 waiting.advance_to(arrived+waiting.settings.scent_ms);
-                require(waiting.player==rested&&waiting.monsters[0].state==MonsterState::Patrolling,"post-retreat pause adapts to scent duration");
+                require(waiting.player==rested&&waiting.monsters[0].state!=MonsterState::Hunting,"post-retreat pause adapts to scent duration");
                 reached=true;break;
             }
         }
@@ -80,23 +83,24 @@ void test_movement_and_hint_profiles(){
 
 void test_director_profiles(){
     for(auto d:{Difficulty::Low,Difficulty::Medium,Difficulty::High}){
-        auto m=fixture(d);m.player=m.id({25,25});m.monsters={monster(0,m.id({1,1}),NEVER)};m.move_player(0,1);
+        auto m=fixture(d);m.player=m.id({25,25});m.monsters={monster(0,m.id({20,20}),NEVER)};m.move_player(0,1);
         int first_tick=((m.settings.confinement_ms+DIRECTOR_TICK_MS-1)/DIRECTOR_TICK_MS)*DIRECTOR_TICK_MS;
         oscillate(m,first_tick-100);m.advance_to(first_tick-1);
         require(m.director_hint_width()==m.settings.hint_area_size,"relief does not start early");
         m.monsters[0].target=m.id({25,25});m.advance_to(first_tick);
         require(m.director_hint_width()==m.settings.hint_area_size+2*m.settings.padding_step,"confinement widens selected profile");
         require(m.monsters[0].target==-1,"expansion invalidates tighter target");
-        m.advance_to(first_tick+m.settings.relief_ms-1);
+        oscillate(m,first_tick+m.settings.relief_ms-100);m.advance_to(first_tick+m.settings.relief_ms-1);
         require(m.director_hint_width()==m.settings.hint_area_size+2*m.settings.padding_step,"relief stage holds for profile duration");
         m.advance_to(first_tick+m.settings.relief_ms);
         require(m.director_hint_width()==m.settings.hint_area_size+4*m.settings.padding_step,"persistent confinement escalates selected profile");
-        require(m.monsters[0].state==MonsterState::Patrolling,"escalation does not revive expired scent");
-        m.advance_to(first_tick+8*m.settings.relief_ms);
+        int width=m.director_hint_width();m.advance_to(m.now+2*m.settings.relief_ms);
+        require(m.director_hint_width()==width,"idle time after confinement does not escalate further");
+        oscillate(m,first_tick+8*m.settings.relief_ms-100);m.advance_to(first_tick+8*m.settings.relief_ms);
         require(m.director_hint_width()==m.settings.hint_area_size+2*m.settings.max_padding,"relief respects maximum uncertainty");
         m.reset_game();require(m.director_hint_width()==m.settings.hint_area_size,"reset restores profile precision");
         for(auto dims:std::vector<std::pair<int,int>>{{5,5},{5,51},{51,5}}){
-            auto small=fixture(d,dims.first,dims.second);small.monsters={monster(0,small.exit_cell,NEVER)};
+            auto small=fixture(d,dims.first,dims.second);small.monsters={monster(0,small.id({3,1}),NEVER)};
             small.move_player(0,1);const auto&hint=small.monsters[0].hint;
             require(hint.min_row>=0&&hint.min_col>=0&&hint.max_row<small.rows&&hint.max_col<small.cols,"hint clipping never produces negative bounds");
             require(hint.contains(small.point(small.player)),"clipped hint contains player");

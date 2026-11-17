@@ -10,7 +10,7 @@ void test_bounded_wait_and_committed_retreat(){
     m.grid[m.entrance]=PATH;m.grid[m.exit_cell]=EXIT;m.rebuild_graph();m.reset_game();
     m.player=m.id({1,20});m.monsters={monster(0,m.id({1,23}),NEVER)};
     m.move_player(0,-1);int start=m.player;m.set_auto_solve(true);m.advance_to(560);
-    require(m.player==start&&m.monsters[0].state==MonsterState::Patrolling,"initial wait really sheds scent");
+    require(m.player==start&&m.monsters[0].state!=MonsterState::Hunting,"initial wait really sheds scent");
     m.advance_to(1160);
     require(m.player!=start,"exhausted wait budget starts moving");
     require(m.point(m.player).c<m.point(start).c,"retreat increases distance from blocked exit");
@@ -39,7 +39,7 @@ void oscillate(Maze& m,Millis until){
 void test_director_precision_and_privacy(){
     std::ostringstream log;auto a=open_maze(41,41,&log),b=open_maze(41,41);
     a.player=a.id({11,11});b.player=b.id({13,11});
-    for(auto* m:{&a,&b})m->monsters={monster(0,m->id({1,1}),NEVER),monster(1,m->id({1,3}),NEVER)};
+    for(auto* m:{&a,&b})m->monsters={monster(0,m->id({5,5}),NEVER),monster(1,m->id({5,7}),NEVER)};
     a.move_player(0,1);b.move_player(0,1);
     oscillate(a,3900);oscillate(b,3900);
     auto old=a.monsters[0].hint;
@@ -60,17 +60,20 @@ void test_director_precision_and_privacy(){
         a.monsters[i].next_move=NEVER;
     }
     a.advance_to(4460);
-    for(const auto& x:a.monsters)require(x.state==MonsterState::Patrolling&&x.hint.revision==0,"director does not extend original idle deadline");
-    a.advance_to(10000);require(a.director_hint_width()==21,"continued confinement escalates precision relief");
-    for(const auto&x:a.monsters)require(x.state==MonsterState::Patrolling,"director escalation cannot reawaken patrols");
+    for(const auto& x:a.monsters)require(x.state==MonsterState::Searching,"director does not extend original idle deadline");
+    a.advance_to(10000);require(a.director_hint_width()==13,"standing still is not confinement: relief does not escalate");
+    for(const auto&x:a.monsters)require(x.state==MonsterState::Patrolling,"director cannot reawaken patrols");
     a.move_player(0,1);
-    for(const auto&x:a.monsters)require(x.state==MonsterState::Hunting&&x.hint.max_row-x.hint.min_row+1==21,"next real movement broadcasts broader clue");
+    for(const auto&x:a.monsters)require(x.state==MonsterState::Hunting&&x.hint.max_row-x.hint.min_row+1==13,"next real movement broadcasts current relief clue");
+    oscillate(a,16100);a.advance_to(16200);
+    require(a.director_hint_width()==21,"continued moving confinement escalates precision relief");
+    for(const auto&x:a.monsters)require(x.hint.max_row-x.hint.min_row+1==21,"escalation re-tasks informed hunters with the broader clue");
     require(log.str().find("Director: RELIEF started")!=std::string::npos&&log.str().find("RELIEF increased")!=std::string::npos,"director transitions logged");
     a.reset_game();require(a.director_hint_width()==5&&a.auto_recovery_target()==-1,"reset clears director and recovery state");
 }
 
 void test_director_recovers_without_flicker(){
-    auto m=open_maze(41,41);m.player=m.id({11,11});m.monsters={monster(0,m.id({1,1}),NEVER)};
+    auto m=open_maze(41,41);m.player=m.id({11,11});m.monsters={monster(0,m.id({20,25}),NEVER)};
     m.move_player(0,1);oscillate(m,3900);m.advance_to(4000);
     require(m.director_hint_width()==13,"relief is active");
     for(int i=0;i<18;++i){m.advance_to(4200+i*200);m.move_player(0,1);}
@@ -99,10 +102,25 @@ void test_director_event_partition_and_stall_regressions(){
     }
 }
 
+// V5.4.2: a manual player who simply stands still must not earn wider clues.
+void test_idle_player_gets_no_relief(){
+    for(auto d:{Difficulty::Medium,Difficulty::High}){
+        int relief=0;
+        for(unsigned seed=1;seed<=40;++seed){
+            Maze m(33,33,seed,nullptr,d);m.generate(5);
+            if(!m.move_player(0,1))continue;
+            int base=m.director_hint_width();m.advance_to(m.settings.confinement_ms+1500);
+            relief+=m.outcome==Outcome::Playing&&m.director_hint_width()>base;
+        }
+        require(relief==0,"idle manual player never receives director relief");
+    }
+}
+
 int director_regression_main(){try{
     test_movement_contract();test_no_exact_location_leak();test_waits_and_invalid_moves();test_complete_overlay();
     test_two_solution_generation();test_wait_for_scent_loss();test_regressions();test_logs();
     test_bounded_wait_and_committed_retreat();test_alternate_branch_backtracking();
     test_director_precision_and_privacy();test_director_recovers_without_flicker();test_director_event_partition_and_stall_regressions();
+    test_idle_player_gets_no_relief();
     std::cout<<"PASS: "<<checks<<" assertions across director, recovery, path, generation, and gameplay regressions.\n";return 0;
 }catch(const std::exception&e){std::cerr<<e.what()<<'\n';return 1;}}
