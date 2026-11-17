@@ -1,0 +1,2 @@
+Maze setup failed: injected generation failure
+PASS: real-GL application lifecycle, async generation, input callbacks, pause clocks, focus loss, replay seeds, results, DPI, and worker failure recovery.

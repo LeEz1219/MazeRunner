@@ -1,0 +1,23 @@
+{
+  "source_sha256": "19affcaf73d4f7acc3578b53b1e5f8a0a0debe11beb2ecf8e365773b2e9ee1ae",
+  "physical_lines": 2643,
+  "annotated_lines": 2643,
+  "missing_lines": [],
+  "function_index_entries": 136,
+  "annotation_categories": {
+    "access": 8,
+    "blank": 102,
+    "comment": 247,
+    "glyph": 23,
+    "include": 21,
+    "palette": 16,
+    "preprocessor": 4,
+    "registry": 10,
+    "semantic": 1767,
+    "sprite-boundary": 12,
+    "sprite-definition": 12,
+    "sprite-row": 120,
+    "structure": 284,
+    "widget": 17
+  }
+}

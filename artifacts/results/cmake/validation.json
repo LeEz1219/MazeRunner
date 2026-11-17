@@ -1,0 +1,219 @@
+{
+  "recorded_utc": "2026-11-17T21:29:44.268613+00:00",
+  "cmake_configure_build_ctest_status": "not_run",
+  "reason": "CMake is not installed. The package installer found no available CMake distribution; the official binary download returned HTTP 403. Native GLFW/GLEW development files are also unavailable.",
+  "scope": "Direct compiler validation using GNU Release-equivalent flags; this is not a CMake or CTest execution.",
+  "source_sha256": "19affcaf73d4f7acc3578b53b1e5f8a0a0debe11beb2ecf8e365773b2e9ee1ae",
+  "direct_compiler_checks_status": "passed",
+  "checks": [
+    {
+      "name": "release-regressions-build",
+      "command": [
+        "g++",
+        "tests/ui_tests.cpp",
+        "-std=c++17",
+        "-O3",
+        "-DNDEBUG",
+        "-Wall",
+        "-Wextra",
+        "-Wpedantic",
+        "-Werror",
+        "-pthread",
+        "-o",
+        "build/cmake-equivalent/maze-regressions"
+      ],
+      "exit_code": 0,
+      "seconds": 8.294
+    },
+    {
+      "name": "release-regressions",
+      "command": [
+        "./build/cmake-equivalent/maze-regressions"
+      ],
+      "exit_code": 0,
+      "seconds": 0.69
+    },
+    {
+      "name": "release-headless-build",
+      "command": [
+        "g++",
+        "src/mazerunnerV5.4.1.cpp",
+        "-std=c++17",
+        "-O3",
+        "-DNDEBUG",
+        "-Wall",
+        "-Wextra",
+        "-Wpedantic",
+        "-Werror",
+        "-pthread",
+        "-DMAZERUNNER_HEADLESS",
+        "-o",
+        "build/cmake-equivalent/maze-headless"
+      ],
+      "exit_code": 0,
+      "seconds": 4.514
+    },
+    {
+      "name": "cli-help",
+      "command": [
+        "./build/cmake-equivalent/maze-headless",
+        "--help"
+      ],
+      "exit_code": 0,
+      "seconds": 0.003
+    },
+    {
+      "name": "smoke-33-low",
+      "command": [
+        "./build/cmake-equivalent/maze-headless",
+        "--simulate",
+        "33",
+        "33",
+        "10",
+        "42",
+        "1000",
+        "--difficulty",
+        "low",
+        "--quiet"
+      ],
+      "exit_code": 0,
+      "seconds": 0.003
+    },
+    {
+      "name": "smoke-33-medium",
+      "command": [
+        "./build/cmake-equivalent/maze-headless",
+        "--simulate",
+        "33",
+        "33",
+        "10",
+        "42",
+        "1000",
+        "--difficulty",
+        "medium",
+        "--quiet"
+      ],
+      "exit_code": 0,
+      "seconds": 0.004
+    },
+    {
+      "name": "smoke-33-high",
+      "command": [
+        "./build/cmake-equivalent/maze-headless",
+        "--simulate",
+        "33",
+        "33",
+        "10",
+        "42",
+        "1000",
+        "--difficulty",
+        "high",
+        "--quiet"
+      ],
+      "exit_code": 0,
+      "seconds": 0.004
+    },
+    {
+      "name": "smoke-63-low",
+      "command": [
+        "./build/cmake-equivalent/maze-headless",
+        "--simulate",
+        "63",
+        "63",
+        "10",
+        "42",
+        "1000",
+        "--difficulty",
+        "low",
+        "--quiet"
+      ],
+      "exit_code": 0,
+      "seconds": 0.007
+    },
+    {
+      "name": "smoke-63-medium",
+      "command": [
+        "./build/cmake-equivalent/maze-headless",
+        "--simulate",
+        "63",
+        "63",
+        "10",
+        "42",
+        "1000",
+        "--difficulty",
+        "medium",
+        "--quiet"
+      ],
+      "exit_code": 0,
+      "seconds": 0.008
+    },
+    {
+      "name": "smoke-63-high",
+      "command": [
+        "./build/cmake-equivalent/maze-headless",
+        "--simulate",
+        "63",
+        "63",
+        "10",
+        "42",
+        "1000",
+        "--difficulty",
+        "high",
+        "--quiet"
+      ],
+      "exit_code": 0,
+      "seconds": 0.008
+    },
+    {
+      "name": "smoke-101-low",
+      "command": [
+        "./build/cmake-equivalent/maze-headless",
+        "--simulate",
+        "101",
+        "101",
+        "10",
+        "42",
+        "1000",
+        "--difficulty",
+        "low",
+        "--quiet"
+      ],
+      "exit_code": 0,
+      "seconds": 0.017
+    },
+    {
+      "name": "smoke-101-medium",
+      "command": [
+        "./build/cmake-equivalent/maze-headless",
+        "--simulate",
+        "101",
+        "101",
+        "10",
+        "42",
+        "1000",
+        "--difficulty",
+        "medium",
+        "--quiet"
+      ],
+      "exit_code": 0,
+      "seconds": 0.021
+    },
+    {
+      "name": "smoke-101-high",
+      "command": [
+        "./build/cmake-equivalent/maze-headless",
+        "--simulate",
+        "101",
+        "101",
+        "10",
+        "42",
+        "1000",
+        "--difficulty",
+        "high",
+        "--quiet"
+      ],
+      "exit_code": 0,
+      "seconds": 0.015
+    }
+  ]
+}

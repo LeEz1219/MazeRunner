@@ -1,0 +1,36 @@
+{
+  "recorded_utc": "2026-11-17T20:23:45.926610+00:00",
+  "status": "passed",
+  "checks": {
+    "source_unmodified": true,
+    "exactly_three_markdown_files": true,
+    "eighteen_png_screenshots": true,
+    "raw_validation_passed": true,
+    "smoke_matrix_complete": true,
+    "line_coverage_complete": true,
+    "02-AI-Graphics-and-Redesign.md_fences_balanced": true,
+    "02-AI-Graphics-and-Redesign.md_no_internal_paths": true,
+    "01-Source-Line-by-Line.md_fences_balanced": true,
+    "01-Source-Line-by-Line.md_no_internal_paths": true,
+    "03-Build-Test-and-Reproduce.md_fences_balanced": true,
+    "03-Build-Test-and-Reproduce.md_no_internal_paths": true,
+    "cmake_file_included": true
+  },
+  "visual_review": [
+    "preset-101.png",
+    "hud.png",
+    "result.png",
+    "monsters.png"
+  ],
+  "review_notes": [
+    "Reviewed Large preset values/highlight, full route HUD, actual escape result, and ten-monster gallery.",
+    "Native GLFW desktop startup and macOS/Windows builds were not executed.",
+    "Portable/regression assertion counters are cumulative, not independent simulation totals."
+  ],
+  "cmake_addendum": {
+    "recorded_utc": "2026-11-17T21:32:31.509923+00:00",
+    "cmake_configure_build_ctest": "not_run",
+    "direct_gcc_release_equivalent_checks": "passed",
+    "details": "artifacts/results/cmake/validation.json"
+  }
+}

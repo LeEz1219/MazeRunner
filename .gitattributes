@@ -1,0 +1,3 @@
+# Preserve the original package hashes, including on Windows checkouts.
+* -text
+*.png binary
