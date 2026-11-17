@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Rebuild and test the packaged V5.4.1 source; run from any working directory."""
+"""Rebuild and test the V5.4.2 source; run from any working directory."""
 import argparse, datetime, hashlib, json, os, pathlib, platform, subprocess, sys, time
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
@@ -41,7 +41,7 @@ def ppm_to_png(path):
     output=b'\x89PNG\r\n\x1a\n'+chunk(b'IHDR',struct.pack('>IIBBBBB',w,h,8,2,0,0,0))+chunk(b'IDAT',zlib.compress(scan,9))+chunk(b'IEND',b'')
     path.with_suffix('.png').write_bytes(output)
 
-source='src/mazerunnerV5.4.1.cpp'
+source='src/mazerunnerV5.4.2.cpp'
 flags=['-std=c++17','-Wall','-Wextra','-Wpedantic','-Werror','-pthread']
 status=0
 try:
