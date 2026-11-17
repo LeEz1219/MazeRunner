@@ -1,0 +1,507 @@
+{
+  "status": "passed",
+  "checks": [
+    {
+      "name": "compiler",
+      "command": [
+        "g++",
+        "--version"
+      ],
+      "exit_code": 0,
+      "seconds": 0.002,
+      "status": "passed"
+    },
+    {
+      "name": "build-headless",
+      "command": [
+        "g++",
+        "src/mazerunnerV5.4.1.cpp",
+        "-std=c++17",
+        "-Wall",
+        "-Wextra",
+        "-Wpedantic",
+        "-Werror",
+        "-pthread",
+        "-O2",
+        "-DMAZERUNNER_HEADLESS",
+        "-o",
+        "build/maze-headless"
+      ],
+      "exit_code": 0,
+      "seconds": 4.497,
+      "status": "passed"
+    },
+    {
+      "name": "help",
+      "command": [
+        "./build/maze-headless",
+        "--help"
+      ],
+      "exit_code": 0,
+      "seconds": 0.003,
+      "status": "passed"
+    },
+    {
+      "name": "build-regressions",
+      "command": [
+        "g++",
+        "tests/ui_tests.cpp",
+        "-std=c++17",
+        "-Wall",
+        "-Wextra",
+        "-Wpedantic",
+        "-Werror",
+        "-pthread",
+        "-O2",
+        "-o",
+        "build/regressions"
+      ],
+      "exit_code": 0,
+      "seconds": 6.922,
+      "status": "passed"
+    },
+    {
+      "name": "gameplay-and-ui",
+      "command": [
+        "./build/regressions"
+      ],
+      "exit_code": 0,
+      "seconds": 0.709,
+      "status": "passed"
+    },
+    {
+      "name": "build-sanitizers",
+      "command": [
+        "g++",
+        "tests/ui_tests.cpp",
+        "-std=c++17",
+        "-Wall",
+        "-Wextra",
+        "-Wpedantic",
+        "-Werror",
+        "-pthread",
+        "-O1",
+        "-g",
+        "-fsanitize=address,undefined",
+        "-o",
+        "build/regressions-asan"
+      ],
+      "exit_code": 0,
+      "seconds": 17.787,
+      "status": "passed"
+    },
+    {
+      "name": "sanitizers",
+      "command": [
+        "./build/regressions-asan"
+      ],
+      "exit_code": 0,
+      "seconds": 6.545,
+      "status": "passed"
+    },
+    {
+      "name": "preset-33-low",
+      "command": [
+        "./build/maze-headless",
+        "--simulate",
+        "33",
+        "33",
+        "10",
+        "42",
+        "1000",
+        "--difficulty",
+        "low",
+        "--quiet"
+      ],
+      "exit_code": 0,
+      "seconds": 0.005,
+      "status": "passed"
+    },
+    {
+      "name": "preset-33-low-repeat",
+      "command": [
+        "./build/maze-headless",
+        "--simulate",
+        "33",
+        "33",
+        "10",
+        "42",
+        "1000",
+        "--difficulty",
+        "low",
+        "--quiet"
+      ],
+      "exit_code": 0,
+      "seconds": 0.003,
+      "status": "passed"
+    },
+    {
+      "name": "preset-33-medium",
+      "command": [
+        "./build/maze-headless",
+        "--simulate",
+        "33",
+        "33",
+        "10",
+        "42",
+        "1000",
+        "--difficulty",
+        "medium",
+        "--quiet"
+      ],
+      "exit_code": 0,
+      "seconds": 0.004,
+      "status": "passed"
+    },
+    {
+      "name": "preset-33-medium-repeat",
+      "command": [
+        "./build/maze-headless",
+        "--simulate",
+        "33",
+        "33",
+        "10",
+        "42",
+        "1000",
+        "--difficulty",
+        "medium",
+        "--quiet"
+      ],
+      "exit_code": 0,
+      "seconds": 0.003,
+      "status": "passed"
+    },
+    {
+      "name": "preset-33-high",
+      "command": [
+        "./build/maze-headless",
+        "--simulate",
+        "33",
+        "33",
+        "10",
+        "42",
+        "1000",
+        "--difficulty",
+        "high",
+        "--quiet"
+      ],
+      "exit_code": 0,
+      "seconds": 0.004,
+      "status": "passed"
+    },
+    {
+      "name": "preset-33-high-repeat",
+      "command": [
+        "./build/maze-headless",
+        "--simulate",
+        "33",
+        "33",
+        "10",
+        "42",
+        "1000",
+        "--difficulty",
+        "high",
+        "--quiet"
+      ],
+      "exit_code": 0,
+      "seconds": 0.004,
+      "status": "passed"
+    },
+    {
+      "name": "preset-63-low",
+      "command": [
+        "./build/maze-headless",
+        "--simulate",
+        "63",
+        "63",
+        "10",
+        "42",
+        "1000",
+        "--difficulty",
+        "low",
+        "--quiet"
+      ],
+      "exit_code": 0,
+      "seconds": 0.007,
+      "status": "passed"
+    },
+    {
+      "name": "preset-63-low-repeat",
+      "command": [
+        "./build/maze-headless",
+        "--simulate",
+        "63",
+        "63",
+        "10",
+        "42",
+        "1000",
+        "--difficulty",
+        "low",
+        "--quiet"
+      ],
+      "exit_code": 0,
+      "seconds": 0.008,
+      "status": "passed"
+    },
+    {
+      "name": "preset-63-medium",
+      "command": [
+        "./build/maze-headless",
+        "--simulate",
+        "63",
+        "63",
+        "10",
+        "42",
+        "1000",
+        "--difficulty",
+        "medium",
+        "--quiet"
+      ],
+      "exit_code": 0,
+      "seconds": 0.007,
+      "status": "passed"
+    },
+    {
+      "name": "preset-63-medium-repeat",
+      "command": [
+        "./build/maze-headless",
+        "--simulate",
+        "63",
+        "63",
+        "10",
+        "42",
+        "1000",
+        "--difficulty",
+        "medium",
+        "--quiet"
+      ],
+      "exit_code": 0,
+      "seconds": 0.009,
+      "status": "passed"
+    },
+    {
+      "name": "preset-63-high",
+      "command": [
+        "./build/maze-headless",
+        "--simulate",
+        "63",
+        "63",
+        "10",
+        "42",
+        "1000",
+        "--difficulty",
+        "high",
+        "--quiet"
+      ],
+      "exit_code": 0,
+      "seconds": 0.008,
+      "status": "passed"
+    },
+    {
+      "name": "preset-63-high-repeat",
+      "command": [
+        "./build/maze-headless",
+        "--simulate",
+        "63",
+        "63",
+        "10",
+        "42",
+        "1000",
+        "--difficulty",
+        "high",
+        "--quiet"
+      ],
+      "exit_code": 0,
+      "seconds": 0.009,
+      "status": "passed"
+    },
+    {
+      "name": "preset-101-low",
+      "command": [
+        "./build/maze-headless",
+        "--simulate",
+        "101",
+        "101",
+        "10",
+        "42",
+        "1000",
+        "--difficulty",
+        "low",
+        "--quiet"
+      ],
+      "exit_code": 0,
+      "seconds": 0.016,
+      "status": "passed"
+    },
+    {
+      "name": "preset-101-low-repeat",
+      "command": [
+        "./build/maze-headless",
+        "--simulate",
+        "101",
+        "101",
+        "10",
+        "42",
+        "1000",
+        "--difficulty",
+        "low",
+        "--quiet"
+      ],
+      "exit_code": 0,
+      "seconds": 0.015,
+      "status": "passed"
+    },
+    {
+      "name": "preset-101-medium",
+      "command": [
+        "./build/maze-headless",
+        "--simulate",
+        "101",
+        "101",
+        "10",
+        "42",
+        "1000",
+        "--difficulty",
+        "medium",
+        "--quiet"
+      ],
+      "exit_code": 0,
+      "seconds": 0.019,
+      "status": "passed"
+    },
+    {
+      "name": "preset-101-medium-repeat",
+      "command": [
+        "./build/maze-headless",
+        "--simulate",
+        "101",
+        "101",
+        "10",
+        "42",
+        "1000",
+        "--difficulty",
+        "medium",
+        "--quiet"
+      ],
+      "exit_code": 0,
+      "seconds": 0.018,
+      "status": "passed"
+    },
+    {
+      "name": "preset-101-high",
+      "command": [
+        "./build/maze-headless",
+        "--simulate",
+        "101",
+        "101",
+        "10",
+        "42",
+        "1000",
+        "--difficulty",
+        "high",
+        "--quiet"
+      ],
+      "exit_code": 0,
+      "seconds": 0.018,
+      "status": "passed"
+    },
+    {
+      "name": "preset-101-high-repeat",
+      "command": [
+        "./build/maze-headless",
+        "--simulate",
+        "101",
+        "101",
+        "10",
+        "42",
+        "1000",
+        "--difficulty",
+        "high",
+        "--quiet"
+      ],
+      "exit_code": 0,
+      "seconds": 0.02,
+      "status": "passed"
+    },
+    {
+      "name": "graphical-syntax",
+      "command": [
+        "g++",
+        "src/mazerunnerV5.4.1.cpp",
+        "-std=c++17",
+        "-Wall",
+        "-Wextra",
+        "-Wpedantic",
+        "-Werror",
+        "-pthread",
+        "-Itests/support/syntax",
+        "-fsyntax-only"
+      ],
+      "exit_code": 0,
+      "seconds": 1.074,
+      "status": "passed"
+    },
+    {
+      "name": "build-render",
+      "command": [
+        "g++",
+        "tests/render_tests.cpp",
+        "-std=c++17",
+        "-Wall",
+        "-Wextra",
+        "-Wpedantic",
+        "-Werror",
+        "-pthread",
+        "-O2",
+        "-Itests/support/egl",
+        "-l:libEGL.so.1",
+        "-l:libGL.so.1",
+        "-o",
+        "build/render-tests"
+      ],
+      "exit_code": 0,
+      "seconds": 4.613,
+      "status": "passed"
+    },
+    {
+      "name": "render",
+      "command": [
+        "./build/render-tests"
+      ],
+      "exit_code": 0,
+      "seconds": 0.421,
+      "status": "passed"
+    },
+    {
+      "name": "build-app",
+      "command": [
+        "g++",
+        "tests/app_tests.cpp",
+        "-std=c++17",
+        "-Wall",
+        "-Wextra",
+        "-Wpedantic",
+        "-Werror",
+        "-pthread",
+        "-O2",
+        "-Itests/support/app",
+        "-l:libEGL.so.1",
+        "-l:libGL.so.1",
+        "-o",
+        "build/app-tests"
+      ],
+      "exit_code": 0,
+      "seconds": 5.079,
+      "status": "passed"
+    },
+    {
+      "name": "app",
+      "command": [
+        "./build/app-tests"
+      ],
+      "exit_code": 0,
+      "seconds": 0.088,
+      "status": "passed"
+    }
+  ]
+}

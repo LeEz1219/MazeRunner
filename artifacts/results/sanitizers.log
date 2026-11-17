@@ -1,0 +1,4 @@
+PASS: 1998665 assertions across director, recovery, path, generation, and gameplay regressions.
+PASS: 5587538 assertions including all difficulty profiles, input, timing, hints, diversity, and determinism.
+PASS: visual geometry and camera invariants plus all gameplay/difficulty regressions.
+PASS: setup validation, all controls, text input, bounds, DPI hit testing, keyboard navigation, and screen transitions.

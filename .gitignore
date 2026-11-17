@@ -1,0 +1,9 @@
+# Local build output and generated intermediate captures.
+/build/
+/cmake-build-*/
+/CMakeUserPresets.json
+/artifacts/screenshots/*.ppm
+__pycache__/
+*.py[cod]
+.DS_Store
+Thumbs.db

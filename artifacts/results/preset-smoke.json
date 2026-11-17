@@ -1,0 +1,83 @@
+[
+  {
+    "size": 33,
+    "difficulty": "low",
+    "monsters": 10,
+    "seed": 42,
+    "limit_ms": 1000,
+    "state": "Maze Runner V5.4.1 | difficulty=Low | seed=42 | 33x33 | monsters=10 | RUNNING | simulation_ms=1000 | auto_steps=4",
+    "repeat_equal": true
+  },
+  {
+    "size": 33,
+    "difficulty": "medium",
+    "monsters": 10,
+    "seed": 42,
+    "limit_ms": 1000,
+    "state": "Maze Runner V5.4.1 | difficulty=Medium | seed=42 | 33x33 | monsters=10 | RUNNING | simulation_ms=1000 | auto_steps=0",
+    "repeat_equal": true
+  },
+  {
+    "size": 33,
+    "difficulty": "high",
+    "monsters": 10,
+    "seed": 42,
+    "limit_ms": 1000,
+    "state": "Maze Runner V5.4.1 | difficulty=High | seed=42 | 33x33 | monsters=10 | RUNNING | simulation_ms=1000 | auto_steps=0",
+    "repeat_equal": true
+  },
+  {
+    "size": 63,
+    "difficulty": "low",
+    "monsters": 10,
+    "seed": 42,
+    "limit_ms": 1000,
+    "state": "Maze Runner V5.4.1 | difficulty=Low | seed=42 | 63x63 | monsters=10 | RUNNING | simulation_ms=1000 | auto_steps=25",
+    "repeat_equal": true
+  },
+  {
+    "size": 63,
+    "difficulty": "medium",
+    "monsters": 10,
+    "seed": 42,
+    "limit_ms": 1000,
+    "state": "Maze Runner V5.4.1 | difficulty=Medium | seed=42 | 63x63 | monsters=10 | RUNNING | simulation_ms=1000 | auto_steps=25",
+    "repeat_equal": true
+  },
+  {
+    "size": 63,
+    "difficulty": "high",
+    "monsters": 10,
+    "seed": 42,
+    "limit_ms": 1000,
+    "state": "Maze Runner V5.4.1 | difficulty=High | seed=42 | 63x63 | monsters=10 | RUNNING | simulation_ms=1000 | auto_steps=22",
+    "repeat_equal": true
+  },
+  {
+    "size": 101,
+    "difficulty": "low",
+    "monsters": 10,
+    "seed": 42,
+    "limit_ms": 1000,
+    "state": "Maze Runner V5.4.1 | difficulty=Low | seed=42 | 101x101 | monsters=10 | RUNNING | simulation_ms=1000 | auto_steps=25",
+    "repeat_equal": true
+  },
+  {
+    "size": 101,
+    "difficulty": "medium",
+    "monsters": 10,
+    "seed": 42,
+    "limit_ms": 1000,
+    "state": "Maze Runner V5.4.1 | difficulty=Medium | seed=42 | 101x101 | monsters=10 | RUNNING | simulation_ms=1000 | auto_steps=25",
+    "repeat_equal": true
+  },
+  {
+    "size": 101,
+    "difficulty": "high",
+    "monsters": 10,
+    "seed": 42,
+    "limit_ms": 1000,
+    "state": "Maze Runner V5.4.1 | difficulty=High | seed=42 | 101x101 | monsters=10 | RUNNING | simulation_ms=1000 | auto_steps=0",
+    "repeat_equal": true
+  }
+]
