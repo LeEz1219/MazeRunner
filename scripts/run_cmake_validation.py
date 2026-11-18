@@ -38,18 +38,20 @@ summary = {}
 try:
     version = run('cmake-version', ['cmake', '--version']).splitlines()[0]
     configure = ['cmake', '-S', '.', '-B', str(build), '-DCMAKE_BUILD_TYPE=Release',
-                 '-DMAZERUNNER_WARNINGS_AS_ERRORS=ON']
+                 '-DBUILD_TESTING=ON', '-DMAZERUNNER_WARNINGS_AS_ERRORS=ON']
     configure.append('-DMAZERUNNER_BUILD_GRAPHICS=' + ('OFF' if args.headless else 'ON'))
     if args.generator:
         configure[1:1] = ['-G', args.generator]
     run('configure', configure)
     run('build', ['cmake', '--build', str(build), '--parallel', str(args.jobs)])
-    output = run('ctest', ['ctest', '--test-dir', str(build), '--output-on-failure'])
+    output = run('ctest', ['ctest', '--test-dir', str(build), '--output-on-failure', '--no-tests=error'])
     match = re.search(r'(\d+)% tests passed, (\d+) tests failed out of (\d+)', output)
+    if not match or int(match.group(3)) == 0:
+        raise RuntimeError('CTest did not report a positive test count; see artifacts/results/cmake/ctest.log')
     tests = re.findall(r'Test\s+#\d+: (\S+) \.+\s+(\w+)', output)
     summary = dict(cmake=version, graphical_target=not args.headless, generator=args.generator or 'default',
-                   tests_total=int(match.group(3)) if match else None,
-                   tests_failed=int(match.group(2)) if match else None,
+                   tests_total=int(match.group(3)),
+                   tests_failed=int(match.group(2)),
                    tests=[dict(name=n, result=r) for n, r in tests],
                    executables=sorted(x.name for x in (build / 'bin').iterdir()))
 except Exception as exc:

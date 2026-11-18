@@ -5,7 +5,9 @@ Run after an intended change to the source, guides, tests, or regenerated artifa
 It reads what is on disk; it does not build or run anything. Afterwards,
 scripts/verify_package.py checks the tree against the records written here.
 """
-import csv, datetime, hashlib, html, json, pathlib, re, struct, sys
+import csv, datetime, hashlib, html, json, os, pathlib, re, struct, sys
+
+from verify_package import release_paths
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 RELEASE = '5.4.3a'
@@ -19,16 +21,16 @@ EXCLUDED_FILES = {'manifest.json', 'SHA256SUMS'}
 def sha256(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
-def payload():
-    files = []
-    for path in sorted(ROOT.rglob('*')):
-        rel = path.relative_to(ROOT)
-        if not path.is_file() or rel.parts[0] in EXCLUDED_DIRS or str(rel) in EXCLUDED_FILES:
-            continue
-        if rel.suffix in ('.ppm', '.tmp') or '__pycache__' in rel.parts or rel.parts[0].startswith('cmake-build-'):
-            continue
-        files.append(rel.as_posix())
-    return files
+def report_unlisted_files(approved):
+    for directory, children, filenames in os.walk(ROOT):
+        parent = pathlib.Path(directory).relative_to(ROOT)
+        children[:] = [name for name in children if name != '__pycache__' and
+                       not (parent == pathlib.Path('.') and
+                            (name in EXCLUDED_DIRS or name.startswith('cmake-build-')))]
+        for name in sorted(filenames):
+            rel = (parent / name).as_posix()
+            if rel not in approved and rel not in EXCLUDED_FILES and not rel.endswith(('.tmp', '.ppm')):
+                print('Excluded unlisted file: ' + rel, file=sys.stderr)
 
 def calibration_matches():
     report = json.loads((RESULTS / 'calibration.json').read_text())
@@ -76,6 +78,8 @@ def category(line):
     return 'semantic'
 
 def main():
+    files = release_paths()
+    report_unlisted_files(set(files))
     now = datetime.datetime.now(datetime.timezone.utc).isoformat()
     source = (ROOT / SOURCE).read_bytes()
     lines = source.decode('utf-8').splitlines()
@@ -100,8 +104,8 @@ def main():
 
     checks = {
         'source_matches_line_guide': not missing and len(entries) == len(lines),
-        'exactly_three_markdown_files': sorted(p.name for p in ROOT.glob('*.md')) == DOCUMENTS,
-        'eighteen_png_screenshots': len(list((ROOT / 'artifacts/screenshots').glob('*.png'))) == 18,
+        'exactly_three_markdown_files': sorted(name for name in files if '/' not in name and name.endswith('.md')) == DOCUMENTS,
+        'eighteen_png_screenshots': sum(pathlib.Path(name).parent.as_posix() == 'artifacts/screenshots' and name.endswith('.png') for name in files) == 18,
         'cmake_file_included': (ROOT / 'CMakeLists.txt').is_file(),
     }
     def status(path, key='status'):
@@ -137,7 +141,6 @@ def main():
     render = (RESULTS / 'render.log').read_text().splitlines()[0] if (RESULTS / 'render.log').is_file() else None
     cmake = json.loads((RESULTS / 'cmake/validation.json').read_text()) if (RESULTS / 'cmake/validation.json').is_file() else {}
     calibration = json.loads((RESULTS / 'calibration.json').read_text()) if (RESULTS / 'calibration.json').is_file() else {}
-    files = payload()
     manifest = dict(
         package=f'MazeRunner V{RELEASE} Documentation and Validation', release=RELEASE, previous_release='5.4.2',
         prepared_date=now[:10],

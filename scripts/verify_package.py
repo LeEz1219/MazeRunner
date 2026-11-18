@@ -9,11 +9,24 @@ DOCUMENTS = ['01-Source-Line-by-Line.md','02-AI-Graphics-and-Redesign.md','03-Bu
 def require(condition, message):
     if not condition: raise RuntimeError(message)
 
+def release_paths():
+    names = (ROOT / 'scripts/devkit-files.txt').read_text(encoding='utf-8').splitlines()
+    require(len(names) == len(set(names)), 'Duplicate release path')
+    for name in names:
+        rel = Path(name)
+        path = ROOT / rel
+        require(name and rel.as_posix() == name and not rel.is_absolute() and '..' not in rel.parts,
+                'Invalid release path: ' + name)
+        require(path.resolve() == path, 'Release paths must not be symlinks: ' + name)
+    return sorted(names)
+
 def main():
     manifest=json.loads((ROOT/'manifest.json').read_text(encoding='utf-8'))
     require(manifest['release']==EXPECTED_RELEASE,'Incorrect manifest release')
     expected = {entry['path']: entry['sha256'] for entry in manifest['files']}
     require(len(expected) == len(manifest['files']), 'Duplicate manifest entries')
+    approved = release_paths()
+    require(set(expected) == set(approved), 'Manifest membership differs from scripts/devkit-files.txt')
     for entry in manifest['files']:
         path=(ROOT/entry['path']).resolve()
         require(path.is_relative_to(ROOT), 'Unsafe manifest path: '+entry['path'])
@@ -32,7 +45,7 @@ def main():
         require(path.is_file() and hashlib.sha256(path.read_bytes()).hexdigest()==digest,'Checksum mismatch: '+name)
     expected['manifest.json'] = hashlib.sha256((ROOT/'manifest.json').read_bytes()).hexdigest()
     require(ledger == expected, 'Checksum ledger and manifest do not cover the same payload')
-    require(sorted(p.name for p in ROOT.glob('*.md'))==DOCUMENTS,'Expected exactly the three documented Markdown files')
+    require(sorted(name for name in approved if '/' not in name and name.endswith('.md'))==DOCUMENTS,'Expected exactly the three documented Markdown files')
     source_path=f'src/mazerunnerV{EXPECTED_RELEASE}.cpp'
     require(manifest['source']['path']==source_path,'Manifest names an unexpected source file')
     source=(ROOT/source_path).read_bytes()
@@ -60,7 +73,7 @@ def main():
             require(resolved.exists(),f'Broken local link in {document}: {target}')
             if anchor and re.fullmatch(r'l\d{4}',anchor):
                 require(f'<a id="{anchor}"></a>' in resolved.read_text(encoding='utf-8'),'Missing link anchor: '+target)
-    pngs=sorted((ROOT/'artifacts/screenshots').glob('*.png'))
+    pngs=[ROOT/name for name in approved if Path(name).parent.as_posix()=='artifacts/screenshots' and name.endswith('.png')]
     require(len(pngs)==18,'Expected eighteen screenshots')
     for path in pngs:
         raw=path.read_bytes()

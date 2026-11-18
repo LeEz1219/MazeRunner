@@ -635,7 +635,7 @@ Pixel-identical output can vary across GL drivers and rasterization environments
 ![V5.4.3a result from a real zero-monster escape](artifacts/screenshots/result.png)
 ### Rebuild the release ZIP
 
-Start from a pristine checkout or extracted release if you want the published bytes. The archive script verifies the manifest first, sorts its entries, fixes ZIP timestamps and uses standard-library DEFLATE. Reproducing the exact compressed bytes also requires compatible zlib output. After a deliberate change or evidence rerun, audit the new tree before packaging. New runtime measurements have their own hashes.
+Start from a pristine checkout or extracted release if you want the published bytes. The archive script verifies the manifest first, sorts its entries, fixes ZIP timestamps and uses standard-library DEFLATE. Reproducing the exact compressed bytes also requires compatible zlib output. After a deliberate change or evidence rerun, audit the new tree before packaging. New runtime measurements have their own hashes. The audit reports unlisted local files and excludes them from the kit. To change which files ship, edit [scripts/devkit-files.txt](scripts/devkit-files.txt) before running the audit.
 
 ```bash
 python3 scripts/verify_package.py
