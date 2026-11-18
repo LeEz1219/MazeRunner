@@ -8,15 +8,15 @@ p = argparse.ArgumentParser(description=__doc__)
 p.add_argument('--build-dir', default='build/cmake-validation')
 p.add_argument('--generator', default='Ninja' if shutil.which('ninja') else None,
                help='CMake generator (default: Ninja when available)')
+p.add_argument('--headless', action='store_true', help='build CLI and tests without GLFW/GLEW development packages')
+p.add_argument('--jobs', type=int, default=2, help='concurrent compiler processes')
 args = p.parse_args()
+if args.jobs < 1:
+    p.error('--jobs must be positive')
 
 results = ROOT / 'artifacts/results/cmake'
-if results.exists():
-    shutil.rmtree(results)
-results.mkdir(parents=True)
-build = ROOT / args.build_dir
-if build.exists():
-    shutil.rmtree(build)
+results.mkdir(parents=True, exist_ok=True)
+build = pathlib.Path(args.build_dir)
 records = []
 env = dict(os.environ, LC_ALL='C')
 
@@ -39,14 +39,15 @@ try:
     version = run('cmake-version', ['cmake', '--version']).splitlines()[0]
     configure = ['cmake', '-S', '.', '-B', str(build), '-DCMAKE_BUILD_TYPE=Release',
                  '-DMAZERUNNER_WARNINGS_AS_ERRORS=ON']
+    configure.append('-DMAZERUNNER_BUILD_GRAPHICS=' + ('OFF' if args.headless else 'ON'))
     if args.generator:
         configure[1:1] = ['-G', args.generator]
     run('configure', configure)
-    run('build', ['cmake', '--build', str(build), '--parallel'])
+    run('build', ['cmake', '--build', str(build), '--parallel', str(args.jobs)])
     output = run('ctest', ['ctest', '--test-dir', str(build), '--output-on-failure'])
     match = re.search(r'(\d+)% tests passed, (\d+) tests failed out of (\d+)', output)
     tests = re.findall(r'Test\s+#\d+: (\S+) \.+\s+(\w+)', output)
-    summary = dict(cmake=version, generator=args.generator or 'default',
+    summary = dict(cmake=version, graphical_target=not args.headless, generator=args.generator or 'default',
                    tests_total=int(match.group(3)) if match else None,
                    tests_failed=int(match.group(2)) if match else None,
                    tests=[dict(name=n, result=r) for n, r in tests],

@@ -1,0 +1,29 @@
+name: Ubuntu CMake validation
+on:
+  push:
+    paths:
+      - 'CMakeLists.txt'
+      - 'src/**'
+      - 'tests/**'
+      - 'scripts/run_cmake_validation.py'
+      - '.github/workflows/validate.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  cmake:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install graphics development packages
+        run: sudo apt-get update && sudo apt-get install -y ninja-build libglfw3-dev libglew-dev libgl-dev libegl1-mesa-dev
+      - name: Build desktop and headless targets and run CTest
+        run: python3 scripts/run_cmake_validation.py --generator Ninja --jobs 2
+      - name: Preserve CMake and CTest logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ubuntu-cmake-validation
+          path: artifacts/results/cmake/

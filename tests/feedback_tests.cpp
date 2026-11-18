@@ -1,6 +1,6 @@
 #define MAZERUNNER_HEADLESS
 #define MAZERUNNER_NO_MAIN
-#include "../src/mazerunnerV5.4.2.cpp"
+#include "../src/mazerunnerV5.4.3a.cpp"
 #include <set>
 
 int checks=0;
@@ -55,7 +55,8 @@ void test_movement_contract(){
     require(near.hint.max_row-near.hint.min_row==4&&near.hint.max_col-near.hint.min_col==4,"hint gives 5x5 region");
     require(near.planned_revision==0,"hint remains pending until own move");
     require(m.manhattan(m.monsters[1].cell,m.player)>m.hearing_radius(),"fixture monster is out of hearing");
-    require(m.monsters[1].state==MonsterState::Patrolling&&m.monsters[1].hint.revision==0,"monster beyond hearing keeps roaming");
+    require(m.monsters[1].state==MonsterState::Searching&&m.monsters[1].scent_until==NEVER&&m.monsters[1].hint.contains(m.point(m.player)),
+            "monster beyond hearing receives an actionable director sector without scent");
     for(auto& x:m.monsters)x.next_move=NEVER;
     const Millis scent=m.settings.scent_ms,search=m.settings.search_ms;
     m.advance_to(300+scent-1);require(m.monsters[0].state==MonsterState::Hunting,"hunt stays active until timeout");
@@ -69,7 +70,7 @@ void test_movement_contract(){
     m.advance_to(t+40);m.move_player(-1,0);m.advance_to(t+40+scent-1);
     require(m.monsters[0].state==MonsterState::Hunting,"fresh movement extends timeout");
     m.advance_to(t+40+scent);require(m.monsters[0].state==MonsterState::Searching,"extended timeout eventually expires");
-    require(m.monsters[1].state==MonsterState::Patrolling,"distant monster never heard anything");
+    require(m.monsters[1].state!=MonsterState::Hunting&&m.monsters[1].scent_until==NEVER,"radio never grants physical hearing");
 }
 void test_no_exact_location_leak(){
     auto a=open_maze(),b=open_maze();a.player=a.id({11,11});b.player=b.id({13,13});
@@ -93,8 +94,8 @@ void test_no_exact_location_leak(){
     hidden.grid[hidden.id({20,20})]=WALL;hidden.rebuild_graph();
     hidden.monsters={monster(0,hidden.id({1,1}),10),monster(1,hidden.id({33,33}),10)};
     hidden.move_player(0,1);
-    require(hidden.monsters[0].state==MonsterState::Patrolling,"hearing range gates distant monsters");
-    require(hidden.monsters[1].state==MonsterState::Hunting,"nearby monster hears through walls");
+    require(hidden.monsters[0].state==MonsterState::Searching&&hidden.monsters[0].scent_until==NEVER,"far monster has only a radio clue");
+    require(hidden.monsters[1].state==MonsterState::Hunting,"nearby monster hears along an open path");
 }
 void test_waits_and_invalid_moves(){
     auto m=open_maze();m.player=m.id({11,11});m.monsters={monster(0,m.id({5,5}),NEVER)};

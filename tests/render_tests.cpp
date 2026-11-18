@@ -1,6 +1,6 @@
 #define MAZERUNNER_NO_MAIN
 #define MAZERUNNER_RENDER_TEST
-#include "../src/mazerunnerV5.4.2.cpp"
+#include "../src/mazerunnerV5.4.3a.cpp"
 #include <fstream>
 extern "C" {
 void* eglGetPlatformDisplay(unsigned,void*,const std::intptr_t*);
@@ -79,13 +79,16 @@ int main(){try{
         ui.form.width="999";ui.select(Control::Width);
         menu.draw(1280,960,ui);capture(1280,960,"artifacts/screenshots/setup-invalid.ppm");
         ui.show(Screen::Loading);menu.draw(1280,960,ui);capture(1280,960,"artifacts/screenshots/loading.ppm");
-        Maze game(33,33,42,nullptr);game.generate(10);game.set_auto_solve(true);game.advance_to(400);Renderer graphics(game);
+        Maze game(21,31,7,nullptr);game.generate(5);game.set_auto_solve(true);game.advance_to(4200);
+        require(std::string(game.director_phase())=="RELIEF" && game.radio_area_label()=="21x25" && game.director_reports()>0,
+                "HUD capture uses a real widened director report");
         for(auto screen:{Screen::Playing,Screen::Paused,Screen::Result}) {
             ui.show(screen);
             if(screen==Screen::Result) {
                 game.generate(0);game.set_auto_solve(true);game.advance_to(120000);
                 require(game.outcome==Outcome::Won,"real zero-monster escape for results screenshot");
             }
+            Renderer graphics(game);
             UiTransform t(1280,960);int bottom=int(t.y+702*t.scale),top=int(t.y+94*t.scale);
             graphics.draw(1280,bottom-top,game,960-bottom);menu.draw(1280,960,ui,&game);
             capture(1280,960,screen==Screen::Playing?"artifacts/screenshots/hud.ppm":screen==Screen::Paused?"artifacts/screenshots/pause.ppm":"artifacts/screenshots/result.ppm");

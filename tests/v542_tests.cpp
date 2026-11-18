@@ -36,7 +36,7 @@ void test_hearing_and_per_monster_scent(){
         if(m.manhattan(m.monsters[0].cell,m.player)<=radius)last_heard=m.now;
     }
     require(last_heard>0&&last_heard<1500,"player walked out of the first monster's hearing range");
-    require(m.monsters[1].state==MonsterState::Patrolling,"far monster never hears");
+    require(m.monsters[1].state!=MonsterState::Hunting&&m.monsters[1].scent_until==NEVER,"far monster never hears");
     m.advance_to(last_heard+m.settings.scent_ms-1);
     require(m.monsters[0].state==MonsterState::Hunting,"hunt persists until this monster's own scent expires");
     // Keep moving out of range: the player is active but this monster cannot hear.

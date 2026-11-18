@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.20)
-project(MazeRunner VERSION 5.4.2 LANGUAGES CXX)
+project(MazeRunner VERSION 5.4.3 LANGUAGES CXX)
+set(MAZERUNNER_RELEASE "${PROJECT_VERSION}a")
 
 # Configure out of source: cmake -S . -B build/cmake -DCMAKE_BUILD_TYPE=Release
 option(MAZERUNNER_BUILD_GRAPHICS "Build the GLFW/OpenGL game" ON)
@@ -14,13 +15,13 @@ if(NOT CMAKE_CONFIGURATION_TYPES AND NOT CMAKE_BUILD_TYPE)
 endif()
 
 # Accept either the extracted documentation bundle or a standalone source/file pair.
-set(_maze_file "mazerunnerV${PROJECT_VERSION}.cpp")
+set(_maze_file "mazerunnerV${MAZERUNNER_RELEASE}.cpp")
 if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/src/${_maze_file}")
     set(_maze_default_source "${CMAKE_CURRENT_SOURCE_DIR}/src/${_maze_file}")
 else()
     set(_maze_default_source "${CMAKE_CURRENT_SOURCE_DIR}/${_maze_file}")
 endif()
-set(MAZERUNNER_SOURCE "${_maze_default_source}" CACHE FILEPATH "MazeRunner V${PROJECT_VERSION} source file")
+set(MAZERUNNER_SOURCE "${_maze_default_source}" CACHE FILEPATH "MazeRunner V${MAZERUNNER_RELEASE} source file")
 if(NOT EXISTS "${MAZERUNNER_SOURCE}")
     message(FATAL_ERROR "Source not found: ${MAZERUNNER_SOURCE}. Place ${_maze_file} beside CMakeLists.txt or under src/, or set MAZERUNNER_SOURCE.")
 endif()
@@ -30,7 +31,7 @@ function(maze_configure_target target output_name)
     target_compile_features(${target} PRIVATE cxx_std_17)
     target_link_libraries(${target} PRIVATE Threads::Threads)
     # One version string everywhere; the source falls back to the same default.
-    target_compile_definitions(${target} PRIVATE MAZERUNNER_VERSION="${PROJECT_VERSION}")
+    target_compile_definitions(${target} PRIVATE MAZERUNNER_VERSION="${MAZERUNNER_RELEASE}")
     set_target_properties(${target} PROPERTIES
         CXX_EXTENSIONS OFF
         OUTPUT_NAME "${output_name}"
@@ -90,7 +91,7 @@ if(MAZERUNNER_BUILD_GRAPHICS)
 
     # Intentionally retain the console on Windows so player/monster logs remain visible.
     add_executable(mazerunner "${MAZERUNNER_SOURCE}")
-    maze_configure_target(mazerunner "mazerunnerV${PROJECT_VERSION}")
+    maze_configure_target(mazerunner "mazerunnerV${MAZERUNNER_RELEASE}")
     target_link_libraries(mazerunner PRIVATE ${_maze_glfw} ${_maze_glew} OpenGL::GL)
     get_target_property(_maze_glfw_type ${_maze_glfw} TYPE)
     if(WIN32 AND _maze_glfw_type STREQUAL "SHARED_LIBRARY")
@@ -149,7 +150,7 @@ if(BUILD_TESTING)
 
     if(TARGET maze-headless)
         add_test(NAME cli-help COMMAND maze-headless --help)
-        string(REPLACE "." "\\." _maze_version_regex "${PROJECT_VERSION}")
+        string(REPLACE "." "\\." _maze_version_regex "${MAZERUNNER_RELEASE}")
         set_tests_properties(cli-help PROPERTIES
             PASS_REGULAR_EXPRESSION "Maze Runner V${_maze_version_regex}" TIMEOUT 30)
         foreach(size IN ITEMS 33 63 101)

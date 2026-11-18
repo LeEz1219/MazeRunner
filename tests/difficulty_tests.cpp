@@ -52,7 +52,8 @@ void test_movement_and_hint_profiles(){
         auto x=monster(0,moving.id({1,1}),100);x.target=moving.id({1,40});x.next_replan=NEVER;
         auto frozen=fixture(d);frozen.player=frozen.id({45,45});frozen.monsters={x};
         frozen.advance_to(1000);require(frozen.monsters[0].cell==x.cell&&frozen.monsters[0].next_move==100,"monsters stay frozen until the first input");
-        moving.monsters={x};require(moving.move_player(0,-1),"first input releases monsters");
+        moving.monsters={x};moving.set_auto_solve(true);moving.set_auto_solve(false);
+        require(moving.timer_started,"enabling auto-solve releases patrols before a real step or radio report");
         moving.advance_to(99);require(moving.monsters[0].cell==x.cell,"monster waits for its deadline");
         moving.advance_to(100);require(moving.monsters[0].cell==moving.id({1,2}),"monster moves at deadline");
         require(moving.monsters[0].next_move==100+moving.settings.monster_move_ms,"monster schedules selected interval");

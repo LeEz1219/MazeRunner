@@ -1,8 +1,9 @@
 #define MAZERUNNER_NO_MAIN
 #define MAZERUNNER_APP_TEST
-#include "../src/mazerunnerV5.4.2.cpp"
+#include "../src/mazerunnerV5.4.3a.cpp"
 #include "egl_test_context.h"
 #include <thread>
+#include <tuple>
 
 // Inject window input into production callbacks; all rendering uses real EGL/GL.
 struct GLFWwindow { void* app=nullptr; double x=0,y=0; int width=1280,height=960,fw=1280,fh=960; };
@@ -30,8 +31,38 @@ void ready(GameApplication& app,bool focused=true){
     require(app.maze&&app.renderer&&!app.generation.valid(),"asynchronous maze ready");
     require(app.maze->now==0,"loading does not advance simulation time");
 }
+void test_held_collision_clock() {
+    auto play=[](Millis arrival,const std::vector<Millis>& frames) {
+        GameApplication app(11,true,true,false,Difficulty::Medium);
+        GLFWwindow window;window.app=&app;
+        app.maze=std::make_unique<Maze>(31,31,11,nullptr,Difficulty::Medium);
+        auto& m=*app.maze;
+        for(int r=1;r<30;++r) for(int c=1;c<30;++c) m.grid[m.id({r,c})]=PATH;
+        m.grid[m.entrance]=PATH;m.grid[m.exit_cell]=EXIT;m.rebuild_graph();m.reset_game();
+        m.player=m.id({1,10});
+        Monster hunter;hunter.cell=m.id({2,11});hunter.next_move=arrival;
+        m.monsters={hunter};
+        app.renderer=std::make_unique<Renderer>(m);
+        app.ui.show(Screen::Playing);
+        key(window,GLFW_KEY_D);
+        auto& active=m.monsters.front();
+        active.target=m.id({1,11});active.planned_revision=active.hint.revision;active.next_replan=NEVER;
+        for(Millis delta:frames) app.tick(delta);
+        return std::make_tuple(m.outcome,m.now,m.point(m.player).c,m.manual_steps,active.cell);
+    };
+    auto escaped=play(230,{250});
+    require(escaped==play(230,{220,30}) && escaped==play(230,{119,100,12,19}),
+            "frame partition cannot change whether the held step escapes");
+    require(std::get<0>(escaped)==Outcome::Playing && std::get<2>(escaped)==12,
+            "the 220 ms repeat moves before the 230 ms monster");
+    auto caught=play(220,{250});
+    require(caught==play(220,{219,1,30}) && std::get<0>(caught)==Outcome::Caught &&
+            std::get<1>(caught)==220 && std::get<2>(caught)==11,"monsters win an exact repeat-time tie");
+    require(play(230,{500})==play(230,{250,250}),"large frame keeps every elapsed simulation deadline");
+}
 int main(){try{
     Offscreen egl(1280,960);
+    test_held_collision_clock();
     {
         GameApplication app(42,true,true,false,Difficulty::High);GLFWwindow w;w.app=&app;
         require(app.ui.screen==Screen::Setup&&!app.maze,"launch shows setup without terminal input");
@@ -66,6 +97,10 @@ int main(){try{
             app.tick(240);require(m.player==start+4,"repeat cadence is steady");
             key(w,GLFW_KEY_D,0,GLFW_RELEASE);app.tick(500);require(m.player==start+4,"release stops walking");
             key(w,GLFW_KEY_D,0,GLFW_REPEAT);require(m.player==start+4,"OS key-repeat events are ignored");
+            key(w,GLFW_KEY_D);click(w,Control::Pause);click(w,Control::Resume);
+            int paused=m.player;app.tick(300);require(m.player==paused,"pause and resume without a tick clear the hold");
+            key(w,GLFW_KEY_D);click(w,Control::AutoSolve);click(w,Control::AutoSolve);
+            int toggled=m.player;app.tick(300);require(m.player==toggled,"an auto-solve toggle cannot resurrect the old hold");
             key(w,GLFW_KEY_S);focus_callback(&w,0);focus_callback(&w,1);click(w,Control::Resume);
             int held=m.player;app.tick(1000);require(m.player==held,"focus loss cancels a held direction");
             now=m.now;
