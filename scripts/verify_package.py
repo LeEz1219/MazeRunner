@@ -3,7 +3,7 @@
 from pathlib import Path
 import hashlib, html, json, re, struct, sys
 ROOT = Path(__file__).resolve().parents[1]
-EXPECTED_RELEASE = '5.4.2'
+EXPECTED_RELEASE = '5.4.3a'
 DOCUMENTS = ['01-Source-Line-by-Line.md','02-AI-Graphics-and-Redesign.md','03-Build-Test-and-Reproduce.md']
 
 def require(condition, message):
@@ -12,6 +12,8 @@ def require(condition, message):
 def main():
     manifest=json.loads((ROOT/'manifest.json').read_text(encoding='utf-8'))
     require(manifest['release']==EXPECTED_RELEASE,'Incorrect manifest release')
+    expected = {entry['path']: entry['sha256'] for entry in manifest['files']}
+    require(len(expected) == len(manifest['files']), 'Duplicate manifest entries')
     for entry in manifest['files']:
         path=(ROOT/entry['path']).resolve()
         require(path.is_relative_to(ROOT), 'Unsafe manifest path: '+entry['path'])
@@ -20,11 +22,16 @@ def main():
         require(len(raw)==entry['bytes'], 'Size mismatch: '+entry['path'])
         require(hashlib.sha256(raw).hexdigest()==entry['sha256'], 'SHA-256 mismatch: '+entry['path'])
     sums=(ROOT/'SHA256SUMS').read_text(encoding='utf-8').splitlines()
+    ledger = {}
     for line in sums:
         digest,name=line.split('  ',1)
+        require(name not in ledger, 'Duplicate checksum: '+name)
+        ledger[name] = digest
         path=(ROOT/name).resolve()
         require(path.is_relative_to(ROOT),'Unsafe checksum path')
         require(path.is_file() and hashlib.sha256(path.read_bytes()).hexdigest()==digest,'Checksum mismatch: '+name)
+    expected['manifest.json'] = hashlib.sha256((ROOT/'manifest.json').read_bytes()).hexdigest()
+    require(ledger == expected, 'Checksum ledger and manifest do not cover the same payload')
     require(sorted(p.name for p in ROOT.glob('*.md'))==DOCUMENTS,'Expected exactly the three documented Markdown files')
     source_path=f'src/mazerunnerV{EXPECTED_RELEASE}.cpp'
     require(manifest['source']['path']==source_path,'Manifest names an unexpected source file')
@@ -40,7 +47,7 @@ def main():
         if decoded=='[blank line]': decoded=''
         require(decoded==lines[expected-1],f'Quoted source differs at L{expected:04d}')
         require(f'<a id="l{expected:04d}"></a>' in guide,f'Missing source anchor L{expected:04d}')
-    for document in DOCUMENTS:
+    for document in [*DOCUMENTS, '.github/README.md']:
         data=(ROOT/document).read_text(encoding='utf-8')
         data=re.sub(r'<code>.*?</code>', '', data, flags=re.S)
         data=re.sub(r'```.*?```', '', data, flags=re.S)
@@ -48,9 +55,9 @@ def main():
         for target in re.findall(r'!?\[[^\]\n]*\]\(([^)\n]+)\)',data):
             if target.startswith(('https://','http://','mailto:')):continue
             path,_,anchor=target.partition('#')
-            resolved=(ROOT/path).resolve() if path else ROOT/document
+            resolved=(ROOT/document).parent.joinpath(path).resolve() if path else ROOT/document
             require(resolved.is_relative_to(ROOT),'Local link escapes the package: '+target)
-            require(resolved.is_file(),f'Broken local link in {document}: {target}')
+            require(resolved.exists(),f'Broken local link in {document}: {target}')
             if anchor and re.fullmatch(r'l\d{4}',anchor):
                 require(f'<a id="{anchor}"></a>' in resolved.read_text(encoding='utf-8'),'Missing link anchor: '+target)
     pngs=sorted((ROOT/'artifacts/screenshots').glob('*.png'))

@@ -5,16 +5,16 @@ Run after an intended change to the source, guides, tests, or regenerated artifa
 It reads what is on disk; it does not build or run anything. Afterwards,
 scripts/verify_package.py checks the tree against the records written here.
 """
-import datetime, hashlib, html, json, pathlib, re, struct, sys
+import csv, datetime, hashlib, html, json, pathlib, re, struct, sys
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
-RELEASE = '5.4.2'
+RELEASE = '5.4.3a'
 SOURCE = f'src/mazerunnerV{RELEASE}.cpp'
 DOCUMENTS = ['01-Source-Line-by-Line.md', '02-AI-Graphics-and-Redesign.md', '03-Build-Test-and-Reproduce.md']
 RESULTS = ROOT / 'artifacts/results'
 # Files that describe the package rather than belong to it, and generated build output.
-EXCLUDED_DIRS = {'.git', '.github', 'build'}
-EXCLUDED_FILES = {'.gitignore', '.gitattributes', 'manifest.json', 'SHA256SUMS'}
+EXCLUDED_DIRS = {'.git', 'build', 'dist'}
+EXCLUDED_FILES = {'manifest.json', 'SHA256SUMS'}
 
 def sha256(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
@@ -25,10 +25,43 @@ def payload():
         rel = path.relative_to(ROOT)
         if not path.is_file() or rel.parts[0] in EXCLUDED_DIRS or str(rel) in EXCLUDED_FILES:
             continue
-        if rel.suffix == '.ppm' or '__pycache__' in rel.parts:
+        if rel.suffix in ('.ppm', '.tmp') or '__pycache__' in rel.parts or rel.parts[0].startswith('cmake-build-'):
             continue
         files.append(rel.as_posix())
     return files
+
+def calibration_matches():
+    report = json.loads((RESULTS / 'calibration.json').read_text())
+    if report['source_sha256'] != sha256(ROOT / SOURCE):
+        return False
+    groups = {}
+    with (RESULTS / 'calibration-runs.csv').open(newline='') as records:
+        for row in csv.DictReader(records):
+            group = (row['cohort'], row['height'] + 'x' + row['width'], int(row['monsters']),
+                     int(row['limit_ms']), row['difficulty'])
+            seed, elapsed, moves = (int(row[k]) for k in ('seed', 'simulation_ms', 'auto_steps'))
+            outcome = row['outcome']
+            if outcome not in ('ESCAPED', 'CAUGHT', 'RUNNING') or not 0 <= elapsed <= group[3] or moves < 0:
+                return False
+            if outcome == 'RUNNING' and elapsed != group[3]:
+                return False
+            outcomes = groups.setdefault(group, {})
+            if seed in outcomes:
+                return False
+            outcomes[seed] = outcome
+    total = 0
+    for cell in report['results']:
+        group = (cell['cohort'], cell['size'], cell['monsters'], cell['limit_ms'], cell['difficulty'])
+        outcomes = groups.pop(group, {})
+        start, end = map(int, cell['seeds'].split('-'))
+        if set(outcomes) != set(range(start, end + 1)) or len(outcomes) != cell['games']:
+            return False
+        counts = list(outcomes.values())
+        if [counts.count(s) for s in ('ESCAPED', 'CAUGHT', 'RUNNING')] != [cell[k] for k in ('escaped','caught','timed_out')]:
+            return False
+        total += len(counts)
+    return not groups and total == report['total_games']
+
 
 def category(line):
     s = line.strip()
@@ -74,9 +107,16 @@ def main():
     def status(path, key='status'):
         try: return json.loads((RESULTS / path).read_text()).get(key)
         except (OSError, ValueError): return None
-    checks['raw_validation_passed'] = status('validation-summary.json') == 'passed'
+    validation = json.loads((RESULTS / 'validation-summary.json').read_text())
+    names = {check['name'] for check in validation['checks'] if check['status'] == 'passed'}
+    checks['raw_validation_passed'] = (validation['status'] == 'passed' and
+        {'gameplay-and-ui', 'app', 'render', 'sanitizers', 'director-radio', 'director-relief'} <= names)
     checks['cmake_configure_build_ctest_passed'] = status('cmake/validation.json', 'cmake_configure_build_ctest_status') == 'passed'
-    checks['calibration_recorded'] = (RESULTS / 'calibration.json').is_file()
+    checks['raw_calibration_matches_all_groups_and_seeds'] = calibration_matches()
+    checks['director_evidence'] = (
+        'Investigating by radio: 5 | Using local evidence: 0' in (RESULTS / 'director-radio.log').read_text()
+        and 'Radio area: 21x25 | Retasked: 5 | Interceptors released: 1' in (RESULTS / 'director-relief.log').read_text()
+        and 'NORMAL precision restored' in (RESULTS / 'director-relief.log').read_text())
     try:
         smoke = json.loads((RESULTS / 'preset-smoke.json').read_text())
         checks['smoke_matrix_complete'] = len(smoke) == 9 and all(r['repeat_equal'] for r in smoke)
@@ -88,7 +128,7 @@ def main():
         checks[f'{document}_no_internal_paths'] = not re.search(r'/(tmp|root|home)/[A-Za-z]', text)
     audit = dict(recorded_utc=now, release=RELEASE, status='passed' if all(checks.values()) else 'failed', checks=checks,
                  visual_review=['setup.png', 'hud.png', 'game.png', 'result.png'],
-                 review_notes=['Reviewed the V5.4.2 setup label, the HUD hunting counter and amber route, the generated-map route, and the real zero-monster escape result.',
+                 review_notes=['Release captures show the V5.4.3a label, the seed-7 relief HUD with RADIO 3 and 21x25 area, the generated exit route and the zero-monster result.',
                                'Native GLFW desktop startup and macOS/Windows builds were not executed.',
                                'Portable/regression assertion counters are cumulative, not independent simulation totals.'])
     (RESULTS / 'documentation-audit.json').write_text(json.dumps(audit, indent=2) + '\n')
@@ -99,11 +139,12 @@ def main():
     calibration = json.loads((RESULTS / 'calibration.json').read_text()) if (RESULTS / 'calibration.json').is_file() else {}
     files = payload()
     manifest = dict(
-        package=f'MazeRunner V{RELEASE} Documentation and Validation', release=RELEASE, previous_release='5.4.1',
+        package=f'MazeRunner V{RELEASE} Documentation and Validation', release=RELEASE, previous_release='5.4.2',
         prepared_date=now[:10],
         source=dict(path=SOURCE, bytes=len(source), physical_lines=len(lines), sha256=coverage['source_sha256']),
         validation=dict(platform=env.get('platform'), compiler=env.get('compiler'), renderer=render,
-                        native_glfw_startup_executed=False, macos_execution=False, windows_execution=False,
+                        direct_runner_checks=len(json.loads((RESULTS / 'validation-summary.json').read_text())['checks']),
+                        benchmark_games=calibration['total_games'], native_glfw_startup_executed=False, macos_execution=False, windows_execution=False,
                         sanitizer_leak_detection=env.get('sanitizer_leak_detection'),
                         preset_smoke_configurations=9, smoke_invocations=18,
                         cmake_configure_build_ctest=cmake.get('cmake_configure_build_ctest_status'),
@@ -111,11 +152,11 @@ def main():
                         calibration_benchmark_performed=bool(calibration),
                         calibration_pooled_escape_rates={k: v['escape_rate'] for k, v in calibration.get('pooled_calibration', {}).items()}),
         entry_guide='03-Build-Test-and-Reproduce.md',
-        excluded_generated_files=['build/', 'artifacts/screenshots/*.ppm'],
+        excluded_generated_files=['build/', 'dist/', 'artifacts/screenshots/*.ppm'],
         build_system=dict(file='CMakeLists.txt', minimum_cmake='3.20',
                           targets=['mazerunner', 'maze-headless', 'maze-regressions', 'maze-render-tests', 'maze-app-tests'],
                           full_package_ctest_cases=13, ctest_cases_without_egl=11,
-                          configuration_executed_here=cmake.get('cmake_configure_build_ctest_status') == 'passed',
+                          configuration_executed=cmake.get('cmake_configure_build_ctest_status') == 'passed',
                           validation_record='artifacts/results/cmake/validation.json'),
         files=[dict(path=f, bytes=(ROOT / f).stat().st_size, sha256=sha256(ROOT / f)) for f in files])
     (ROOT / 'manifest.json').write_text(json.dumps(manifest, indent=2) + '\n')

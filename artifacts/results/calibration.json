@@ -1,8 +1,11 @@
 {
-  "recorded_utc": "2026-11-18T00:04:34.285233+00:00",
-  "source": "src/mazerunnerV5.4.2.cpp",
-  "platform": "Linux-6.18.44-fc-v553-x86_64-with-glibc2.39",
-  "compiler": "g++ (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0",
+  "recorded_utc": "2026-11-18T01:30:49.078806+00:00",
+  "source": "src/mazerunnerV5.4.3a.cpp",
+  "source_sha256": "62fa1254b9c509ae3002f812bfa6b26823cd5b97eae71921fa2d153ad249a403",
+  "total_games": 4740,
+  "raw_file": "calibration-runs.csv",
+  "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+  "compiler": "g++ (Debian 14.2.0-19) 14.2.0",
   "targets": {
     "low": 0.92,
     "medium": 0.65,
@@ -10,31 +13,31 @@
   },
   "pooled_calibration": {
     "low": {
-      "escape_rate": 0.9313,
+      "escape_rate": 0.9387,
       "escape_rate_95ci": [
-        0.9116,
-        0.9468
+        0.9199,
+        0.9534
       ],
       "games": 800
     },
     "medium": {
-      "escape_rate": 0.6488,
+      "escape_rate": 0.67,
       "escape_rate_95ci": [
-        0.615,
-        0.681
+        0.6367,
+        0.7017
       ],
       "games": 800
     },
     "high": {
-      "escape_rate": 0.3212,
+      "escape_rate": 0.3412,
       "escape_rate_95ci": [
-        0.2898,
-        0.3544
+        0.3092,
+        0.3748
       ],
       "games": 800
     }
   },
-  "wall_seconds": 31.9,
+  "wall_seconds": 22.7,
   "results": [
     {
       "cohort": "calibration",
@@ -44,159 +47,159 @@
       "difficulty": "low",
       "seeds": "1-400",
       "games": 400,
-      "escaped": 356,
-      "caught": 41,
-      "timed_out": 3,
-      "escape_rate": 0.89,
-      "escape_rate_95ci": [
-        0.8555,
-        0.917
-      ],
-      "median_escape_ms": 6320
-    },
-    {
-      "cohort": "calibration",
-      "size": "21x21",
-      "monsters": 5,
-      "limit_ms": 60000,
-      "difficulty": "medium",
-      "seeds": "1-400",
-      "games": 400,
-      "escaped": 228,
-      "caught": 169,
-      "timed_out": 3,
-      "escape_rate": 0.57,
-      "escape_rate_95ci": [
-        0.521,
-        0.6176
-      ],
-      "median_escape_ms": 14480
-    },
-    {
-      "cohort": "calibration",
-      "size": "21x21",
-      "monsters": 5,
-      "limit_ms": 60000,
-      "difficulty": "high",
-      "seeds": "1-400",
-      "games": 400,
-      "escaped": 111,
-      "caught": 286,
-      "timed_out": 3,
-      "escape_rate": 0.2775,
-      "escape_rate_95ci": [
-        0.2359,
-        0.3233
-      ],
-      "median_escape_ms": 18960
-    },
-    {
-      "cohort": "calibration",
-      "size": "31x31",
-      "monsters": 5,
-      "limit_ms": 60000,
-      "difficulty": "low",
-      "seeds": "1-400",
-      "games": 400,
-      "escaped": 389,
-      "caught": 11,
-      "timed_out": 0,
-      "escape_rate": 0.9725,
-      "escape_rate_95ci": [
-        0.9514,
-        0.9846
-      ],
-      "median_escape_ms": 4960
-    },
-    {
-      "cohort": "calibration",
-      "size": "31x31",
-      "monsters": 5,
-      "limit_ms": 60000,
-      "difficulty": "medium",
-      "seeds": "1-400",
-      "games": 400,
-      "escaped": 291,
-      "caught": 106,
-      "timed_out": 3,
-      "escape_rate": 0.7275,
-      "escape_rate_95ci": [
-        0.6819,
-        0.7688
-      ],
-      "median_escape_ms": 12960
-    },
-    {
-      "cohort": "calibration",
-      "size": "31x31",
-      "monsters": 5,
-      "limit_ms": 60000,
-      "difficulty": "high",
-      "seeds": "1-400",
-      "games": 400,
-      "escaped": 146,
-      "caught": 245,
-      "timed_out": 9,
-      "escape_rate": 0.365,
-      "escape_rate_95ci": [
-        0.3193,
-        0.4133
-      ],
-      "median_escape_ms": 16920
-    },
-    {
-      "cohort": "presets",
-      "size": "33x33",
-      "monsters": 10,
-      "limit_ms": 120000,
-      "difficulty": "low",
-      "seeds": "1-60",
-      "games": 60,
-      "escaped": 55,
-      "caught": 5,
-      "timed_out": 0,
-      "escape_rate": 0.9167,
-      "escape_rate_95ci": [
-        0.8193,
-        0.9639
-      ],
-      "median_escape_ms": 11960
-    },
-    {
-      "cohort": "presets",
-      "size": "33x33",
-      "monsters": 10,
-      "limit_ms": 120000,
-      "difficulty": "medium",
-      "seeds": "1-60",
-      "games": 60,
-      "escaped": 27,
-      "caught": 33,
-      "timed_out": 0,
-      "escape_rate": 0.45,
-      "escape_rate_95ci": [
-        0.3309,
-        0.5751
-      ],
-      "median_escape_ms": 21920
-    },
-    {
-      "cohort": "presets",
-      "size": "33x33",
-      "monsters": 10,
-      "limit_ms": 120000,
-      "difficulty": "high",
-      "seeds": "1-60",
-      "games": 60,
-      "escaped": 2,
-      "caught": 57,
+      "escaped": 359,
+      "caught": 40,
       "timed_out": 1,
-      "escape_rate": 0.0333,
+      "escape_rate": 0.8975,
       "escape_rate_95ci": [
-        0.0092,
-        0.1136
+        0.8639,
+        0.9235
       ],
-      "median_escape_ms": 70640
+      "median_escape_ms": 5440
+    },
+    {
+      "cohort": "calibration",
+      "size": "21x21",
+      "monsters": 5,
+      "limit_ms": 60000,
+      "difficulty": "medium",
+      "seeds": "1-400",
+      "games": 400,
+      "escaped": 254,
+      "caught": 143,
+      "timed_out": 3,
+      "escape_rate": 0.635,
+      "escape_rate_95ci": [
+        0.5867,
+        0.6807
+      ],
+      "median_escape_ms": 12020.0
+    },
+    {
+      "cohort": "calibration",
+      "size": "21x21",
+      "monsters": 5,
+      "limit_ms": 60000,
+      "difficulty": "high",
+      "seeds": "1-400",
+      "games": 400,
+      "escaped": 116,
+      "caught": 281,
+      "timed_out": 3,
+      "escape_rate": 0.29,
+      "escape_rate_95ci": [
+        0.2477,
+        0.3363
+      ],
+      "median_escape_ms": 14760.0
+    },
+    {
+      "cohort": "calibration",
+      "size": "31x31",
+      "monsters": 5,
+      "limit_ms": 60000,
+      "difficulty": "low",
+      "seeds": "1-400",
+      "games": 400,
+      "escaped": 392,
+      "caught": 8,
+      "timed_out": 0,
+      "escape_rate": 0.98,
+      "escape_rate_95ci": [
+        0.961,
+        0.9898
+      ],
+      "median_escape_ms": 4960.0
+    },
+    {
+      "cohort": "calibration",
+      "size": "31x31",
+      "monsters": 5,
+      "limit_ms": 60000,
+      "difficulty": "medium",
+      "seeds": "1-400",
+      "games": 400,
+      "escaped": 282,
+      "caught": 114,
+      "timed_out": 4,
+      "escape_rate": 0.705,
+      "escape_rate_95ci": [
+        0.6585,
+        0.7476
+      ],
+      "median_escape_ms": 10300.0
+    },
+    {
+      "cohort": "calibration",
+      "size": "31x31",
+      "monsters": 5,
+      "limit_ms": 60000,
+      "difficulty": "high",
+      "seeds": "1-400",
+      "games": 400,
+      "escaped": 157,
+      "caught": 236,
+      "timed_out": 7,
+      "escape_rate": 0.3925,
+      "escape_rate_95ci": [
+        0.3459,
+        0.4412
+      ],
+      "median_escape_ms": 11880
+    },
+    {
+      "cohort": "presets",
+      "size": "33x33",
+      "monsters": 10,
+      "limit_ms": 120000,
+      "difficulty": "low",
+      "seeds": "1-60",
+      "games": 60,
+      "escaped": 53,
+      "caught": 7,
+      "timed_out": 0,
+      "escape_rate": 0.8833,
+      "escape_rate_95ci": [
+        0.7782,
+        0.9423
+      ],
+      "median_escape_ms": 8720
+    },
+    {
+      "cohort": "presets",
+      "size": "33x33",
+      "monsters": 10,
+      "limit_ms": 120000,
+      "difficulty": "medium",
+      "seeds": "1-60",
+      "games": 60,
+      "escaped": 30,
+      "caught": 30,
+      "timed_out": 0,
+      "escape_rate": 0.5,
+      "escape_rate_95ci": [
+        0.3773,
+        0.6227
+      ],
+      "median_escape_ms": 20280.0
+    },
+    {
+      "cohort": "presets",
+      "size": "33x33",
+      "monsters": 10,
+      "limit_ms": 120000,
+      "difficulty": "high",
+      "seeds": "1-60",
+      "games": 60,
+      "escaped": 9,
+      "caught": 51,
+      "timed_out": 0,
+      "escape_rate": 0.15,
+      "escape_rate_95ci": [
+        0.081,
+        0.2611
+      ],
+      "median_escape_ms": 17320
     },
     {
       "cohort": "presets",
@@ -214,7 +217,7 @@
         0.863,
         0.9829
       ],
-      "median_escape_ms": 11680
+      "median_escape_ms": 12520
     },
     {
       "cohort": "presets",
@@ -224,15 +227,15 @@
       "difficulty": "medium",
       "seeds": "1-60",
       "games": 60,
-      "escaped": 28,
-      "caught": 32,
+      "escaped": 27,
+      "caught": 33,
       "timed_out": 0,
-      "escape_rate": 0.4667,
+      "escape_rate": 0.45,
       "escape_rate_95ci": [
-        0.3463,
-        0.5911
+        0.3309,
+        0.5751
       ],
-      "median_escape_ms": 19200
+      "median_escape_ms": 22880
     },
     {
       "cohort": "presets",
@@ -242,15 +245,15 @@
       "difficulty": "high",
       "seeds": "1-60",
       "games": 60,
-      "escaped": 7,
-      "caught": 53,
-      "timed_out": 0,
-      "escape_rate": 0.1167,
+      "escaped": 10,
+      "caught": 49,
+      "timed_out": 1,
+      "escape_rate": 0.1667,
       "escape_rate_95ci": [
-        0.0577,
-        0.2218
+        0.0931,
+        0.2803
       ],
-      "median_escape_ms": 30280
+      "median_escape_ms": 27240.0
     },
     {
       "cohort": "presets",
@@ -268,7 +271,7 @@
         0.9398,
         1.0
       ],
-      "median_escape_ms": 16400
+      "median_escape_ms": 16280.0
     },
     {
       "cohort": "presets",
@@ -278,15 +281,15 @@
       "difficulty": "medium",
       "seeds": "1-60",
       "games": 60,
-      "escaped": 46,
-      "caught": 14,
+      "escaped": 43,
+      "caught": 17,
       "timed_out": 0,
-      "escape_rate": 0.7667,
+      "escape_rate": 0.7167,
       "escape_rate_95ci": [
-        0.6456,
-        0.8556
+        0.5923,
+        0.8149
       ],
-      "median_escape_ms": 27120
+      "median_escape_ms": 29120
     },
     {
       "cohort": "presets",
@@ -296,15 +299,159 @@
       "difficulty": "high",
       "seeds": "1-60",
       "games": 60,
-      "escaped": 15,
-      "caught": 45,
+      "escaped": 13,
+      "caught": 47,
       "timed_out": 0,
-      "escape_rate": 0.25,
+      "escape_rate": 0.2167,
       "escape_rate_95ci": [
-        0.1578,
-        0.3723
+        0.1312,
+        0.3362
       ],
-      "median_escape_ms": 35520
+      "median_escape_ms": 27400
+    },
+    {
+      "cohort": "setup",
+      "size": "21x31",
+      "monsters": 5,
+      "limit_ms": 60000,
+      "difficulty": "medium",
+      "seeds": "401-800",
+      "games": 400,
+      "escaped": 260,
+      "caught": 136,
+      "timed_out": 4,
+      "escape_rate": 0.65,
+      "escape_rate_95ci": [
+        0.602,
+        0.6951
+      ],
+      "median_escape_ms": 12980.0
+    },
+    {
+      "cohort": "holdout",
+      "size": "21x21",
+      "monsters": 5,
+      "limit_ms": 60000,
+      "difficulty": "low",
+      "seeds": "1201-1400",
+      "games": 200,
+      "escaped": 186,
+      "caught": 14,
+      "timed_out": 0,
+      "escape_rate": 0.93,
+      "escape_rate_95ci": [
+        0.8859,
+        0.9578
+      ],
+      "median_escape_ms": 3680.0
+    },
+    {
+      "cohort": "holdout",
+      "size": "21x21",
+      "monsters": 5,
+      "limit_ms": 60000,
+      "difficulty": "medium",
+      "seeds": "1201-1400",
+      "games": 200,
+      "escaped": 135,
+      "caught": 62,
+      "timed_out": 3,
+      "escape_rate": 0.675,
+      "escape_rate_95ci": [
+        0.6073,
+        0.7361
+      ],
+      "median_escape_ms": 10720
+    },
+    {
+      "cohort": "holdout",
+      "size": "21x21",
+      "monsters": 5,
+      "limit_ms": 60000,
+      "difficulty": "high",
+      "seeds": "1201-1400",
+      "games": 200,
+      "escaped": 55,
+      "caught": 144,
+      "timed_out": 1,
+      "escape_rate": 0.275,
+      "escape_rate_95ci": [
+        0.2178,
+        0.3407
+      ],
+      "median_escape_ms": 13480
+    },
+    {
+      "cohort": "holdout",
+      "size": "31x31",
+      "monsters": 5,
+      "limit_ms": 60000,
+      "difficulty": "low",
+      "seeds": "1201-1400",
+      "games": 200,
+      "escaped": 196,
+      "caught": 3,
+      "timed_out": 1,
+      "escape_rate": 0.98,
+      "escape_rate_95ci": [
+        0.9497,
+        0.9922
+      ],
+      "median_escape_ms": 4640.0
+    },
+    {
+      "cohort": "holdout",
+      "size": "31x31",
+      "monsters": 5,
+      "limit_ms": 60000,
+      "difficulty": "medium",
+      "seeds": "1201-1400",
+      "games": 200,
+      "escaped": 143,
+      "caught": 56,
+      "timed_out": 1,
+      "escape_rate": 0.715,
+      "escape_rate_95ci": [
+        0.6488,
+        0.7731
+      ],
+      "median_escape_ms": 11120
+    },
+    {
+      "cohort": "holdout",
+      "size": "31x31",
+      "monsters": 5,
+      "limit_ms": 60000,
+      "difficulty": "high",
+      "seeds": "1201-1400",
+      "games": 200,
+      "escaped": 89,
+      "caught": 110,
+      "timed_out": 1,
+      "escape_rate": 0.445,
+      "escape_rate_95ci": [
+        0.3778,
+        0.5143
+      ],
+      "median_escape_ms": 13600
+    },
+    {
+      "cohort": "setup-holdout",
+      "size": "21x31",
+      "monsters": 5,
+      "limit_ms": 60000,
+      "difficulty": "medium",
+      "seeds": "1201-1400",
+      "games": 200,
+      "escaped": 146,
+      "caught": 54,
+      "timed_out": 0,
+      "escape_rate": 0.73,
+      "escape_rate_95ci": [
+        0.6646,
+        0.7868
+      ],
+      "median_escape_ms": 10060.0
     }
   ]
 }

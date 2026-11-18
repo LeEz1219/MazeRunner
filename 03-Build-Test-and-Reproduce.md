@@ -1,24 +1,26 @@
-# MazeRunner V5.4.2 — compile, test, and reproduce
+# MazeRunner V5.4.3a — compile, test, and reproduce
 
-This guide builds the [V5.4.2 source](src/mazerunnerV5.4.2.cpp) in this repository. It covers **Ubuntu Linux**, **macOS on Apple Silicon**, and **Windows Command Prompt (CMD)**. For what changed in V5.4.2 and why, see the [AI and graphics guide](02-AI-Graphics-and-Redesign.md).
+This guide builds the playtested V5.4.3a director hotfix on Ubuntu Linux, Apple Silicon macOS or Windows CMD. Use the package root for commands that start with `src/` or `scripts/`. [Production source](src/mazerunnerV5.4.3a.cpp) · [AI and graphics guide](02-AI-Graphics-and-Redesign.md)
 
-**Validation status:** the source and tests passed on an Ubuntu 24.04 x86-64 Linux host using GCC 13.3.0. That run included the Ubuntu package installation in Section 3, a real graphical compile and link against GLFW/GLEW/OpenGL with warnings as errors, a real CMake configure/build/CTest run (13 tests), headless gameplay/UI regressions, the V5.4.2 feature tests, address/undefined-behavior sanitizers, nine preset/profile smoke cases repeated twice, real offscreen OpenGL rendering, application logic with injected GLFW callbacks, and a 2,940-game calibration benchmark. Native desktop GLFW startup was **not** executed because the host had no display. The macOS and Windows commands were checked against the source and official dependency documentation, but were **not executed on those operating systems**. Those distinctions are reflected throughout this guide.
+Ubuntu 24.04 CI compiled and linked the graphical game, built the headless simulator, and passed all 13 CTest cases with GCC 13.3.0, Ninja and CMake 3.31.6. A separate Debian x86-64 run with GCC 14.2 exercised the direct compiler commands, ASan/UBSan, offscreen OpenGL, injected application input and 4,740 simulated games. Native macOS, Windows and interactive desktop play are covered by the instructions and acceptance checklist. Those sessions have no recorded pass in this kit. [Ubuntu workflow](https://github.com/LeEz1219/MazeRunner/actions/runs/44216985629) · [Recorded environments](artifacts/results/environment.json)
 
 ## 1. Package contents and starting directory
 
-Clone the repository, or extract a ZIP of it, before compiling. In the commands below, its top-level `MazeRunner` directory is the **package root**, containing these three Markdown guides and the `src`, `tests`, `scripts`, and `artifacts` directories.
+Extract the developer ZIP and enter `MazeRunner-V5.4.3a`, or enter `MazeRunner` in a repository checkout. This is the **package root**. It contains the three numbered guides alongside `CMakeLists.txt`, `src`, `tests`, `scripts` and `artifacts`.
 
 | Path | Purpose |
 |---|---|
-| [01-Source-Line-by-Line.md](01-Source-Line-by-Line.md) | Every physical source line, with 158 function/method index entries |
+| [01-Source-Line-by-Line.md](01-Source-Line-by-Line.md) | Every physical line with an exact source quote, explanation, and 166 indexed functions or methods |
 | [02-AI-Graphics-and-Redesign.md](02-AI-Graphics-and-Redesign.md) | AI behavior, exact difficulty settings, rendering, UI, and redesign plans |
-| [src/mazerunnerV5.4.2.cpp](src/mazerunnerV5.4.2.cpp) | Production source, including embedded sprites/font |
+| [src/mazerunnerV5.4.3a.cpp](src/mazerunnerV5.4.3a.cpp) | Production source, including embedded sprites/font |
 | [CMakeLists.txt](CMakeLists.txt) | C++17 graphical/headless targets; portable and EGL CTest registration |
-| `tests/*_tests.cpp` | Gameplay, director, profiles, V5.4.2 features, visuals, UI, renderer, and application tests |
+| `tests/*_tests.cpp` | Portable gameplay, director, profiles, V5.4.2 compatibility, V5.4.3a behavior, renderer and application checks |
 | `tests/support/` | Narrow test-only GL/GLFW declarations/adapters |
 | [scripts/run_validation.py](scripts/run_validation.py) | Linux build/test runner and screenshot conversion |
 | [scripts/run_cmake_validation.py](scripts/run_cmake_validation.py) | Real CMake configure/build/CTest run with recorded logs |
-| [scripts/run_calibration.py](scripts/run_calibration.py) | Auto-solver escape-rate benchmark over fixed seed cohorts |
+| [scripts/run_calibration.py](scripts/run_calibration.py) | Four benchmark cohorts and an ordered row for each game |
+| [scripts/package_devkit.py](scripts/package_devkit.py) | Verify and package a deterministic ZIP from the release manifest |
+| [.github/workflows/validate.yml](.github/workflows/validate.yml) | Repeat Ubuntu graphical and headless CMake validation on relevant repo pushes |
 | [scripts/audit_documentation.py](scripts/audit_documentation.py) | Regenerates the documentation coverage/audit records and package checksums |
 | [scripts/verify_package.py](scripts/verify_package.py) | SHA-256 integrity and source-annotation coverage verification |
 | [manifest.json](manifest.json) and [SHA256SUMS](SHA256SUMS) | Package provenance and payload checksums |
@@ -27,10 +29,10 @@ Clone the repository, or extract a ZIP of it, before compiling. In the commands 
 
 Compiled executables, temporary PPM images, dependency packages, and private authoring files are deliberately absent from the repository. Reproduction creates its own `build/` directory and can regenerate PPM/PNG captures. There are no external art or font files to download for the game: artwork and glyphs are embedded in the source. GLFW/GLEW and the platform's OpenGL implementation remain external runtime dependencies for the graphical binary.
 
-The source is **167,884 bytes**, **3,161 physical lines**, with SHA-256:
+The source is **173,782 bytes**, **3,261 physical lines**, with SHA-256:
 
 ```text
-1d3604ad7db5700d1658c0acdda18295405be19b5dee09c27db944944bf28dab
+62fa1254b9c509ae3002f812bfa6b26823cd5b97eae71921fa2d153ad249a403
 ```
 
 If your editor adds a byte-order mark or converts LF newlines to CRLF, the checksum changes even when C++ behavior does not. Keep the packaged source unchanged when reproducing the recorded artifact identity. A terminal's width or soft wrapping does not change physical source line numbers.
@@ -52,7 +54,7 @@ Add `-DNDEBUG` to release builds, as the commands below do. Without it, the game
 
 The repository includes [CMakeLists.txt](CMakeLists.txt). Use **CMake 3.20 or newer** and a C++17 compiler. CMake generates the build system, `cmake --build` compiles its targets, and CTest runs the registered checks. These commands are an alternative to the direct compiler instructions below, not an additional required compilation pass.
 
-The supplied configuration builds `mazerunner` (graphical game), `maze-headless` (simulator), and `maze-regressions` (the portable gameplay/UI suite). On Linux, when `libEGL` and `libGL` are found, it also builds `maze-render-tests` and `maze-app-tests`, the real-OpenGL offscreen suites. Executables go under the selected build directory's `bin/`. The graphical executable is named `mazerunnerV5.4.2` (from the CMake project version), with `.exe` appended on Windows. The other executable names match their target names. CMake passes the project version to the source as `MAZERUNNER_VERSION`, so the window title, logs, and help text always match it. The Windows game deliberately retains its console so state logs remain visible.
+The supplied configuration builds `mazerunner` (graphical game), `maze-headless` (simulator), and `maze-regressions` (the portable gameplay/UI suite). On Linux, when `libEGL` and `libGL` are found, it also builds `maze-render-tests` and `maze-app-tests`, the real-OpenGL offscreen suites. Executables go under the selected build directory's `bin/`. The graphical executable is named `mazerunnerV5.4.3a` (from the full release label), with `.exe` appended on Windows. The other executable names match their target names. CMake keeps the numeric project version at 5.4.3 and appends the lowercase suffix in `MAZERUNNER_RELEASE`. This full label supplies `MAZERUNNER_VERSION` in the game, window title, logs and CLI help. The Windows game deliberately retains its console so state logs remain visible.
 
 ### Ubuntu: configure, build, test, run
 
@@ -65,7 +67,7 @@ cmake --version
 cmake -S . -B build/cmake -G Ninja -DCMAKE_BUILD_TYPE=Release
 cmake --build build/cmake --parallel
 ctest --test-dir build/cmake --output-on-failure
-./build/cmake/bin/mazerunnerV5.4.2 --seed 42
+./build/cmake/bin/mazerunnerV5.4.3a --seed 42
 ```
 
 If CMake is older than 3.20, update it before configuring. The supplied file locates OpenGL and GLEW through imported targets. It first looks for GLFW's CMake package; if that is unavailable, it tries `pkg-config` metadata for GLFW 3.3 or later. Failure to find development dependencies is a configuration error, not a reason to use the test-only GL headers for the desktop build.
@@ -79,7 +81,7 @@ brew install cmake ninja glfw glew pkgconf
 cmake -S . -B build/cmake -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_OSX_ARCHITECTURES=arm64 -DCMAKE_PREFIX_PATH="$(brew --prefix)"
 cmake --build build/cmake --parallel
 ctest --test-dir build/cmake --output-on-failure
-./build/cmake/bin/mazerunnerV5.4.2 --seed 42
+./build/cmake/bin/mazerunnerV5.4.3a --seed 42
 ```
 
 The prefix helps CMake locate the native Homebrew dependencies, and `arm64` avoids silently producing an Intel build. `OpenGL::GL` supplies the platform-specific framework linkage; do not add Linux's `-lGL` manually. This still produces a command-line executable using installed libraries, not a bundled or signed `.app`.
@@ -96,7 +98,7 @@ cd /d "%USERPROFILE%\Downloads\MazeRunner"
 cmake -S . -B build/cmake -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=C:/msys64/ucrt64/bin/g++.exe -DCMAKE_PREFIX_PATH=C:/msys64/ucrt64
 cmake --build build/cmake --parallel
 ctest --test-dir build/cmake --output-on-failure
-build\cmake\bin\mazerunnerV5.4.2.exe --seed 42
+build\cmake\bin\mazerunnerV5.4.3a.exe --seed 42
 ```
 
 These are CMD commands, including the explicit Bash invocation for package management. Selecting `Ninja` and the UCRT64 compiler avoids accidentally combining Visual Studio/MSVC with MinGW libraries. Keep the UCRT64 `bin` directory on PATH while running so the matching GLFW, GLEW, and GCC runtime DLLs can be found. CMake does not automatically copy those DLLs into the output directory; the existing Windows DLL instructions still apply.
@@ -133,11 +135,11 @@ build\headless\bin\maze-headless.exe --simulate 33 33 5 42 60000 --difficulty me
 
 On Linux with EGL available, the repository registers **13 CTest tests**: one portable regression entry point, the `render-egl` and `app-egl` real-OpenGL suites, one CLI help check, and nine size/difficulty smoke cases. Without EGL (macOS, Windows, or Linux without the libraries) it registers 11. The EGL suites write their screenshots under the build directory, not into `artifacts/`. The separate Python validation runner still provides repeated smoke comparisons and sanitizers, which CTest does not run. To build only the desktop game, configure with `-DMAZERUNNER_BUILD_HEADLESS=OFF -DBUILD_TESTING=OFF` and retain graphics enabled.
 
-If you download only the `.cpp` and `CMakeLists.txt`, place them in the same folder. Missing regression sources are reported and skipped; the game/headless targets can still build. In the full repository, portable tests directly include `src/mazerunnerV5.4.2.cpp`. Selecting a different `MAZERUNNER_SOURCE` therefore requires `-DBUILD_TESTING=OFF`; this prevents a misleading result where the tests exercise another source file. No source file is downloaded automatically.
+If you download only the `.cpp` and `CMakeLists.txt`, place them in the same folder. Missing regression sources are reported and skipped; the game/headless targets can still build. In the full repository, portable tests directly include `src/mazerunnerV5.4.3a.cpp`. Selecting a different `MAZERUNNER_SOURCE` therefore requires `-DBUILD_TESTING=OFF`; this prevents a misleading result where the tests exercise another source file. No source file is downloaded automatically.
 
 Use a fresh build directory when changing compiler, CPU architecture, or generator. A stale CMake cache can retain the previous toolchain/dependency paths. CMake's multi-configuration generators also accept `cmake --build build/cmake --config Release` and `ctest --test-dir build/cmake -C Release --output-on-failure`; the supported command recipes above use single-configuration Ninja. The file contains MSVC warning handling, but no native MSVC build was executed or established by this package.
 
-**CMake validation:** the Ubuntu commands above were executed with CMake 3.28.3 and Ninja: Release configuration with `-DMAZERUNNER_WARNINGS_AS_ERRORS=ON`, a full build including the graphical game against the real GLFW/GLEW packages, and CTest with **13 of 13 tests passing**. `scripts/run_cmake_validation.py` repeats that sequence and records it in [artifacts/results/cmake/validation.json](artifacts/results/cmake/validation.json) together with the configure, build, and CTest logs. The V5.4.1 package could not run CMake at all and recorded direct-compiler stand-ins instead; those have been replaced. The macOS and Windows CMake recipes remain unexecuted.
+Ubuntu CI executed `python3 scripts/run_cmake_validation.py --generator Ninja --jobs 2`. Its Release build included the native desktop binary, CLI and EGL harnesses. All 13 CTest cases passed. For an installation without GLFW/GLEW development headers, pass `--headless` and a different `--build-dir`. [Configure log](artifacts/results/cmake/configure.log) · [Build log](artifacts/results/cmake/build.log) · [CTest log](artifacts/results/cmake/ctest.log) · [Hosted run](https://github.com/LeEz1219/MazeRunner/actions/runs/44216985629)
 
 ## 3. Ubuntu Linux: direct compiler build
 
@@ -171,7 +173,7 @@ cd "$HOME/Downloads/MazeRunner"
 mkdir -p build
 g++ --version
 pkg-config --modversion glfw3 glew
-sha256sum src/mazerunnerV5.4.2.cpp
+sha256sum src/mazerunnerV5.4.3a.cpp
 ```
 
 Compare the hash with the value above. `pkg-config` should print versions for both libraries. If it cannot find `glfw3` or `glew`, resolve that installation issue before compiling.
@@ -179,7 +181,7 @@ Compare the hash with the value above. `pkg-config` should print versions for bo
 ### Step 3 — compile the desktop game
 
 ```bash
-g++ src/mazerunnerV5.4.2.cpp -o build/mazerunnerV5.4.2 -std=c++17 -O2 -DNDEBUG -Wall -Wextra -Wpedantic $(pkg-config --cflags glfw3 glew) $(pkg-config --libs glfw3 glew) -lGL -pthread
+g++ src/mazerunnerV5.4.3a.cpp -o build/mazerunnerV5.4.3a -std=c++17 -O2 -DNDEBUG -Wall -Wextra -Wpedantic $(pkg-config --cflags glfw3 glew) $(pkg-config --libs glfw3 glew) -lGL -pthread
 ```
 
 The shell expands the two `pkg-config` expressions into this installation's include/link flags. Source/object inputs precede libraries so the linker can resolve references correctly. `-pthread` supports the asynchronous generation worker, the frame limiter, and the standard threading runtime. `-O2 -DNDEBUG` is a release-style configuration; it is not a difficulty setting. No `-march=native` is used, avoiding an unnecessary CPU-specific instruction requirement.
@@ -187,7 +189,7 @@ The shell expands the two `pkg-config` expressions into this installation's incl
 If package metadata is unavailable but the normal Ubuntu development packages are installed, the equivalent explicit-library command is:
 
 ```bash
-g++ src/mazerunnerV5.4.2.cpp -o build/mazerunnerV5.4.2 -std=c++17 -O2 -DNDEBUG -Wall -Wextra -Wpedantic -lglfw -lGLEW -lGL -pthread
+g++ src/mazerunnerV5.4.3a.cpp -o build/mazerunnerV5.4.3a -std=c++17 -O2 -DNDEBUG -Wall -Wextra -Wpedantic -lglfw -lGLEW -lGL -pthread
 ```
 
 Use either command, not both as successive mandatory steps. Successful compilation normally returns to the prompt without output. The result is a Linux executable, not a Windows `.exe` or macOS application.
@@ -195,25 +197,25 @@ Use either command, not both as successive mandatory steps. Successful compilati
 ### Step 4 — launch and inspect
 
 ```bash
-./build/mazerunnerV5.4.2
+./build/mazerunnerV5.4.3a
 ```
 
 Select difficulty, a preset or custom dimensions, and monster count. Start opens a loading screen, then the maze. Monsters stay still until your first move or until you press G; the HUD says "MOVE OR PRESS G TO START" until then. Hold a movement key to keep walking. Esc pauses and resumes but never quits; use Q or the QUIT button. For a repeatable initial maze and fixed-seed replays:
 
 ```bash
-./build/mazerunnerV5.4.2 --seed 42 --difficulty medium
+./build/mazerunnerV5.4.3a --seed 42 --difficulty medium
 ```
 
 `42` is simply an example seed, not a special balance parameter or a required value. The difficulty option preselects the card; the user can still change it in setup. To preserve detailed diagnostics while playing:
 
 ```bash
-./build/mazerunnerV5.4.2 --seed 42 --verbose 2>&1 | tee desktop-session.log
+./build/mazerunnerV5.4.3a --seed 42 --verbose 2>&1 | tee desktop-session.log
 ```
 
 `--quiet` suppresses normal state logs, while `--verbose` adds individual monster-step reports. Omit `--quiet` if you want to inspect pursuit and player state. To inspect shared-library resolution:
 
 ```bash
-ldd build/mazerunnerV5.4.2
+ldd build/mazerunnerV5.4.3a
 ```
 
 Investigate any `not found` entry before debugging gameplay. Launching over SSH without a usable display is different from building successfully; use headless mode for simulation-only work in that environment.
@@ -268,14 +270,14 @@ Follow Homebrew's printed shell-profile instructions if you want its tools avail
 ```bash
 cd "$HOME/Downloads/MazeRunner"
 mkdir -p build
-shasum -a 256 src/mazerunnerV5.4.2.cpp
-clang++ src/mazerunnerV5.4.2.cpp -o build/mazerunnerV5.4.2 -std=c++17 -O2 -DNDEBUG -arch arm64 -Wall -Wextra -Wpedantic $(pkg-config --cflags glfw3 glew) $(pkg-config --libs glfw3 glew) -framework OpenGL -pthread
+shasum -a 256 src/mazerunnerV5.4.3a.cpp
+clang++ src/mazerunnerV5.4.3a.cpp -o build/mazerunnerV5.4.3a -std=c++17 -O2 -DNDEBUG -arch arm64 -Wall -Wextra -Wpedantic $(pkg-config --cflags glfw3 glew) $(pkg-config --libs glfw3 glew) -framework OpenGL -pthread
 ```
 
 The OpenGL framework is the macOS counterpart of Linux's `-lGL`. The package metadata provides the library search paths and GLFW/GLEW linkage. If you need an explicit-path fallback for a standard Homebrew installation, use:
 
 ```bash
-clang++ src/mazerunnerV5.4.2.cpp -o build/mazerunnerV5.4.2 -std=c++17 -O2 -DNDEBUG -arch arm64 -I"$(brew --prefix)/include" -L"$(brew --prefix)/lib" -lglfw -lGLEW -framework Cocoa -framework OpenGL -framework IOKit -framework QuartzCore -pthread
+clang++ src/mazerunnerV5.4.3a.cpp -o build/mazerunnerV5.4.3a -std=c++17 -O2 -DNDEBUG -arch arm64 -I"$(brew --prefix)/include" -L"$(brew --prefix)/lib" -lglfw -lGLEW -framework Cocoa -framework OpenGL -framework IOKit -framework QuartzCore -pthread
 ```
 
 This is an alternative to the metadata command. It is not necessary to edit system include paths or copy headers into the project.
@@ -283,9 +285,9 @@ This is an alternative to the metadata command. It is not necessary to edit syst
 ### Step 4 — verify and run
 
 ```bash
-file build/mazerunnerV5.4.2
-otool -L build/mazerunnerV5.4.2
-./build/mazerunnerV5.4.2 --seed 42 --difficulty medium
+file build/mazerunnerV5.4.3a
+otool -L build/mazerunnerV5.4.3a
+./build/mazerunnerV5.4.3a --seed 42 --difficulty medium
 ```
 
 `file` should identify an arm64 Mach-O executable. `otool -L` shows the dynamic libraries/frameworks it expects. Run the manual checklist later in this document, including Retina pointer alignment and focus-loss pause. The game uses Control+A for numeric-field replacement; Command+A is not mapped by this source. Clicking a field already prepares it for replacement on the next digit.
@@ -323,7 +325,7 @@ where g++
 g++ --version
 cd /d "%USERPROFILE%\Downloads\MazeRunner"
 if not exist build mkdir build
-certutil -hashfile src\mazerunnerV5.4.2.cpp SHA256
+certutil -hashfile src\mazerunnerV5.4.3a.cpp SHA256
 ```
 
 The first `where g++` result should be `C:\msys64\ucrt64\bin\g++.exe`. The PATH change applies to the current CMD session; repeat it when opening a new one. `cd /d` changes drive as well as directory. Compare the source hash against the package value.
@@ -342,7 +344,7 @@ dir C:\msys64\ucrt64\lib\libglew32.dll.a
 Paste this as one CMD command:
 
 ```bat
-g++ "src\mazerunnerV5.4.2.cpp" -o "build\mazerunnerV5.4.2.exe" -std=c++17 -O2 -DNDEBUG -Wall -Wextra -Wpedantic -DNOMINMAX -DGLFW_DLL -I"C:\msys64\ucrt64\include" "C:\msys64\ucrt64\lib\libglfw3.dll.a" "C:\msys64\ucrt64\lib\libglew32.dll.a" -lopengl32 -pthread
+g++ "src\mazerunnerV5.4.3a.cpp" -o "build\mazerunnerV5.4.3a.exe" -std=c++17 -O2 -DNDEBUG -Wall -Wextra -Wpedantic -DNOMINMAX -DGLFW_DLL -I"C:\msys64\ucrt64\include" "C:\msys64\ucrt64\lib\libglfw3.dll.a" "C:\msys64\ucrt64\lib\libglew32.dll.a" -lopengl32 -pthread
 ```
 
 The explicit `.dll.a` files are import libraries for the DLL versions; they avoid ambiguity with similarly named static archives. `GLFW_DLL` declares GLFW's DLL linkage. Do not add `GLEW_STATIC` to this DLL build. `NOMINMAX` prevents Windows header macros from colliding with C++ `std::min`/`std::max`. `opengl32` supplies the system GL linkage, while GLEW loads the additional context functions used by the game.
@@ -356,13 +358,13 @@ CMD does not understand Bash's `$(pkg-config ...)`, `export`, or backslash line 
 From the same CMD session:
 
 ```bat
-build\mazerunnerV5.4.2.exe --seed 42 --difficulty medium
+build\mazerunnerV5.4.3a.exe --seed 42 --difficulty medium
 ```
 
 The PATH set above makes `glfw3.dll`, `glew32.dll`, and the compiler runtime DLLs available. For a diagnostic log file:
 
 ```bat
-build\mazerunnerV5.4.2.exe --seed 42 --verbose > desktop-session.log 2>&1
+build\mazerunnerV5.4.3a.exe --seed 42 --verbose > desktop-session.log 2>&1
 ```
 
 This redirects output to the file, so it will not also scroll in the CMD window. Inspect it afterward with `type desktop-session.log` or a text editor.
@@ -380,7 +382,7 @@ copy "C:\msys64\ucrt64\bin\libwinpthread-1.dll" "build\"
 Use the installed toolchain to inspect imports:
 
 ```bat
-objdump -p build\mazerunnerV5.4.2.exe | findstr /C:"DLL Name"
+objdump -p build\mazerunnerV5.4.3a.exe | findstr /C:"DLL Name"
 objdump -p C:\msys64\ucrt64\bin\glfw3.dll | findstr /C:"DLL Name"
 objdump -p C:\msys64\ucrt64\bin\glew32.dll | findstr /C:"DLL Name"
 ```
@@ -396,21 +398,21 @@ A headless executable runs the same maze, monster, director, and auto-player log
 From the package root after creating `build`:
 
 ```bash
-g++ src/mazerunnerV5.4.2.cpp -o build/maze-headless -std=c++17 -O2 -DNDEBUG -Wall -Wextra -Wpedantic -DMAZERUNNER_HEADLESS -pthread
+g++ src/mazerunnerV5.4.3a.cpp -o build/maze-headless -std=c++17 -O2 -DNDEBUG -Wall -Wextra -Wpedantic -DMAZERUNNER_HEADLESS -pthread
 ./build/maze-headless --simulate 33 33 5 42 60000 --difficulty medium --quiet
 ```
 
 ### Apple Silicon macOS
 
 ```bash
-clang++ src/mazerunnerV5.4.2.cpp -o build/maze-headless -std=c++17 -O2 -DNDEBUG -arch arm64 -Wall -Wextra -Wpedantic -DMAZERUNNER_HEADLESS -pthread
+clang++ src/mazerunnerV5.4.3a.cpp -o build/maze-headless -std=c++17 -O2 -DNDEBUG -arch arm64 -Wall -Wextra -Wpedantic -DMAZERUNNER_HEADLESS -pthread
 ./build/maze-headless --simulate 33 33 5 42 60000 --difficulty medium --quiet
 ```
 
 ### Windows CMD, with the UCRT64 PATH already selected
 
 ```bat
-g++ src\mazerunnerV5.4.2.cpp -o build\maze-headless.exe -std=c++17 -O2 -DNDEBUG -Wall -Wextra -Wpedantic -DMAZERUNNER_HEADLESS -pthread
+g++ src\mazerunnerV5.4.3a.cpp -o build\maze-headless.exe -std=c++17 -O2 -DNDEBUG -Wall -Wextra -Wpedantic -DMAZERUNNER_HEADLESS -pthread
 build\maze-headless.exe --simulate 33 33 5 42 60000 --difficulty medium --quiet
 ```
 
@@ -426,7 +428,7 @@ The first two values are **rows then columns**, whereas the setup summary displa
 
 The final line identifies version, difficulty, seed, dimensions, monster count, outcome, simulation time, automatic steps, and host compute time. `ESCAPED` means escape, `CAUGHT` means collision, and `RUNNING` means the simulation limit was reached before either terminal outcome. All three are valid runs and return process exit code zero. Input/build/runtime failures return a nonzero status, generally one from the program's top-level exception handler. A benchmark must parse the outcome rather than counting exit code zero as a win.
 
-Without `--quiet`, the log shows the V5.4.2 monster behavior as it happens: "Heard by N of M" on each clue, "INTERCEPTING at chokepoint", "SPOTTED the player" (High), "HUNTING -> SEARCHING", and solver boldness changes. Add `--verbose` for every monster step.
+Run without `--quiet` to see “Local footstep area”, “Heard by”, “Director: REPORT”, “Investigating by radio”, and precision transitions with the current radio area, retasked monsters and released interceptors. Direct High sightings and hunt/search state transitions also appear when they occur. Add `--verbose` for individual monster moves.
 
 `simulation_ms` is game time; `compute_ms` measures host processing time for the simulation advance, excluding generation. It varies with load, compiler, and machine. Exclude `compute_ms` when comparing deterministic output. The seed controls pseudorandom choices, not difficulty or a guaranteed maze shape across different C++ library implementations. `std::mt19937` is specified, but higher-level distributions/shuffle can differ between standard libraries. Expect repeatability within the same source/settings/toolchain; validate invariants instead of requiring byte-identical cross-platform trajectories.
 
@@ -481,7 +483,7 @@ python3 scripts/run_cmake_validation.py
 python3 scripts/run_calibration.py
 ```
 
-The calibration script builds its own headless binary, runs 400 seeds per cell on the two calibration maps and 60 seeds per preset cell (2,940 games, about half a minute on four cores), and writes `artifacts/results/calibration.json` with escape rates and 95% intervals. `--seeds` and `--preset-seeds` change the cohort sizes.
+The calibration runner builds a fresh optimized headless binary. Its defaults run 2,400 balance games, 540 ten-monster preset games, 400 default-setup games and 1,400 fresh-seed holdouts. `--seeds`, `--preset-seeds`, and `--holdout-seeds` control the row counts for a local experiment. `--jobs` limits simultaneous processes. The raw CSV is ordered by cohort, map, difficulty and seed even with multiple workers. Time ceilings and partial runs appear explicitly in the data. [Raw CSV](artifacts/results/calibration-runs.csv) · [Aggregate JSON](artifacts/results/calibration.json)
 
 An explicit compiler can be selected with `--compiler g++`. If the local compiler/runtime cannot support the sanitizer configuration, `--skip-sanitizers` records that check as skipped. A skipped sanitizer is not equivalent to the bundled successful sanitizer result. The runner and its environment-report wording are intended for Linux; use the manual portable commands in the next section on macOS/Windows.
 
@@ -492,7 +494,8 @@ The graphics harness requests a real offscreen desktop-OpenGL core context via M
 | Stage | Coverage and output |
 |---|---|
 | Headless compilation/help | C++17, `-O2`, `-Wall -Wextra -Wpedantic -Werror -pthread`; real CLI help |
-| Full portable regressions | `ui_tests.cpp` includes and runs the V5.4.2 feature, visual, difficulty, director, and feedback suites |
+| Full portable regressions | `ui_tests.cpp` includes the previous suites and V5.4.3a director, weighted-overlay and hearing regressions |
+| Director traces | First report on 63×63 and a complete Medium relief/recovery cycle on the default rectangle |
 | Sanitized regressions | Same suite with `-O1 -g -fsanitize=address,undefined` |
 | Preset/profile smoke matrix | Sizes 33/63/101 × Low/Medium/High; ten monsters, seed 42, 1,000 ms; each case run twice |
 | Graphical syntax | Full source syntax using declaration-only test headers; no native GLFW/GLEW link claim |
@@ -508,7 +511,8 @@ The sanitizer run sets `ASAN_OPTIONS=detect_leaks=0` and `UBSAN_OPTIONS=halt_on_
 | [feedback_tests.cpp](tests/feedback_tests.cpp) | Start grace, hearing range, roam/hunt/search transitions, approximate hints, waits and invalid movement, full overlays, route diversity (with an independent A* oracle), core regressions, terminal logs |
 | [director_tests.cpp](tests/director_tests.cpp) | Bounded waits, committed retreats, alternate-branch backtracking, hint privacy/expansion, relief recovery, no relief for an idle player, event partitioning |
 | [difficulty_tests.cpp](tests/difficulty_tests.cpp) | Parsing/profile values, frozen-until-start monsters, exact movement/scent/report timings, all director profiles, exhaustive small-graph diversity checks, per-profile invariants |
-| [v542_tests.cpp](tests/v542_tests.cpp) | V5.4.2 features: start grace, per-monster scent, searching, interceptors, corridor sight, timing-aware blocking, generation fallback, debug terrain guard, bounded threat fields, searching eyes |
+| [v542_tests.cpp](tests/v542_tests.cpp) | Retained start grace, searching, interceptors, corridor sight, timing-aware blocking, generation fallback, terrain guard and searching-eye tests |
+| [v543a_tests.cpp](tests/v543a_tests.cpp) | Radio delivery beyond hearing, quantized privacy and cooldowns, scent expiry and fallback, relief cycles, guard release/cap, weighted path detour and hearing through corridors |
 | [visual_tests.cpp](tests/visual_tests.cpp) | Wall/sprite geometry, camera projection, silhouette uniqueness, inclusion of gameplay/profile regressions |
 | [ui_tests.cpp](tests/ui_tests.cpp) | 33/63/101 presets, dimensions/count validation, pointer and keyboard focus, DPI transform, transitions; top-level portable runner |
 | [render_tests.cpp](tests/render_tests.cpp) | Real offscreen draw/readback, screenshot fixtures, actual shaders, sprite visibility, large-map mesh |
@@ -548,53 +552,49 @@ build\regressions.exe
 
 Use the same compiler-runtime DLL search path as for the game. The Linux sanitizer and EGL instructions are not presented as supported native Windows steps. A Windows debugging/sanitizer setup requires validation of that specific toolchain's support.
 
-## 9. Recorded V5.4.2 results
-
-The evidence was generated on **2026-11-18**, with UTC timestamps inside the machine-readable files. The operating system was **Ubuntu 24.04, x86-64** (Linux 6.18 kernel); compiler **GCC 13.3.0**; Python **3.13.18**; CMake **3.28.3**; GLFW **3.3.10** and GLEW **2.2.0** from Ubuntu packages. The renderer reported **OpenGL 4.5 Core, Mesa 25.2.8, llvmpipe LLVM 20.1.2 (256 bits)**. This is software-rendered offscreen GL, not a hardware-GPU performance result. The V5.4.1 evidence came from a different host (Debian 13, GCC 14.2.0, Mesa 25.0.7).
+## 9. Recorded V5.4.3a results
 
 | Evidence | Recorded result |
 |---|---|
-| [environment.json](artifacts/results/environment.json) | Host, compiler, Python, source hash, scope, sanitizer policy |
-| [validation-summary.json](artifacts/results/validation-summary.json) | Overall `passed`; all 30 executed commands returned zero |
-| [gameplay-and-ui.log](artifacts/results/gameplay-and-ui.log) | All chained gameplay, director, profile, visual-geometry, V5.4.2 feature, and UI regressions passed |
-| [sanitizers.log](artifacts/results/sanitizers.log) | Same suite passed under ASan/UBSan, with leak detection off in the runner |
-| [preset-smoke.json](artifacts/results/preset-smoke.json) | Nine configurations, each repeated with equal state output after excluding compute time |
-| [render.log](artifacts/results/render.log) | Real shader/draw/depth/palette/sprite/aspect/zoom/maximum-size checks passed |
-| [app.log](artifacts/results/app.log) | Injected application-lifecycle checks passed, including Esc and hold-to-move; expected failure injection logged |
-| [cmake/validation.json](artifacts/results/cmake/validation.json) | Real CMake configure, Release build with warnings as errors, CTest 13/13 passed |
-| [calibration.json](artifacts/results/calibration.json) | 2,940 auto-solver games: escape, capture, and timeout counts with 95% intervals |
-| [documentation-coverage.json](artifacts/results/documentation-coverage.json) | All 3,161 physical source lines annotated; no missing lines |
+| [Direct runner](artifacts/results/validation-summary.json) | All 32 recorded commands passed, including two director scenarios. Logs contain exact arguments, return codes and timings. |
+| [Portable regressions](artifacts/results/gameplay-and-ui.log) | Gameplay, settings, director, route, graphics geometry and UI passed. The printed 1,705,277 and 5,221,719 values are cumulative assertion counters from nested suites. |
+| [ASan/UBSan](artifacts/results/sanitizers.log) | Same portable suite passed with address and undefined-behavior instrumentation. Leak detection was disabled. |
+| [Application](artifacts/results/app.log) | Real GL drawing, injected GLFW events, stale key cancellation, time partitioning, async generation and error recovery passed. “Injected generation failure” is the intentional recovery fixture. |
+| [Rendering](artifacts/results/render.log) | OpenGL 4.5 core, Mesa llvmpipe. Real shader compilation, geometry, depth, aspect ratio, all ten appearances, zoom and maximum-size mesh passed. |
+| [Ubuntu CTest](artifacts/results/cmake/validation.json) | Release graphical and headless builds, 13/13 tests. The build and CTest logs accompany the record. |
+| [Seed-by-seed games](artifacts/results/calibration-runs.csv) | 4,740 rows with map, seed, profile, result, simulated time and move count. |
+| [Documentation coverage](artifacts/results/documentation-coverage.json) | All 3,261 lines of the shipped source quoted exactly and explained. |
 
-The portable log prints intermediate counters of **1,794,123** and **5,299,684** assertions. These are cumulative assertion counts within nested regression stages, often executed inside loops over states or pixels. They are not that many independent test cases, simulations, seeds, or users. Do not add the two counters together, and do not compare them directly with V5.4.1's counters: several tests now exercise different scenarios. Later visual, V5.4.2-feature, and UI assertions are reported by their own success messages.
+### Reproduce the two director examples
 
-`app.log` contains `Maze setup failed: injected generation failure` before its PASS line. The test deliberately creates a failing worker future and verifies that the application returns to usable setup with an explanation. This expected diagnostic is evidence of the error-recovery test, not an unhandled failure of the run.
+From the root, first run the headless direct build or `python3 scripts/run_validation.py --core`. The runner places the CLI at `build/maze-headless`. With CMake use `build/cmake/bin/maze-headless` for the build directory in section 2.
 
-Outside the runner, the regression suite was also run once with LeakSanitizer enabled (`ASAN_OPTIONS=detect_leaks=1`) and reported no leaks. That run is not part of the recorded artifacts.
+```bash
+./build/maze-headless --simulate 63 63 5 42 50 --difficulty medium
+./build/maze-headless --simulate 21 31 5 7 32000 --difficulty medium
+```
+
+At 40 ms the first run reports rows 0–16 and columns 0–16. All five monsters investigate by radio while none has local evidence. In the second run relief starts at 4.200 s, retasks five monsters and releases one interceptor. The radio area grows from 17×17 to 21×25 and later 21×31. Normal precision returns at 17.600 s. The solver escapes at 31.400 s with 462 successful automatic moves. [First report](artifacts/results/director-radio.log) · [Full relief trace](artifacts/results/director-relief.log)
 
 ### Exact preset smoke outcomes
 
-Each row uses ten monsters, seed 42, a **1,000-ms simulation ceiling**, and two independent invocations. All final state records matched their repeat after excluding `compute_ms`. The V5.4.1 column shows the same configuration under the previous release.
+Every entry uses ten monsters and seed 42. Two invocations produced identical state and step counts through 1,000 simulated milliseconds after excluding host compute time. These short runs check reproducibility. The longer benchmark below measures escape frequency.
 
-| Size | Difficulty | Outcome | Automatic movement steps | V5.4.1 steps | Repeat matched? |
-|---|---|---|---:|---:|---|
-| 33×33 | Low | RUNNING | 25 | 4 | Yes |
-| 33×33 | Medium | RUNNING | 25 | 0 | Yes |
-| 33×33 | High | RUNNING | 4 | 0 | Yes |
-| 63×63 | Low | RUNNING | 25 | 25 | Yes |
-| 63×63 | Medium | RUNNING | 25 | 25 | Yes |
-| 63×63 | High | RUNNING | 25 | 22 | Yes |
-| 101×101 | Low | RUNNING | 25 | 25 | Yes |
-| 101×101 | Medium | RUNNING | 25 | 25 | Yes |
-| 101×101 | High | RUNNING | 25 | 0 | Yes |
+| Map | Difficulty | Outcome at 1,000 ms | Successful moves | Repeat identical |
+|---|---|---|---:|---|
+| 33×33 | Low | RUNNING | 9 | Yes |
+| 33×33 | Medium | RUNNING | 24 | Yes |
+| 33×33 | High | RUNNING | 4 | Yes |
+| 63×63 | Low | RUNNING | 25 | Yes |
+| 63×63 | Medium | RUNNING | 25 | Yes |
+| 63×63 | High | RUNNING | 25 | Yes |
+| 101×101 | Low | RUNNING | 25 | Yes |
+| 101×101 | Medium | RUNNING | 25 | Yes |
+| 101×101 | High | RUNNING | 25 | Yes |
 
-Twenty-five steps is the maximum in one second (one action every 40 ms). V5.4.1 stood still for the whole second in three of these cases, consistent with its rule that any monster on every exit route is a blockage that triggers a scent-loss wait; V5.4.2 moves in all nine. These cases verify input propagation, generation, scheduling, and repeatability; they are **18 smoke invocations**, not a balance study.
+### Escape rate and seed protocol
 
-### Escape-rate calibration
-
-`scripts/run_calibration.py` measured the auto-solver on the source's calibration cohort (21×21 and 31×31, five monsters, 60 s, seeds 1–400) and on the presets (ten monsters, 120 s, seeds 1–60). Pooled calibration escape rates were **Low 93.1%, Medium 64.9%, High 32.1%**, against targets of 92%, 65%, and 35%. Per-map tables, the V5.4.1 comparison, and the preset results are in [section 6 of the AI guide](02-AI-Graphics-and-Redesign.md#measured-escape-rates).
-
-For a future comparison, publish the seed cohort, exact dimensions/counts/duration, compiler/library versions, and counts of ESCAPED/CAUGHT/RUNNING. Keep timeouts in the denominator unless explicitly reporting a different quantity.
-
+Five-monster calibration on 21×21 and 31×31 used seeds 1–400 per profile per size and a 60-second simulation ceiling. Escapes pooled to 751/800 Low, 536/800 Medium and 273/800 High. Ten-monster presets used 33×33, 63×63 and 101×101, each with seeds 1–60 per difficulty and a 120-second ceiling. The actual setup default is 21 rows × 31 columns, five monsters, Medium. It escaped in 260/400 games using seeds 401–800. Separate evaluations on seeds 1201–1400 give 1,400 further games across the two square maps and the default rectangle. Read the row counts, timeouts and Wilson intervals together. [Per-map tables](02-AI-Graphics-and-Redesign.md) · [Benchmark runner](scripts/run_calibration.py)
 ## 10. Screenshots and their reproduction
 
 The repository contains **18 PNG captures** produced by `tests/render_tests.cpp` through actual GL draw/readback. The harness initially emits uncompressed P6 PPM files. The Python runner converts them losslessly to PNG using its standard-library encoder. No image-generation model or external art editor produced these evidence images.
@@ -610,9 +610,9 @@ The repository contains **18 PNG captures** produced by `tests/render_tests.cpp`
 | [setup-portrait.png](artifacts/screenshots/setup-portrait.png) | Default form at 600×1000 offscreen, checking tall-aspect robustness |
 | [setup-invalid.png](artifacts/screenshots/setup-invalid.png) | Width `999`, focused field, visible validation and disabled Start |
 | [loading.png](artifacts/screenshots/loading.png) | Noninteractive maze-generation screen |
-| [hud.png](artifacts/screenshots/hud.png) | Naturally generated 33×33 Medium map, ten monsters, seed 42, auto-solving at 400 ms: ten steps taken, "6 HUNTING" in the HUD, amber route crossing distant monsters |
-| [pause.png](artifacts/screenshots/pause.png) | Paused presentation of that same 400-ms game state |
-| [result.png](artifacts/screenshots/result.png) | Actual zero-monster escape on regenerated 33×33 Medium seed-42 terrain: 148 automatic moves, 5,920 ms, displayed as 5.9 seconds |
+| [hud.png](artifacts/screenshots/hud.png) | Seed 7, 21 rows × 31 columns, Medium, five monsters, 4,200 ms. Fifty steps, three hunting, three radio reports and a relief area of 21×25. |
+| [pause.png](artifacts/screenshots/pause.png) | Pause menu drawn over the same measured 4,200-ms relief state. |
+| [result.png](artifacts/screenshots/result.png) | Genuine escape after regenerating the same Maze object with zero monsters. The static mesh is rebuilt for that terrain. Result reads 3.6 s and 90 steps. |
 | [showcase.png](artifacts/screenshots/showcase.png) | Hand-arranged 13×19 geometry/actor fixture, three hunting appearances, 1200×900 |
 | [wide.png](artifacts/screenshots/wide.png) | Same showcase at 1600×600 |
 | [portrait.png](artifacts/screenshots/portrait.png) | Same showcase at 600×1000 |
@@ -628,17 +628,26 @@ To regenerate all captures on the supported Linux harness:
 python3 scripts/run_validation.py --graphics
 ```
 
-To produce a comparable native-window screenshot manually, start with `--seed 42`, select Medium, Small, and ten monsters, start the game, then enable auto-solving with G. Capturing precisely 400 simulation milliseconds through manual interaction is difficult, so a desktop screenshot should be labeled with its actual visible time instead of represented as pixel-identical to the offscreen fixture. For exact fixture states, use the provided harness.
+To compare the native HUD, launch with `--seed 7`, leave the default width 31, height 21, Medium and five monsters, then press G. Watch for the first relief event around 4.2 seconds on a matching toolchain. The automated fixture stops at precisely 4,200 simulated milliseconds. A manually captured frame should be labeled with its visible time.
 
 Pixel-identical output can vary across GL drivers and rasterization environments. The tests check geometry, invariants, visibility, and color ranges rather than claiming universal screenshot hashes across platforms. The package hashes identify the supplied PNG bytes only.
 
-![V5.4.2 result from a real zero-monster escape](artifacts/screenshots/result.png)
+![V5.4.3a result from a real zero-monster escape](artifacts/screenshots/result.png)
+### Rebuild the release ZIP
 
+Start from a pristine checkout or extracted release if you want the published bytes. The archive script verifies the manifest first, sorts its entries, fixes ZIP timestamps and uses standard-library DEFLATE. Reproducing the exact compressed bytes also requires compatible zlib output. After a deliberate change or evidence rerun, audit the new tree before packaging. New runtime measurements have their own hashes.
+
+```bash
+python3 scripts/verify_package.py
+python3 scripts/package_devkit.py
+```
+
+The archive is written to `dist/MazeRunner-V5.4.3a-Documentation-and-Validation.zip`. Its top-level folder is `MazeRunner-V5.4.3a/`. Verification works from a fresh extraction with Python 3.9 or newer, without Git, network access or compiled binaries. Compare the archive digest printed by the packager against the distributor's published SHA-256.
 ## 11. Native desktop acceptance checklist
 
 Run this on each actual intended release platform after a successful native graphical build. Record OS/architecture, compiler, GLFW/GLEW versions, graphics device/driver, source hash, and whether you used a fixed seed. These checks complement the automated results; they are not marked completed by the Linux offscreen run.
 
-1. Launch with no arguments. Verify that the window title and setup say V5.4.2, the app opens without terminal prompts, and the initial form is Medium, 31×21, five monsters. Keep the terminal visible and verify normal logs appear when play starts.
+1. Launch with no arguments. Verify that the window title and setup say V5.4.3a, the app opens without terminal prompts, and the initial form is Medium, 31×21, five monsters. Keep the terminal visible and verify normal logs appear when play starts.
 2. Select each preset and confirm Small 33×33, Standard 63×63, Large 101×101. Confirm only the matching size button is selected. Edit one dimension to a different valid odd value and confirm the preset highlight clears appropriately.
 3. Type `20` into a dimension, move focus, and start; verify normalization to `21`. Try empty fields, width `999`, and count `11`; verify a visible error and disabled Start. Confirm zero and ten monsters are accepted.
 4. Use mouse, Tab, Shift+Tab, Enter, and numeric editing. Press inside a button and release outside it; confirm it does not activate. Verify the click target remains aligned after resizing and on a high-DPI display. Press Esc while editing a field: focus should move to Start and the game must not quit. Press Esc again on setup: nothing should happen.

@@ -1,6 +1,6 @@
 {
-  "recorded_utc": "2026-11-18T00:10:48.369814+00:00",
-  "release": "5.4.2",
+  "recorded_utc": "2026-11-18T01:46:03.902878+00:00",
+  "release": "5.4.3a",
   "status": "passed",
   "checks": {
     "source_matches_line_guide": true,
@@ -9,7 +9,8 @@
     "cmake_file_included": true,
     "raw_validation_passed": true,
     "cmake_configure_build_ctest_passed": true,
-    "calibration_recorded": true,
+    "raw_calibration_matches_all_groups_and_seeds": true,
+    "director_evidence": true,
     "smoke_matrix_complete": true,
     "01-Source-Line-by-Line.md_fences_balanced": true,
     "01-Source-Line-by-Line.md_no_internal_paths": true,
@@ -25,7 +26,7 @@
     "result.png"
   ],
   "review_notes": [
-    "Reviewed the V5.4.2 setup label, the HUD hunting counter and amber route, the generated-map route, and the real zero-monster escape result.",
+    "Release captures show the V5.4.3a label, the seed-7 relief HUD with RADIO 3 and 21x25 area, the generated exit route and the zero-monster result.",
     "Native GLFW desktop startup and macOS/Windows builds were not executed.",
     "Portable/regression assertion counters are cumulative, not independent simulation totals."
   ]

@@ -1,9 +1,10 @@
 {
-  "recorded_utc": "2026-11-18T00:03:55.055346+00:00",
+  "recorded_utc": "2026-11-18T01:36:28.822720+00:00",
   "cmake_configure_build_ctest_status": "passed",
   "scope": "Real CMake configure, Release build with warnings as errors, and CTest run on this Linux host.",
   "summary": {
-    "cmake": "cmake version 3.28.3",
+    "cmake": "cmake version 3.31.6",
+    "graphical_target": true,
     "generator": "Ninja",
     "tests_total": 13,
     "tests_failed": 0,
@@ -66,7 +67,7 @@
       "maze-headless",
       "maze-regressions",
       "maze-render-tests",
-      "mazerunnerV5.4.2"
+      "mazerunnerV5.4.3a"
     ]
   },
   "checks": [
@@ -77,7 +78,7 @@
         "--version"
       ],
       "exit_code": 0,
-      "seconds": 0.047,
+      "seconds": 0.558,
       "status": "passed"
     },
     {
@@ -89,12 +90,13 @@
         "-S",
         ".",
         "-B",
-        "/home/user/MazeRunner/build/cmake-validation",
+        "build/cmake-validation",
         "-DCMAKE_BUILD_TYPE=Release",
-        "-DMAZERUNNER_WARNINGS_AS_ERRORS=ON"
+        "-DMAZERUNNER_WARNINGS_AS_ERRORS=ON",
+        "-DMAZERUNNER_BUILD_GRAPHICS=ON"
       ],
       "exit_code": 0,
-      "seconds": 0.637,
+      "seconds": 0.995,
       "status": "passed"
     },
     {
@@ -102,11 +104,12 @@
       "command": [
         "cmake",
         "--build",
-        "/home/user/MazeRunner/build/cmake-validation",
-        "--parallel"
+        "build/cmake-validation",
+        "--parallel",
+        "2"
       ],
       "exit_code": 0,
-      "seconds": 10.622,
+      "seconds": 19.33,
       "status": "passed"
     },
     {
@@ -114,11 +117,11 @@
       "command": [
         "ctest",
         "--test-dir",
-        "/home/user/MazeRunner/build/cmake-validation",
+        "build/cmake-validation",
         "--output-on-failure"
       ],
       "exit_code": 0,
-      "seconds": 2.266,
+      "seconds": 6.235,
       "status": "passed"
     }
   ]
