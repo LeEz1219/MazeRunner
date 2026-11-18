@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""Verify the original V5.4.1 package before rerunning tests or editing files."""
+"""Verify the committed package (release, payload hashes, line guide, links, screenshots) before rerunning tests or editing files."""
 from pathlib import Path
 import hashlib, html, json, re, struct, sys
 ROOT = Path(__file__).resolve().parents[1]
-EXPECTED_SOURCE_SHA256 = '19affcaf73d4f7acc3578b53b1e5f8a0a0debe11beb2ecf8e365773b2e9ee1ae'
+EXPECTED_RELEASE = '5.4.2'
 DOCUMENTS = ['01-Source-Line-by-Line.md','02-AI-Graphics-and-Redesign.md','03-Build-Test-and-Reproduce.md']
 
 def require(condition, message):
@@ -11,7 +11,7 @@ def require(condition, message):
 
 def main():
     manifest=json.loads((ROOT/'manifest.json').read_text(encoding='utf-8'))
-    require(manifest['release']=='5.4.1','Incorrect manifest release')
+    require(manifest['release']==EXPECTED_RELEASE,'Incorrect manifest release')
     for entry in manifest['files']:
         path=(ROOT/entry['path']).resolve()
         require(path.is_relative_to(ROOT), 'Unsafe manifest path: '+entry['path'])
@@ -26,8 +26,10 @@ def main():
         require(path.is_relative_to(ROOT),'Unsafe checksum path')
         require(path.is_file() and hashlib.sha256(path.read_bytes()).hexdigest()==digest,'Checksum mismatch: '+name)
     require(sorted(p.name for p in ROOT.glob('*.md'))==DOCUMENTS,'Expected exactly the three documented Markdown files')
-    source=(ROOT/'src/mazerunnerV5.4.1.cpp').read_bytes()
-    require(hashlib.sha256(source).hexdigest()==EXPECTED_SOURCE_SHA256,'Production source differs from V5.4.1 reference')
+    source_path=f'src/mazerunnerV{EXPECTED_RELEASE}.cpp'
+    require(manifest['source']['path']==source_path,'Manifest names an unexpected source file')
+    source=(ROOT/source_path).read_bytes()
+    require(hashlib.sha256(source).hexdigest()==manifest['source']['sha256'],f'Production source differs from the V{EXPECTED_RELEASE} manifest')
     lines=source.decode('utf-8').splitlines()
     guide=(ROOT/DOCUMENTS[0]).read_text(encoding='utf-8')
     entries=re.findall(r'^\*\*L(\d{4})\*\* — <code>(.*?)</code>$',guide,re.M)
@@ -58,8 +60,8 @@ def main():
         require(raw[:8]==b'\x89PNG\r\n\x1a\n','Invalid PNG signature: '+path.name)
         w,h=struct.unpack('>II',raw[16:24])
         require(w>0 and h>0,'Invalid PNG dimensions: '+path.name)
-    print(f'PASS: {len(manifest["files"])} payload hashes; source unchanged; {len(lines)} exact line annotations; three Markdown guides; local links; eighteen PNGs.')
-    print('This validates original package integrity, not native-platform build or gameplay behavior.')
+    print(f'PASS: V{EXPECTED_RELEASE}; {len(manifest["files"])} payload hashes; source matches manifest; {len(lines)} exact line annotations; three Markdown guides; local links; eighteen PNGs.')
+    print('This validates package integrity, not native-platform build or gameplay behavior.')
 
 if __name__=='__main__':
     try:main()

@@ -1,0 +1,310 @@
+{
+  "recorded_utc": "2026-11-18T00:04:34.285233+00:00",
+  "source": "src/mazerunnerV5.4.2.cpp",
+  "platform": "Linux-6.18.44-fc-v553-x86_64-with-glibc2.39",
+  "compiler": "g++ (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0",
+  "targets": {
+    "low": 0.92,
+    "medium": 0.65,
+    "high": 0.35
+  },
+  "pooled_calibration": {
+    "low": {
+      "escape_rate": 0.9313,
+      "escape_rate_95ci": [
+        0.9116,
+        0.9468
+      ],
+      "games": 800
+    },
+    "medium": {
+      "escape_rate": 0.6488,
+      "escape_rate_95ci": [
+        0.615,
+        0.681
+      ],
+      "games": 800
+    },
+    "high": {
+      "escape_rate": 0.3212,
+      "escape_rate_95ci": [
+        0.2898,
+        0.3544
+      ],
+      "games": 800
+    }
+  },
+  "wall_seconds": 31.9,
+  "results": [
+    {
+      "cohort": "calibration",
+      "size": "21x21",
+      "monsters": 5,
+      "limit_ms": 60000,
+      "difficulty": "low",
+      "seeds": "1-400",
+      "games": 400,
+      "escaped": 356,
+      "caught": 41,
+      "timed_out": 3,
+      "escape_rate": 0.89,
+      "escape_rate_95ci": [
+        0.8555,
+        0.917
+      ],
+      "median_escape_ms": 6320
+    },
+    {
+      "cohort": "calibration",
+      "size": "21x21",
+      "monsters": 5,
+      "limit_ms": 60000,
+      "difficulty": "medium",
+      "seeds": "1-400",
+      "games": 400,
+      "escaped": 228,
+      "caught": 169,
+      "timed_out": 3,
+      "escape_rate": 0.57,
+      "escape_rate_95ci": [
+        0.521,
+        0.6176
+      ],
+      "median_escape_ms": 14480
+    },
+    {
+      "cohort": "calibration",
+      "size": "21x21",
+      "monsters": 5,
+      "limit_ms": 60000,
+      "difficulty": "high",
+      "seeds": "1-400",
+      "games": 400,
+      "escaped": 111,
+      "caught": 286,
+      "timed_out": 3,
+      "escape_rate": 0.2775,
+      "escape_rate_95ci": [
+        0.2359,
+        0.3233
+      ],
+      "median_escape_ms": 18960
+    },
+    {
+      "cohort": "calibration",
+      "size": "31x31",
+      "monsters": 5,
+      "limit_ms": 60000,
+      "difficulty": "low",
+      "seeds": "1-400",
+      "games": 400,
+      "escaped": 389,
+      "caught": 11,
+      "timed_out": 0,
+      "escape_rate": 0.9725,
+      "escape_rate_95ci": [
+        0.9514,
+        0.9846
+      ],
+      "median_escape_ms": 4960
+    },
+    {
+      "cohort": "calibration",
+      "size": "31x31",
+      "monsters": 5,
+      "limit_ms": 60000,
+      "difficulty": "medium",
+      "seeds": "1-400",
+      "games": 400,
+      "escaped": 291,
+      "caught": 106,
+      "timed_out": 3,
+      "escape_rate": 0.7275,
+      "escape_rate_95ci": [
+        0.6819,
+        0.7688
+      ],
+      "median_escape_ms": 12960
+    },
+    {
+      "cohort": "calibration",
+      "size": "31x31",
+      "monsters": 5,
+      "limit_ms": 60000,
+      "difficulty": "high",
+      "seeds": "1-400",
+      "games": 400,
+      "escaped": 146,
+      "caught": 245,
+      "timed_out": 9,
+      "escape_rate": 0.365,
+      "escape_rate_95ci": [
+        0.3193,
+        0.4133
+      ],
+      "median_escape_ms": 16920
+    },
+    {
+      "cohort": "presets",
+      "size": "33x33",
+      "monsters": 10,
+      "limit_ms": 120000,
+      "difficulty": "low",
+      "seeds": "1-60",
+      "games": 60,
+      "escaped": 55,
+      "caught": 5,
+      "timed_out": 0,
+      "escape_rate": 0.9167,
+      "escape_rate_95ci": [
+        0.8193,
+        0.9639
+      ],
+      "median_escape_ms": 11960
+    },
+    {
+      "cohort": "presets",
+      "size": "33x33",
+      "monsters": 10,
+      "limit_ms": 120000,
+      "difficulty": "medium",
+      "seeds": "1-60",
+      "games": 60,
+      "escaped": 27,
+      "caught": 33,
+      "timed_out": 0,
+      "escape_rate": 0.45,
+      "escape_rate_95ci": [
+        0.3309,
+        0.5751
+      ],
+      "median_escape_ms": 21920
+    },
+    {
+      "cohort": "presets",
+      "size": "33x33",
+      "monsters": 10,
+      "limit_ms": 120000,
+      "difficulty": "high",
+      "seeds": "1-60",
+      "games": 60,
+      "escaped": 2,
+      "caught": 57,
+      "timed_out": 1,
+      "escape_rate": 0.0333,
+      "escape_rate_95ci": [
+        0.0092,
+        0.1136
+      ],
+      "median_escape_ms": 70640
+    },
+    {
+      "cohort": "presets",
+      "size": "63x63",
+      "monsters": 10,
+      "limit_ms": 120000,
+      "difficulty": "low",
+      "seeds": "1-60",
+      "games": 60,
+      "escaped": 57,
+      "caught": 3,
+      "timed_out": 0,
+      "escape_rate": 0.95,
+      "escape_rate_95ci": [
+        0.863,
+        0.9829
+      ],
+      "median_escape_ms": 11680
+    },
+    {
+      "cohort": "presets",
+      "size": "63x63",
+      "monsters": 10,
+      "limit_ms": 120000,
+      "difficulty": "medium",
+      "seeds": "1-60",
+      "games": 60,
+      "escaped": 28,
+      "caught": 32,
+      "timed_out": 0,
+      "escape_rate": 0.4667,
+      "escape_rate_95ci": [
+        0.3463,
+        0.5911
+      ],
+      "median_escape_ms": 19200
+    },
+    {
+      "cohort": "presets",
+      "size": "63x63",
+      "monsters": 10,
+      "limit_ms": 120000,
+      "difficulty": "high",
+      "seeds": "1-60",
+      "games": 60,
+      "escaped": 7,
+      "caught": 53,
+      "timed_out": 0,
+      "escape_rate": 0.1167,
+      "escape_rate_95ci": [
+        0.0577,
+        0.2218
+      ],
+      "median_escape_ms": 30280
+    },
+    {
+      "cohort": "presets",
+      "size": "101x101",
+      "monsters": 10,
+      "limit_ms": 120000,
+      "difficulty": "low",
+      "seeds": "1-60",
+      "games": 60,
+      "escaped": 60,
+      "caught": 0,
+      "timed_out": 0,
+      "escape_rate": 1.0,
+      "escape_rate_95ci": [
+        0.9398,
+        1.0
+      ],
+      "median_escape_ms": 16400
+    },
+    {
+      "cohort": "presets",
+      "size": "101x101",
+      "monsters": 10,
+      "limit_ms": 120000,
+      "difficulty": "medium",
+      "seeds": "1-60",
+      "games": 60,
+      "escaped": 46,
+      "caught": 14,
+      "timed_out": 0,
+      "escape_rate": 0.7667,
+      "escape_rate_95ci": [
+        0.6456,
+        0.8556
+      ],
+      "median_escape_ms": 27120
+    },
+    {
+      "cohort": "presets",
+      "size": "101x101",
+      "monsters": 10,
+      "limit_ms": 120000,
+      "difficulty": "high",
+      "seeds": "1-60",
+      "games": 60,
+      "escaped": 15,
+      "caught": 45,
+      "timed_out": 0,
+      "escape_rate": 0.25,
+      "escape_rate_95ci": [
+        0.1578,
+        0.3723
+      ],
+      "median_escape_ms": 35520
+    }
+  ]
+}

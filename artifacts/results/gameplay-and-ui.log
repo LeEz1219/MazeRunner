@@ -1,4 +1,5 @@
-PASS: 1998665 assertions across director, recovery, path, generation, and gameplay regressions.
-PASS: 5587538 assertions including all difficulty profiles, input, timing, hints, diversity, and determinism.
+PASS: 1794123 assertions across director, recovery, path, generation, and gameplay regressions.
+PASS: 5299684 assertions including all difficulty profiles, input, timing, hints, diversity, and determinism.
 PASS: visual geometry and camera invariants plus all gameplay/difficulty regressions.
+PASS: V5.4.2 start grace, hearing, searching, interceptors, sight, timing-aware blocking, fallback, and guards.
 PASS: setup validation, all controls, text input, bounds, DPI hit testing, keyboard navigation, and screen transitions.
