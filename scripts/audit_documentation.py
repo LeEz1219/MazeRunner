@@ -1,0 +1,131 @@
+#!/usr/bin/env python3
+"""Re-record documentation coverage/audit results, manifest.json, and SHA256SUMS for the current tree.
+
+Run after an intended change to the source, guides, tests, or regenerated artifacts.
+It reads what is on disk; it does not build or run anything. Afterwards,
+scripts/verify_package.py checks the tree against the records written here.
+"""
+import datetime, hashlib, html, json, pathlib, re, struct, sys
+
+ROOT = pathlib.Path(__file__).resolve().parents[1]
+RELEASE = '5.4.2'
+SOURCE = f'src/mazerunnerV{RELEASE}.cpp'
+DOCUMENTS = ['01-Source-Line-by-Line.md', '02-AI-Graphics-and-Redesign.md', '03-Build-Test-and-Reproduce.md']
+RESULTS = ROOT / 'artifacts/results'
+# Files that describe the package rather than belong to it, and generated build output.
+EXCLUDED_DIRS = {'.git', '.github', 'build'}
+EXCLUDED_FILES = {'.gitignore', '.gitattributes', 'manifest.json', 'SHA256SUMS'}
+
+def sha256(path):
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+def payload():
+    files = []
+    for path in sorted(ROOT.rglob('*')):
+        rel = path.relative_to(ROOT)
+        if not path.is_file() or rel.parts[0] in EXCLUDED_DIRS or str(rel) in EXCLUDED_FILES:
+            continue
+        if rel.suffix == '.ppm' or '__pycache__' in rel.parts:
+            continue
+        files.append(rel.as_posix())
+    return files
+
+def category(line):
+    s = line.strip()
+    if not s: return 'blank'
+    if s.startswith('//'): return 'comment'
+    if s.startswith('#include'): return 'include'
+    if s.startswith('#'): return 'preprocessor'
+    if s in ('public:', 'private:', 'protected:'): return 'access'
+    if re.fullmatch(r'[{}();,\]]+', s): return 'structure'
+    if re.fullmatch(r'("[^"]{20}",?\s*)+(\}\};)?', s): return 'sprite-row'
+    if s.startswith("case '") and 'return {' in s: return 'glyph'
+    return 'semantic'
+
+def main():
+    now = datetime.datetime.now(datetime.timezone.utc).isoformat()
+    source = (ROOT / SOURCE).read_bytes()
+    lines = source.decode('utf-8').splitlines()
+    guide = (ROOT / DOCUMENTS[0]).read_text(encoding='utf-8')
+    entries = re.findall(r'^\*\*L(\d{4})\*\* — <code>(.*?)</code>$', guide, re.M)
+    annotated, missing = set(), []
+    for number, code in entries:
+        n = int(number)
+        decoded = html.unescape(code)
+        if decoded == '[blank line]': decoded = ''
+        if 1 <= n <= len(lines) and decoded == lines[n - 1]:
+            annotated.add(n)
+    missing = [n for n in range(1, len(lines) + 1) if n not in annotated]
+    function_rows = re.findall(r'^\| \[L\d{4}\]\(#l\d{4}\) \| `[^`]+` \|', guide, re.M)
+    categories = {}
+    for line in lines:
+        k = category(line); categories[k] = categories.get(k, 0) + 1
+    coverage = dict(source=SOURCE, source_sha256=hashlib.sha256(source).hexdigest(), physical_lines=len(lines),
+                    annotated_lines=len(annotated), missing_lines=missing,
+                    function_index_entries=len(function_rows), annotation_categories=dict(sorted(categories.items())))
+    (RESULTS / 'documentation-coverage.json').write_text(json.dumps(coverage, indent=2) + '\n')
+
+    checks = {
+        'source_matches_line_guide': not missing and len(entries) == len(lines),
+        'exactly_three_markdown_files': sorted(p.name for p in ROOT.glob('*.md')) == DOCUMENTS,
+        'eighteen_png_screenshots': len(list((ROOT / 'artifacts/screenshots').glob('*.png'))) == 18,
+        'cmake_file_included': (ROOT / 'CMakeLists.txt').is_file(),
+    }
+    def status(path, key='status'):
+        try: return json.loads((RESULTS / path).read_text()).get(key)
+        except (OSError, ValueError): return None
+    checks['raw_validation_passed'] = status('validation-summary.json') == 'passed'
+    checks['cmake_configure_build_ctest_passed'] = status('cmake/validation.json', 'cmake_configure_build_ctest_status') == 'passed'
+    checks['calibration_recorded'] = (RESULTS / 'calibration.json').is_file()
+    try:
+        smoke = json.loads((RESULTS / 'preset-smoke.json').read_text())
+        checks['smoke_matrix_complete'] = len(smoke) == 9 and all(r['repeat_equal'] for r in smoke)
+    except (OSError, ValueError, KeyError):
+        checks['smoke_matrix_complete'] = False
+    for document in DOCUMENTS:
+        text = (ROOT / document).read_text(encoding='utf-8')
+        checks[f'{document}_fences_balanced'] = text.count('```') % 2 == 0
+        checks[f'{document}_no_internal_paths'] = not re.search(r'/(tmp|root|home)/[A-Za-z]', text)
+    audit = dict(recorded_utc=now, release=RELEASE, status='passed' if all(checks.values()) else 'failed', checks=checks,
+                 visual_review=['setup.png', 'hud.png', 'game.png', 'result.png'],
+                 review_notes=['Reviewed the V5.4.2 setup label, the HUD hunting counter and amber route, the generated-map route, and the real zero-monster escape result.',
+                               'Native GLFW desktop startup and macOS/Windows builds were not executed.',
+                               'Portable/regression assertion counters are cumulative, not independent simulation totals.'])
+    (RESULTS / 'documentation-audit.json').write_text(json.dumps(audit, indent=2) + '\n')
+
+    env = json.loads((RESULTS / 'environment.json').read_text()) if (RESULTS / 'environment.json').is_file() else {}
+    render = (RESULTS / 'render.log').read_text().splitlines()[0] if (RESULTS / 'render.log').is_file() else None
+    cmake = json.loads((RESULTS / 'cmake/validation.json').read_text()) if (RESULTS / 'cmake/validation.json').is_file() else {}
+    calibration = json.loads((RESULTS / 'calibration.json').read_text()) if (RESULTS / 'calibration.json').is_file() else {}
+    files = payload()
+    manifest = dict(
+        package=f'MazeRunner V{RELEASE} Documentation and Validation', release=RELEASE, previous_release='5.4.1',
+        prepared_date=now[:10],
+        source=dict(path=SOURCE, bytes=len(source), physical_lines=len(lines), sha256=coverage['source_sha256']),
+        validation=dict(platform=env.get('platform'), compiler=env.get('compiler'), renderer=render,
+                        native_glfw_startup_executed=False, macos_execution=False, windows_execution=False,
+                        sanitizer_leak_detection=env.get('sanitizer_leak_detection'),
+                        preset_smoke_configurations=9, smoke_invocations=18,
+                        cmake_configure_build_ctest=cmake.get('cmake_configure_build_ctest_status'),
+                        ctest_tests=cmake.get('summary', {}).get('tests_total'),
+                        calibration_benchmark_performed=bool(calibration),
+                        calibration_pooled_escape_rates={k: v['escape_rate'] for k, v in calibration.get('pooled_calibration', {}).items()}),
+        entry_guide='03-Build-Test-and-Reproduce.md',
+        excluded_generated_files=['build/', 'artifacts/screenshots/*.ppm'],
+        build_system=dict(file='CMakeLists.txt', minimum_cmake='3.20',
+                          targets=['mazerunner', 'maze-headless', 'maze-regressions', 'maze-render-tests', 'maze-app-tests'],
+                          full_package_ctest_cases=13, ctest_cases_without_egl=11,
+                          configuration_executed_here=cmake.get('cmake_configure_build_ctest_status') == 'passed',
+                          validation_record='artifacts/results/cmake/validation.json'),
+        files=[dict(path=f, bytes=(ROOT / f).stat().st_size, sha256=sha256(ROOT / f)) for f in files])
+    (ROOT / 'manifest.json').write_text(json.dumps(manifest, indent=2) + '\n')
+    sums = [f'{sha256(ROOT / f)}  {f}' for f in files + ['manifest.json']]
+    (ROOT / 'SHA256SUMS').write_text('\n'.join(sums) + '\n')
+    print(f"audit {audit['status']}: {len(lines)} lines, {len(annotated)} annotated, {len(function_rows)} index entries; "
+          f"manifest lists {len(files)} files")
+    for key, ok in checks.items():
+        if not ok: print('FAILED CHECK:', key, file=sys.stderr)
+    return 0 if audit['status'] == 'passed' else 1
+
+if __name__ == '__main__':
+    sys.exit(main())

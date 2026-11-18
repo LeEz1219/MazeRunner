@@ -42,7 +42,7 @@ Use CMake 3.20 or newer. The [build and reproduction guide](../03-Build-Test-and
 | Mouse, Tab, Enter | Configure and start a game |
 | WASD or arrow keys | Move the player (hold to keep walking) |
 | G | Toggle automatic solving |
-| Esc | Pause or resume |
+| Esc | Pause or resume (never quits) |
 | Mouse wheel, +, − | Zoom |
 | Home | Fit the maze to the viewport |
 | Q | Quit |
@@ -63,19 +63,19 @@ Here `42` is the random seed, which makes the run reproducible with the same bui
 | File or directory | Contents |
 |---|---|
 | [src/mazerunnerV5.4.2.cpp](../src/mazerunnerV5.4.2.cpp) | Complete game source with embedded sprites and font |
-| [CMakeLists.txt](../CMakeLists.txt) | Graphical, headless, and portable regression targets |
-| [01-Source-Line-by-Line.md](../01-Source-Line-by-Line.md) | Detailed annotations for all 2,643 physical source lines |
-| [02-AI-Graphics-and-Redesign.md](../02-AI-Graphics-and-Redesign.md) | AI mechanics, graphics, UI design, and redesign guidance |
+| [CMakeLists.txt](../CMakeLists.txt) | Graphical, headless, portable regression, and EGL render/app test targets |
+| [01-Source-Line-by-Line.md](../01-Source-Line-by-Line.md) | Detailed annotations for all 3,161 physical source lines |
+| [02-AI-Graphics-and-Redesign.md](../02-AI-Graphics-and-Redesign.md) | AI mechanics, measured escape rates, graphics, UI design, and redesign guidance |
 | [03-Build-Test-and-Reproduce.md](../03-Build-Test-and-Reproduce.md) | Platform-specific compilation and reproduction instructions |
 | [tests/](../tests/) | Gameplay, director, difficulty, V5.4.2 feature, UI, rendering, and application tests |
-| [scripts/](../scripts/) | Validation runner and package integrity verifier |
-| [artifacts/results/](../artifacts/results/) | Recorded commands, environment, test logs, and results |
+| [scripts/](../scripts/) | Validation, CMake, and calibration runners; documentation audit; package integrity verifier |
+| [artifacts/results/](../artifacts/results/) | Recorded commands, environment, test logs, CMake record, and calibration results |
 | [artifacts/screenshots/](../artifacts/screenshots/) | Eighteen PNG captures |
-| [manifest.json](../manifest.json), [SHA256SUMS](../SHA256SUMS) | Original package metadata and payload checksums |
+| [manifest.json](../manifest.json), [SHA256SUMS](../SHA256SUMS) | Package metadata and payload checksums |
 
-The three numbered guides, `manifest.json`, `SHA256SUMS`, `scripts/verify_package.py`, and `artifacts/` describe the original V5.4.1 package and have not been regenerated for V5.4.2. The package verifier therefore reports the V5.4.2 source as a change. When the V5.4.1 package was imported, all 90 files from `MazeRunner-V5.4.1-Documentation-and-Validation.zip` were preserved byte-for-byte. This repository adds this README, a `.gitignore`, and a `.gitattributes` file. The README is under `.github/` so the original verifier's three-guide check continues to pass. Git checkout preserves packaged file bytes across platforms.
+The three numbered guides, `manifest.json`, `SHA256SUMS`, and everything under `artifacts/` were regenerated for V5.4.2. The README lives under `.github/` so the verifier's exactly-three-guides check passes. `.gitattributes` keeps packaged file bytes identical across platforms, so the checksums hold on any checkout.
 
-Verify the original package before editing files or regenerating results, using Python 3.9 or newer:
+Verify the package before editing files or regenerating results, using Python 3.9 or newer:
 
 ```bash
 python3 scripts/verify_package.py
@@ -87,10 +87,17 @@ The Linux validation runner rebuilds and reruns the supplied checks:
 python3 scripts/run_validation.py --all
 ```
 
-This command regenerates files under `artifacts/`, so use a separate working copy to retain the published reference results. See the reproduction guide for the Linux EGL/Mesa requirements and options for running only the portable checks.
+This command regenerates files under `artifacts/`, so use a separate working copy to retain the published reference results. `scripts/run_cmake_validation.py` records a real CMake/CTest run, and `scripts/run_calibration.py` re-measures auto-solver escape rates. After an intended change, `scripts/audit_documentation.py` re-records documentation coverage, `manifest.json`, and `SHA256SUMS`. See the reproduction guide for the Linux EGL/Mesa requirements and options for running only the portable checks.
 
 ## Recorded validation scope
 
-The packaged results passed on a Debian 13 x86-64 host with GCC 14.2.0. They cover gameplay and UI regressions, AddressSanitizer and UndefinedBehaviorSanitizer checks, repeated preset/difficulty smoke cases, real offscreen OpenGL rendering, and application logic with injected GLFW callbacks.
+The recorded V5.4.2 results passed on an Ubuntu 24.04 x86-64 host with GCC 13.3.0. They cover:
 
-The supplied CMake configure/build/CTest workflow was not executed in that environment; its results directory explicitly records direct-compiler checks instead. Native desktop startup, native macOS builds, and native Windows builds were not executed. The platform instructions and recorded logs describe these limits in detail.
+- gameplay, UI, and V5.4.2 feature regressions;
+- AddressSanitizer and UndefinedBehaviorSanitizer checks;
+- repeated preset/difficulty smoke cases;
+- real offscreen OpenGL rendering and application logic with injected GLFW callbacks;
+- a real CMake configure, build, and CTest run (13/13), with the graphical game linked against Ubuntu's GLFW/GLEW packages;
+- a 2,940-game escape-rate calibration.
+
+Native desktop startup (no display was available), native macOS builds, and native Windows builds were not executed. The platform instructions and recorded logs describe these limits in detail.

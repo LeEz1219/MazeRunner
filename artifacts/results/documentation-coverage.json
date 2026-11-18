@@ -1,23 +1,19 @@
 {
-  "source_sha256": "19affcaf73d4f7acc3578b53b1e5f8a0a0debe11beb2ecf8e365773b2e9ee1ae",
-  "physical_lines": 2643,
-  "annotated_lines": 2643,
+  "source": "src/mazerunnerV5.4.2.cpp",
+  "source_sha256": "1d3604ad7db5700d1658c0acdda18295405be19b5dee09c27db944944bf28dab",
+  "physical_lines": 3161,
+  "annotated_lines": 3161,
   "missing_lines": [],
-  "function_index_entries": 136,
+  "function_index_entries": 158,
   "annotation_categories": {
-    "access": 8,
-    "blank": 102,
-    "comment": 247,
-    "glyph": 23,
-    "include": 21,
-    "palette": 16,
-    "preprocessor": 4,
-    "registry": 10,
-    "semantic": 1767,
-    "sprite-boundary": 12,
-    "sprite-definition": 12,
+    "access": 9,
+    "blank": 120,
+    "comment": 341,
+    "glyph": 41,
+    "include": 24,
+    "preprocessor": 25,
+    "semantic": 2127,
     "sprite-row": 120,
-    "structure": 284,
-    "widget": 17
+    "structure": 354
   }
 }
