@@ -9,6 +9,6 @@
 -- Found Threads: TRUE
 -- Found OpenGL: /usr/lib/x86_64-linux-gnu/libOpenGL.so
 -- Found GLEW: /usr/include (found version "2.2.0")
--- Configuring done (1.0s)
+-- Configuring done (2.0s)
 -- Generating done (0.0s)
--- Build files have been written to: /home/runner/work/MazeRunner/MazeRunner/build/cmake-validation
+-- Build files have been written to: ./build/cmake-validation

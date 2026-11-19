@@ -1,5 +1,5 @@
 {
-  "recorded_utc": "2026-11-18T01:36:28.822720+00:00",
+  "recorded_utc": "2026-11-19T02:34:10.640092+00:00",
   "cmake_configure_build_ctest_status": "passed",
   "scope": "Real CMake configure, Release build with warnings as errors, and CTest run on this Linux host.",
   "summary": {
@@ -78,7 +78,7 @@
         "--version"
       ],
       "exit_code": 0,
-      "seconds": 0.558,
+      "seconds": 0.002,
       "status": "passed"
     },
     {
@@ -92,11 +92,12 @@
         "-B",
         "build/cmake-validation",
         "-DCMAKE_BUILD_TYPE=Release",
+        "-DBUILD_TESTING=ON",
         "-DMAZERUNNER_WARNINGS_AS_ERRORS=ON",
         "-DMAZERUNNER_BUILD_GRAPHICS=ON"
       ],
       "exit_code": 0,
-      "seconds": 0.995,
+      "seconds": 1.97,
       "status": "passed"
     },
     {
@@ -109,7 +110,7 @@
         "2"
       ],
       "exit_code": 0,
-      "seconds": 19.33,
+      "seconds": 17.532,
       "status": "passed"
     },
     {
@@ -118,10 +119,11 @@
         "ctest",
         "--test-dir",
         "build/cmake-validation",
-        "--output-on-failure"
+        "--output-on-failure",
+        "--no-tests=error"
       ],
       "exit_code": 0,
-      "seconds": 6.235,
+      "seconds": 7.668,
       "status": "passed"
     }
   ]

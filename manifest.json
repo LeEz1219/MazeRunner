@@ -60,7 +60,7 @@
     {
       "path": ".github/README.md",
       "bytes": 6969,
-      "sha256": "404c56347e74c1ceb16815741b8dfeb5a23322daa66509b9bf3741bc692355e8"
+      "sha256": "fa0f38b9d097462c167e7576633e6a277b968a5e4b62e949f21e90b3e5abc974"
     },
     {
       "path": ".github/workflows/validate.yml",
@@ -85,7 +85,7 @@
     {
       "path": "03-Build-Test-and-Reproduce.md",
       "bytes": 58771,
-      "sha256": "f38e5a8b083ae5882668b73dbcd9f93dad9a8db1158291ec9dd0bfcbaa303e78"
+      "sha256": "f8497dafd448ed266d388192c259e4dde602a715b76ed105e59dac8dfc847770"
     },
     {
       "path": "CMakeLists.txt",
@@ -144,18 +144,18 @@
     },
     {
       "path": "artifacts/results/cmake/configure.log",
-      "bytes": 639,
-      "sha256": "ae1f6caa1ff82ac722347628ae8538d5f848d72e1e274991900b4392ffa4f353"
+      "bytes": 601,
+      "sha256": "2b26a35bf9264e200f66dca05e57bf849971910717eadf234f88087707232eb2"
     },
     {
       "path": "artifacts/results/cmake/ctest.log",
-      "bytes": 1581,
-      "sha256": "d7d0c749a2da1412cfb8d667eea90cbc2367ab97e252798b18b7845f5b1f400e"
+      "bytes": 1505,
+      "sha256": "75590d3fe2f98f80552c595ae15881a65689417cb0fd9271d392feb6c551e104"
     },
     {
       "path": "artifacts/results/cmake/validation.json",
-      "bytes": 2606,
-      "sha256": "41797718044363b24b52561ad9404843aed56598b65a170b71d72934bb0a17af"
+      "bytes": 2664,
+      "sha256": "ec4033c25a6c22b9e852de4e8ec056d38c4270ab3ca7209a1e4e9021f8df70d6"
     },
     {
       "path": "artifacts/results/compiler.log",
@@ -175,7 +175,7 @@
     {
       "path": "artifacts/results/documentation-audit.json",
       "bytes": 1279,
-      "sha256": "463bcbe4e3e500f684890e5872943c05a22ed93babba6633fd3a70aec66332c5"
+      "sha256": "b9064849203934df6c0eb8b99f28e6082a1aef8987c1555637c6ff6d4745fed0"
     },
     {
       "path": "artifacts/results/documentation-coverage.json",
@@ -310,7 +310,7 @@
     {
       "path": "artifacts/results/ubuntu-ci.json",
       "bytes": 582,
-      "sha256": "ad1dca298593fab63d94c6ad7b8edbd19614cdceb2710fa9d39b540fb97f785a"
+      "sha256": "15a037a019a6e180bd7cc9300021f2a54e0874380c2168782df0372b71353f75"
     },
     {
       "path": "artifacts/results/validation-summary.json",

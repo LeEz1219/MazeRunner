@@ -89,6 +89,6 @@ This command regenerates files under `artifacts/`, so use a separate working cop
 
 ## Recorded validation
 
-Ubuntu 24.04 built the graphical and headless binaries with GCC 13.3 and passed all 13 CTest cases. The direct Linux runner passed 32 commands with GCC 14.2, including ASan/UBSan, real OpenGL rendering, input callbacks and two director traces. Interactive desktop sessions and native macOS/Windows runs have no recorded result in this kit. [Ubuntu CI](https://github.com/LeEz1219/MazeRunner/actions/runs/44216985629) · [Validation summary](../artifacts/results/validation-summary.json)
+Ubuntu 24.04 built the graphical and headless binaries with GCC 13.3 and passed all 13 CTest cases. The direct Linux runner passed 32 commands with GCC 14.2, including ASan/UBSan, real OpenGL rendering, input callbacks and two director traces. Interactive desktop sessions and native macOS/Windows runs have no recorded result in this kit. [Ubuntu CI](https://github.com/LeEz1219/MazeRunner/actions/runs/44444571310) · [Validation summary](../artifacts/results/validation-summary.json)
 
 Across 2,400 five-monster calibration games on 21×21 and 31×31, Low escaped 751/800 (93.9%), Medium 536/800 (67.0%) and High 273/800 (34.1%). The full 4,740-game data set also covers the ten-monster presets, the actual rectangular default and fresh-seed holdouts. [All game outcomes](../artifacts/results/calibration-runs.csv) · [Cohort results](../artifacts/results/calibration.json)

@@ -2,7 +2,7 @@
 
 This guide builds the playtested V5.4.3a director hotfix on Ubuntu Linux, Apple Silicon macOS or Windows CMD. Use the package root for commands that start with `src/` or `scripts/`. [Production source](src/mazerunnerV5.4.3a.cpp) · [AI and graphics guide](02-AI-Graphics-and-Redesign.md)
 
-Ubuntu 24.04 CI compiled and linked the graphical game, built the headless simulator, and passed all 13 CTest cases with GCC 13.3.0, Ninja and CMake 3.31.6. A separate Debian x86-64 run with GCC 14.2 exercised the direct compiler commands, ASan/UBSan, offscreen OpenGL, injected application input and 4,740 simulated games. Native macOS, Windows and interactive desktop play are covered by the instructions and acceptance checklist. Those sessions have no recorded pass in this kit. [Ubuntu workflow](https://github.com/LeEz1219/MazeRunner/actions/runs/44216985629) · [Recorded environments](artifacts/results/environment.json)
+Ubuntu 24.04 CI compiled and linked the graphical game, built the headless simulator, and passed all 13 CTest cases with GCC 13.3.0, Ninja and CMake 3.31.6. A separate Debian x86-64 run with GCC 14.2 exercised the direct compiler commands, ASan/UBSan, offscreen OpenGL, injected application input and 4,740 simulated games. Native macOS, Windows and interactive desktop play are covered by the instructions and acceptance checklist. Those sessions have no recorded pass in this kit. [Ubuntu workflow](https://github.com/LeEz1219/MazeRunner/actions/runs/44444571310) · [Recorded environments](artifacts/results/environment.json)
 
 ## 1. Package contents and starting directory
 
@@ -139,7 +139,7 @@ If you download only the `.cpp` and `CMakeLists.txt`, place them in the same fol
 
 Use a fresh build directory when changing compiler, CPU architecture, or generator. A stale CMake cache can retain the previous toolchain/dependency paths. CMake's multi-configuration generators also accept `cmake --build build/cmake --config Release` and `ctest --test-dir build/cmake -C Release --output-on-failure`; the supported command recipes above use single-configuration Ninja. The file contains MSVC warning handling, but no native MSVC build was executed or established by this package.
 
-Ubuntu CI executed `python3 scripts/run_cmake_validation.py --generator Ninja --jobs 2`. Its Release build included the native desktop binary, CLI and EGL harnesses. All 13 CTest cases passed. For an installation without GLFW/GLEW development headers, pass `--headless` and a different `--build-dir`. [Configure log](artifacts/results/cmake/configure.log) · [Build log](artifacts/results/cmake/build.log) · [CTest log](artifacts/results/cmake/ctest.log) · [Hosted run](https://github.com/LeEz1219/MazeRunner/actions/runs/44216985629)
+Ubuntu CI executed `python3 scripts/run_cmake_validation.py --generator Ninja --jobs 2`. Its Release build included the native desktop binary, CLI and EGL harnesses. All 13 CTest cases passed. For an installation without GLFW/GLEW development headers, pass `--headless` and a different `--build-dir`. [Configure log](artifacts/results/cmake/configure.log) · [Build log](artifacts/results/cmake/build.log) · [CTest log](artifacts/results/cmake/ctest.log) · [Hosted run](https://github.com/LeEz1219/MazeRunner/actions/runs/44444571310)
 
 ## 3. Ubuntu Linux: direct compiler build
 

@@ -1,17 +1,17 @@
-Internal ctest changing into directory: /home/runner/work/MazeRunner/MazeRunner/build/cmake-validation
-Test project /home/runner/work/MazeRunner/MazeRunner/build/cmake-validation
+Internal ctest changing into directory: ./build/cmake-validation
+Test project ./build/cmake-validation
       Start  1: gameplay-and-ui
- 1/13 Test  #1: gameplay-and-ui ..................   Passed    1.52 sec
+ 1/13 Test  #1: gameplay-and-ui ..................   Passed    1.68 sec
       Start  2: render-egl
- 2/13 Test  #2: render-egl .......................   Passed    3.94 sec
+ 2/13 Test  #2: render-egl .......................   Passed    5.85 sec
       Start  3: app-egl
- 3/13 Test  #3: app-egl ..........................   Passed    0.10 sec
+ 3/13 Test  #3: app-egl ..........................   Passed    0.08 sec
       Start  4: cli-help
  4/13 Test  #4: cli-help .........................   Passed    0.00 sec
       Start  5: smoke-33-low
  5/13 Test  #5: smoke-33-low .....................   Passed    0.00 sec
       Start  6: smoke-33-medium
- 6/13 Test  #6: smoke-33-medium ..................   Passed    0.01 sec
+ 6/13 Test  #6: smoke-33-medium ..................   Passed    0.00 sec
       Start  7: smoke-33-high
  7/13 Test  #7: smoke-33-high ....................   Passed    0.00 sec
       Start  8: smoke-63-low
@@ -29,4 +29,4 @@ Test project /home/runner/work/MazeRunner/MazeRunner/build/cmake-validation
 
 100% tests passed, 0 tests failed out of 13
 
-Total Test time (real) =   5.68 sec
+Total Test time (real) =   7.67 sec
