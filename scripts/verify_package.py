@@ -3,7 +3,7 @@
 from pathlib import Path
 import hashlib, html, json, re, struct, sys
 ROOT = Path(__file__).resolve().parents[1]
-EXPECTED_RELEASE = '5.4.3a'
+EXPECTED_RELEASE = '5.4.3b'
 DOCUMENTS = ['01-Source-Line-by-Line.md','02-AI-Graphics-and-Redesign.md','03-Build-Test-and-Reproduce.md']
 
 def require(condition, message):

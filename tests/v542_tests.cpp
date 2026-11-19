@@ -44,7 +44,15 @@ void test_hearing_and_per_monster_scent(){
     m.advance_to(last_heard+m.settings.scent_ms);
     require(m.monsters[0].state==MonsterState::Searching,"a monster that stops hearing starts searching while the player keeps moving");
     m.monsters[0].next_move=m.now+1;m.advance_to(m.now+1);
-    require(m.monsters[0].hint.contains(m.point(m.monsters[0].target)),"search targets stay inside the last clue area");
+    const auto& searcher = m.monsters[0];
+    require(m.walkable(searcher.target),"a sweep chooses a walkable target");
+    auto distances = m.distance_field(searcher.target);
+    int gap = INF_DISTANCE;
+    for (int row = searcher.hint.min_row; row <= searcher.hint.max_row; ++row)
+        for (int col = searcher.hint.min_col; col <= searcher.hint.max_col; ++col)
+            gap = std::min(gap, (*distances)[m.id({row,col})]);
+    require(gap <= std::min<Millis>(SWEEP_SPREAD,(m.now-searcher.clue_at)/180),
+            "the suspicion sweep can only expand from a delivered clue along walkable corridors");
 }
 
 void test_interceptor_assignment(){

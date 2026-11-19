@@ -1,6 +1,6 @@
 #define MAZERUNNER_HEADLESS
 #define MAZERUNNER_NO_MAIN
-#include "../src/mazerunnerV5.4.3a.cpp"
+#include "../src/mazerunnerV5.4.3b.cpp"
 #include <set>
 
 int checks=0;

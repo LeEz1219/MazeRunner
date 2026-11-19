@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.20)
 project(MazeRunner VERSION 5.4.3 LANGUAGES CXX)
-set(MAZERUNNER_RELEASE "${PROJECT_VERSION}a")
+set(MAZERUNNER_RELEASE "${PROJECT_VERSION}b")
 
 # Configure out of source: cmake -S . -B build/cmake -DCMAKE_BUILD_TYPE=Release
 option(MAZERUNNER_BUILD_GRAPHICS "Build the GLFW/OpenGL game" ON)
@@ -20,6 +20,11 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/src/${_maze_file}")
     set(_maze_default_source "${CMAKE_CURRENT_SOURCE_DIR}/src/${_maze_file}")
 else()
     set(_maze_default_source "${CMAKE_CURRENT_SOURCE_DIR}/${_maze_file}")
+endif()
+if(DEFINED MAZERUNNER_SOURCE AND NOT EXISTS "${MAZERUNNER_SOURCE}" AND
+   (MAZERUNNER_SOURCE STREQUAL "${CMAKE_CURRENT_SOURCE_DIR}/src/mazerunnerV5.4.3a.cpp" OR
+    MAZERUNNER_SOURCE STREQUAL "${CMAKE_CURRENT_SOURCE_DIR}/mazerunnerV5.4.3a.cpp"))
+    unset(MAZERUNNER_SOURCE CACHE)
 endif()
 set(MAZERUNNER_SOURCE "${_maze_default_source}" CACHE FILEPATH "MazeRunner V${MAZERUNNER_RELEASE} source file")
 if(NOT EXISTS "${MAZERUNNER_SOURCE}")

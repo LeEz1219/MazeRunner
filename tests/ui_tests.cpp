@@ -1,4 +1,4 @@
-#include "v543a_tests.cpp"
+#include "stalker_tests.cpp"
 
 void test_setup_inputs(){
     UiState ui;int r=0,c=0,n=0;
@@ -75,8 +75,10 @@ int main(){try{
     test_weighted_overlay_fork();test_sound_around_walls_and_at_range();test_global_interceptor_reservations();
     test_director_radio_without_local_hearing();test_director_relief_retasks_stale_clues_and_guards();
     test_hunter_retains_radio_until_scent_fades();test_director_observes_solver_waits();
+    test_withdrawal_and_clue_privacy();test_suspicion_scan();test_observed_habits();test_learned_search_choices();test_stalker_replay();
+    std::cout<<"PASS: menace hysteresis, physical withdrawal, pack jobs, suspicion scans, observed habits and deterministic replay.\n";
     std::cout<<"PASS: director radio delivery, privacy, expiry, retasking, interceptor release and complete relief cycle.\n";
-    std::cout<<"PASS: V5.4.3a weighted detours, bounded corridor hearing and global interceptor reservations.\n";
+    std::cout<<"PASS: V5.4.3b weighted detours, bounded corridor hearing and global interceptor reservations.\n";
     test_setup_inputs();test_pointer_and_keyboard_focus();test_screen_transitions();
     std::cout<<"PASS: setup validation, all controls, text input, bounds, DPI hit testing, keyboard navigation, and screen transitions.\n";
 }catch(const std::exception& e){std::cerr<<e.what()<<'\n';return 1;}}

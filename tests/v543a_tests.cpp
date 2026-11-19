@@ -219,7 +219,7 @@ void test_director_observes_solver_waits() {
     require(game.director_hint_width()>game.settings.hint_area_size && game.director_reports()==0 &&
             game.monsters[0].state==MonsterState::Patrolling,"solver inactivity counts even before a scent or blocked-route flag exists");
 
-    std::ostringstream log;Maze real(21,31,7,&log);
+    std::ostringstream log;Maze real(21,31,8,&log);
     real.generate(5);real.set_auto_solve(true);real.advance_to(60000);
     const auto trace=log.str();auto relief=trace.find("Director: RELIEF started");
     require(relief!=std::string::npos && trace.find("Director: NORMAL precision restored",relief)!=std::string::npos,
