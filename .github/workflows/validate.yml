@@ -20,7 +20,7 @@ jobs:
   cmake:
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
       - name: Install graphics development packages
         run: sudo apt-get update && sudo apt-get install -y ninja-build libglfw3-dev libglew-dev libgl-dev libegl1-mesa-dev
       - name: Test release packaging and CTest validation
@@ -29,7 +29,7 @@ jobs:
         run: python3 scripts/run_cmake_validation.py --generator Ninja --jobs 2
       - name: Preserve CMake and CTest logs
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: ubuntu-cmake-validation
           path: artifacts/results/cmake/

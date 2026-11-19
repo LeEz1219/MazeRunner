@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Rebuild and test the V5.4.3a source; run from any working directory."""
-import argparse, datetime, hashlib, json, os, pathlib, platform, subprocess, sys, time
+import argparse, datetime, hashlib, json, os, pathlib, platform, re, subprocess, sys, time
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 os.chdir(ROOT)
@@ -17,13 +17,24 @@ results = ROOT/'artifacts/results'; results.mkdir(parents=True, exist_ok=True)
 shots = ROOT/'artifacts/screenshots'; shots.mkdir(parents=True, exist_ok=True)
 records = []
 env = dict(os.environ, LC_ALL='C')
+HOME = os.path.expanduser('~')
+# Longest first: the checkout usually lives inside the home directory.
+PRIVATE_PREFIXES = sorted({(str(ROOT), '.'), (HOME, '~'), (os.path.realpath(HOME), '~')},
+                          key=lambda item: -len(item[0]))
+
+def scrub(text):
+    """Replace this machine's checkout and home paths so recorded logs can be published."""
+    for prefix, label in PRIVATE_PREFIXES:
+        if prefix not in ('', '/', '.'):
+            text = re.sub(re.escape(prefix) + r'(?![^/\\\s"\'])', label, text)
+    return text
 
 def run(name, command, timeout=300, extra_env=None):
     started=time.monotonic()
     process=subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
                            text=True, env={**env, **(extra_env or {})}, timeout=timeout)
-    (results/(name+'.log')).write_text(process.stdout)
-    records.append(dict(name=name, command=command, exit_code=process.returncode,
+    (results/(name+'.log')).write_text(scrub(process.stdout))
+    records.append(dict(name=name, command=[scrub(part) for part in command], exit_code=process.returncode,
                         seconds=round(time.monotonic()-started,3), status='passed' if process.returncode==0 else 'failed'))
     print(name+': '+records[-1]['status'], flush=True)
     if process.returncode: raise RuntimeError(name+' failed; see artifacts/results/'+name+'.log')
@@ -89,7 +100,7 @@ try:
         for path in shots.glob('*.ppm'): ppm_to_png(path)
 except Exception as exc:
     status=1
-    records.append(dict(name='runner',status='failed',error=str(exc)))
+    records.append(dict(name='runner',status='failed',error=scrub(str(exc))))
     print(str(exc),file=sys.stderr)
 finally:
     (results/'validation-summary.json').write_text(json.dumps(dict(status='passed' if status==0 else 'failed',checks=records),indent=2)+'\n')
