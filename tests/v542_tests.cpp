@@ -91,19 +91,34 @@ void test_corridor_sight(){
         s.advance_to(10);return s;
     };
     auto seen=setup(Difficulty::High,14,false);
-    require(seen.monsters[0].sighted&&seen.monsters[0].state==MonsterState::Hunting,"High monster spots the player down a corridor");
+    require(!seen.monsters[0].sighted&&seen.monsters[0].glimpses==1&&seen.monsters[0].cell==seen.id({10,14})&&
+            seen.monsters[0].gaze==2&&seen.monsters[0].scan_until>seen.now,"a first sighting stops and turns toward the player");
+    seen.advance_to(10+seen.settings.monster_move_ms*PATROL_PACE_PERCENT/100);
+    require(seen.monsters[0].sighted&&seen.monsters[0].state==MonsterState::Hunting,"High monster charges after the notice beat");
     require(seen.monsters[0].target==seen.player||seen.monsters[0].cell==seen.player,"spotting gives the exact cell");
-    require(!setup(Difficulty::High,12,false).monsters[0].sighted,"close quarters do not trigger sight");
+    auto close=setup(Difficulty::High,12,false);close.advance_to(400);
+    require(!close.monsters[0].sighted,"a first sighting needs SIGHT_MIN_CELLS of distance");
     require(!setup(Difficulty::High,14,true).monsters[0].sighted,"walls block sight");
     require(!setup(Difficulty::Medium,14,false).monsters[0].sighted,"Medium has no corridor sight");
-    // A hunter already following clues does not switch to exact tracking.
+    // A hunter following clues can also see the player, after the same notice beat.
     Maze h(21,21,123,nullptr,Difficulty::High);
     for(int r=1;r<h.rows-1;++r)for(int c=1;c<h.cols-1;++c)h.grid[h.id({r,c})]=PATH;
     h.grid[h.entrance]=PATH;h.grid[h.exit_cell]=EXIT;h.rebuild_graph();h.reset_game();
     h.player=h.id({10,9});h.monsters={monster(0,h.id({10,14}),NEVER)};h.move_player(0,1);
     require(h.monsters[0].state==MonsterState::Hunting,"fixture monster heard the move");
     h.monsters[0].next_move=h.now+1;h.advance_to(h.now+1);
-    require(!h.monsters[0].sighted,"sight is a discovery mechanic, not continuous tracking");
+    require(!h.monsters[0].sighted&&h.monsters[0].glimpses==1,"a hunter notices the player in view");
+    h.advance_to(h.now+h.settings.monster_move_ms);
+    require(h.monsters[0].sighted&&h.monsters[0].target==h.player,"a hunter that keeps seeing the player charges");
+    // A charge keeps tracking inside SIGHT_MIN_CELLS instead of heading for a stale cell.
+    Maze c(21,21,123,nullptr,Difficulty::High);
+    for(int r=1;r<c.rows-1;++r)for(int k=1;k<c.cols-1;++k)c.grid[c.id({r,k})]=PATH;
+    c.grid[c.entrance]=PATH;c.grid[c.exit_cell]=EXIT;c.rebuild_graph();c.reset_game();
+    c.player=c.id({10,12});auto chaser=monster(0,c.id({10,10}),NEVER);
+    chaser.state=MonsterState::Hunting;chaser.sighted=true;chaser.target=c.id({10,11});chaser.scent_until=NEVER/2;
+    chaser.next_replan=NEVER;c.monsters={chaser};c.set_auto_solve(true);c.set_auto_solve(false);
+    c.monsters[0].next_move=c.now+1;c.advance_to(c.now+1);
+    require(c.monsters[0].sighted&&c.monsters[0].target==c.player,"a charge two cells away retargets the player's current cell");
 }
 
 void test_timing_aware_blocking(){

@@ -1,6 +1,6 @@
 #define MAZERUNNER_NO_MAIN
 #define MAZERUNNER_RENDER_TEST
-#include "../src/mazerunnerV5.4.3b.cpp"
+#include "../src/mazerunnerV5.4.3c.cpp"
 #include <fstream>
 extern "C" {
 void* eglGetPlatformDisplay(unsigned,void*,const std::intptr_t*);
@@ -107,7 +107,7 @@ int main(){try{
         ui.form.width="999";ui.select(Control::Width);
         menu.draw(1280,960,ui);capture(1280,960,"artifacts/screenshots/setup-invalid.ppm");
         ui.show(Screen::Loading);menu.draw(1280,960,ui);capture(1280,960,"artifacts/screenshots/loading.ppm");
-        Maze game(21,31,8,nullptr);game.generate(5);game.set_auto_solve(true);game.advance_to(8800);
+        Maze game(21,31,8,nullptr);game.generate(5);game.set_auto_solve(true);game.advance_to(12400);
         require(std::string(game.director_phase())=="RELIEF" && game.radio_area_label()=="21x25" && game.director_reports()>0,
                 "HUD capture uses a real widened director report");
         require(game.withdrawing() && game.withdrawal_steps()>0, "HUD capture shows a physical withdrawal");

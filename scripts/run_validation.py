@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Rebuild and test the V5.4.3b source; run from any working directory."""
+"""Rebuild and test the V5.4.3c source; run from any working directory."""
 import argparse, datetime, hashlib, json, os, pathlib, platform, re, subprocess, sys, time
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
@@ -55,7 +55,7 @@ def ppm_to_png(path):
     output=b'\x89PNG\r\n\x1a\n'+chunk(b'IHDR',struct.pack('>IIBBBBB',w,h,8,2,0,0,0))+chunk(b'IDAT',zlib.compress(scan,9))+chunk(b'IEND',b'')
     path.with_suffix('.png').write_bytes(output)
 
-source='src/mazerunnerV5.4.3b.cpp'
+source='src/mazerunnerV5.4.3c.cpp'
 flags=['-std=c++17','-Wall','-Wextra','-Wpedantic','-Werror','-pthread']
 status=0
 try:
@@ -72,7 +72,7 @@ try:
         radio = run('director-radio',['./build/maze-headless','--simulate','63','63','5','42','50','--difficulty','medium'])
         if 'Remote receivers: 5 | Using local evidence: 0 | Lead investigators: 1' not in radio:
             raise RuntimeError('Expected one lead for five remote receivers on the first report')
-        relief = run('director-relief',['./build/maze-headless','--simulate','21','31','5','8','32000','--difficulty','medium'])
+        relief = run('director-relief',['./build/maze-headless','--simulate','21','31','5','26','32000','--difficulty','medium'])
         for marker in ('RELIEF started', 'BACKSTAGE starts', 'WITHDRAWING to', 'BACKSTAGE ends',
                        'NORMAL precision restored', '| ESCAPED |'):
             if marker not in relief:

@@ -1,5 +1,5 @@
-// Build: g++ -std=c++17 -O2 -DNDEBUG mazerunnerV5.4.3b.cpp -o mazerunnerV5.4.3b -lglfw -lGLEW -lGL -pthread
-// Headless: g++ -std=c++17 -O2 -DNDEBUG -DMAZERUNNER_HEADLESS mazerunnerV5.4.3b.cpp -o mazerunnerV5.4.3b-headless -pthread
+// Build: g++ -std=c++17 -O2 -DNDEBUG mazerunnerV5.4.3c.cpp -o mazerunnerV5.4.3c -lglfw -lGLEW -lGL -pthread
+// Headless: g++ -std=c++17 -O2 -DNDEBUG -DMAZERUNNER_HEADLESS mazerunnerV5.4.3c.cpp -o mazerunnerV5.4.3c-headless -pthread
 
 #ifndef MAZERUNNER_HEADLESS
 #include <GL/glew.h>
@@ -23,6 +23,7 @@
 #include <string>
 #include <string_view>
 #include <cstddef>
+#include <unordered_set>
 #include <utility>
 #include <vector>
 #include <future>
@@ -31,7 +32,7 @@
 // One version string for logs, the window title, the setup screen, and --help.
 // CMake supplies the release label. Standalone builds use the same default.
 #ifndef MAZERUNNER_VERSION
-#define MAZERUNNER_VERSION "5.4.3b"
+#define MAZERUNNER_VERSION "5.4.3c"
 #endif
 #define MAZERUNNER_TITLE "Maze Runner V" MAZERUNNER_VERSION
 
@@ -65,8 +66,15 @@ constexpr int CUTTER_PACE_MS = 80;
 constexpr int CUTTER_CAMP_MS = 4000;
 // Patrols spread across coarse regions by preferring ones not recently visited.
 constexpr int PATROL_REGION = 8;
-// Corridor sight (High) only triggers at this distance or more.
+// Corridor sight first notices the player at this distance or more; a charging
+// monster keeps tracking at any range. Junction scans inspect arm cells from here out.
 constexpr int SIGHT_MIN_CELLS = 3;
+// Moves a monster must keep the player in view before it charges; the first is a
+// visible stop-and-look that gives the player one monster period to break sight.
+constexpr int SIGHT_NOTICE_TICKS = 2;
+// Movement period by intent, as a percent of the profile interval: monsters prowl
+// while roaming, sweep a little faster, hunt at the profile pace, and burst on sight.
+constexpr int PATROL_PACE_PERCENT = 130, SEARCH_PACE_PERCENT = 115, CHARGE_PACE_PERCENT = 85;
 // Generation retries before deterministically adding connections instead.
 constexpr int MAX_GENERATION_ATTEMPTS = 64;
 // The director changes information precision, never movement speed or collisions.
@@ -75,6 +83,12 @@ constexpr int DIRECTOR_RECOVERY_MS = 2000;
 constexpr int MENACE_HIGH = 76, MENACE_LOW = 26;
 constexpr int WITHDRAW_HOLD_MS = 1400, WITHDRAW_DISTANCE = 10;
 constexpr int SWEEP_SPREAD = 5, INSPECTION_MEMORY_MS = 1800;
+// Radio ramps with route progress. Near the entrance, reports are spaced so a
+// remote search lapses for part of each cycle; from halfway on, the full rate.
+constexpr int RADIO_EARLY_UPTIME_PERCENT = 50, RADIO_FULL_PROGRESS_PERCENT = 50;
+// Pack lessons: the pack adapts to what actually let the player get away, one
+// lesson at a time and never in the opening seconds, so each new trick is noticeable.
+constexpr int LESSON_EVIDENCE = 2, LESSON_SPACING_MS = 12000, LOOP_RETURN_MS = 4000;
 constexpr int INF_DISTANCE = 100000000;
 using Millis = std::int64_t;
 constexpr Millis NEVER = std::numeric_limits<Millis>::max() / 4;
@@ -94,6 +108,7 @@ enum class MonsterRole { Chaser, Cutter };
 enum class PackDuty { Roam, Investigate, Perimeter, Withdraw };
 enum class Outcome { Playing, Won, Caught };
 enum class Difficulty { Low, Medium, High };
+enum Lesson : int { AlcoveSweep, CorridorHeading, JunctionAmbush, DoubleBack, LESSON_COUNT };
 
 // Difficulty changes opposition and terrain, not the player's planning ability.
 // All profiles share the same planner, director rules, and collision handling.
@@ -117,7 +132,7 @@ constexpr DifficultySettings difficulty_settings(Difficulty difficulty) {
     switch (difficulty) {
         case Difficulty::Low:    return {"Low",    4, 225, 210, 9, 200, 420, 2500, 8000, 4, 16, 18, 10, 1500, 0, 0, 19, 3000};
         case Difficulty::Medium: return {"Medium", 2, 135, 148, 5,   0, 560, 4000, 6000, 4, 16, 18, 14, 2500, 1, 0, 17, 1800};
-        case Difficulty::High:   return {"High",   2, 100, 126, 6,   0, 840, 6000, 4000, 2,  8, 28, 18, 3500, 2, 6, 11, 1000};
+        case Difficulty::High:   return {"High",   2, 100, 126, 8,   0, 840, 6000, 4000, 2,  8, 28, 18, 3500, 2, 6, 11, 1000};
     }
     throw std::invalid_argument("Unknown difficulty.");
 }
@@ -175,6 +190,7 @@ struct Monster {
     int target = -1;
     int blocked_turns = 0;
     bool sighted = false;
+    int glimpses = 0;  // Consecutive moves with the player in view before a charge.
     std::deque<int> recent_cells;
     PackDuty duty = PackDuty::Roam;
     int withdrawal_goal = -1, last_junction = -1, return_junction = -1;
@@ -184,10 +200,12 @@ struct Monster {
     struct Inspection { int cell; Millis at; };
     std::vector<Inspection> inspected;
     // Only delivered footstep sectors and this monster's own contact losses feed habits.
+    // A failed local search can credit only the audible clue it actually inspected.
+    std::uint64_t lost_clue_revision = 0;
+    bool inspected_alcove = false;
     int heard_sector = -1, heading = -1, heading_streak = 0;
-    int scent_losses = 0, loop_returns = 0, reversals = 0;
-    bool heard_this_hunt = false, extrapolates = false, close_last_tick = false;
-    std::vector<int> heard_sectors;
+    bool heard_this_hunt = false, close_last_tick = false;
+    std::vector<std::pair<int, Millis>> heard_sectors;  // Recent audible sectors and when each was left.
 };
 
 // Time-based memory distinguishes actual progress from repeated moves and waits.
@@ -209,6 +227,10 @@ struct DirectorState {
     bool backstage = false, withdrawal_pending = false;
     Millis quiet_until = 0;
     int withdrawal_episodes = 0, withdrawal_steps = 0, junction_scans = 0;
+    // Clue IDs deduplicate asynchronous searches even when they finish out of order.
+    std::array<std::unordered_set<std::uint64_t>, LESSON_COUNT> evidence;
+    std::array<bool, LESSON_COUNT> lessons{};
+    Millis next_lesson_at = NEVER;
 };
 
 // All game rules live here, independent of GLFW. Tests use this same simulation.
@@ -800,8 +822,9 @@ public:
         text << " | Hearing radius: " << hearing_radius() << " corridor steps | Interceptors: " << settings.cutters
              << " | Corridor sight: ";
         if (settings.sight_cells) text << settings.sight_cells << " cells"; else text << "off";
-        text << "\nDirector radio: first successful step, then every " << settings.report_interval_ms
-             << " ms on a successful step | Normal radio area: " << std::min(rows, radio_sector_size())
+        text << "\nDirector radio: first successful step, then every " << radio_interval_ms() << " ms near the entrance, "
+             << settings.report_interval_ms << " ms from " << RADIO_FULL_PROGRESS_PERCENT
+             << "% of the route, on a successful step | Normal radio area: " << std::min(rows, radio_sector_size())
              << 'x' << std::min(cols, radio_sector_size()) << " | Remote monsters investigate without gaining scent.";
         text << "\nMonsters wait for the first move or auto-solve | Director confinement: "
              << settings.confinement_ms << " ms | Relief hold: " << settings.relief_ms
@@ -823,6 +846,25 @@ public:
         int size = radio_sector_size() + 2 * director.hint_padding;
         return std::to_string(std::min(rows, size)) + "x" + std::to_string(std::min(cols, size));
     }
+    /// Best share of the entrance-to-exit corridor distance covered so far, 0-100.
+    /// Monotonic: a detour or backtrack never lowers the stakes again.
+    int route_progress_percent() const {
+        if (!exit_distances || best_exit_distance == INF_DISTANCE) return 0;
+        const int start = (*exit_distances)[entrance];
+        if (start <= 0 || start == INF_DISTANCE) return 100;
+        return std::clamp(100 * (start - best_exit_distance) / start, 0, 100);
+    }
+
+    /// Radio cooldown before relief doubling. The early interval is long enough that a
+    /// remote search (search_ms) lapses for part of each cycle; it shortens linearly to the
+    /// profile's full rate once the player is RADIO_FULL_PROGRESS_PERCENT of the way out.
+    int radio_interval_ms() const {
+        const int full = settings.report_interval_ms;
+        const int early = std::max(full, settings.search_ms * 100 / RADIO_EARLY_UPTIME_PERCENT);
+        const int ramp = std::min(100, route_progress_percent() * 100 / RADIO_FULL_PROGRESS_PERCENT);
+        return early + (full - early) * ramp / 100;
+    }
+
     /// Expose the committed detour endpoint, or -1 during ordinary exit planning.
     int auto_recovery_target() const { return recovery_target; }
     /// Walkable distance within which a monster hears a player step. Larger maps
@@ -921,6 +963,106 @@ private:
         return best;
     }
 
+    /// Credit each source clue once, even if several listeners finish a search at different times.
+    void note_evidence(Lesson lesson, std::uint64_t revision) {
+        if (revision && !director.lessons[lesson]) director.evidence[lesson].insert(revision);
+    }
+
+    /// Unlock at most one lesson per LESSON_SPACING_MS: the best-evidenced pending one.
+    void unlock_lessons() {
+        if (now < director.next_lesson_at) return;
+        int best = -1;
+        for (int k = 0; k < LESSON_COUNT; ++k)
+            if (!director.lessons[k] && director.evidence[k].size() >= LESSON_EVIDENCE &&
+                (best < 0 || director.evidence[k].size() > director.evidence[best].size())) best = k;
+        if (best < 0) return;
+        director.lessons[best] = true;
+        director.next_lesson_at = now + LESSON_SPACING_MS;
+        static constexpr const char* names[LESSON_COUNT] = {
+            "checking dead ends", "heading you off", "waiting at junctions", "doubling back"};
+        log_event(std::string("Pack learned: ") + names[best] + " after " +
+                  std::to_string(director.evidence[best].size()) + " observations.");
+    }
+
+    /// Learned heading: the nearest junction just past the clue's leading edge, so the lead
+    /// heads off a player who keeps fleeing one way. Reads only the clue and heard heading.
+    int junction_ahead(const Monster& m) {
+        const int anchor = clue_anchor(m.hint);
+        if (anchor < 0 || m.heading < 0) return -1;
+        const Point dir = directions[m.heading];
+        const int span = std::max(m.hint.max_row - m.hint.min_row, m.hint.max_col - m.hint.min_col) + 1;
+        auto field = local_field(anchor, std::min(2 * span, THREAT_RADIUS));
+        for (int v : field->queue) {  // Breadth-first order: the first match is nearest.
+            const Point p = point(v);
+            const bool beyond = dir.r ? (dir.r > 0 ? p.r > m.hint.max_row : p.r < m.hint.min_row)
+                                      : (dir.c > 0 ? p.c > m.hint.max_col : p.c < m.hint.min_col);
+            if (beyond && degrees[v] >= 3 && !dead_end_depth[v]) return v;
+        }
+        return -1;
+    }
+
+public:
+    bool pack_learned(Lesson lesson) const { return director.lessons[lesson]; }
+    int lesson_evidence(Lesson lesson) const { return static_cast<int>(director.evidence[lesson].size()); }
+private:
+
+    /// Drop the acoustic sequence when its hunt ends or its spatial precision changes.
+    static void clear_heard_route(Monster& m) {
+        m.heard_this_hunt = false;
+        m.heard_sector = m.heading = -1;
+        m.heading_streak = 0;
+        m.heard_sectors.clear();
+    }
+
+    /// Test whether the ordered sector observations admit a closed walk on the real terrain.
+    /// Each boundary can be crossed only forward, preventing a tree corridor from faking a loop.
+    bool sector_circuit(const Monster& m, const LocationHint& hint) const {
+        const int first = sector_center(hint);
+        std::vector<int> order{m.heard_sector};
+        for (auto it = m.heard_sectors.rbegin(); it != m.heard_sectors.rend(); ++it) {
+            if (std::find(order.begin(), order.end(), it->first) != order.end()) return false;
+            order.push_back(it->first);
+            if (it->first == first) {
+                if (order.size() < 3 || now - it->second < LOOP_RETURN_MS) return false;
+                break;
+            }
+        }
+        if (order.back() != first) return false;
+        std::reverse(order.begin(), order.end());
+        auto sector_of = [&](int v) {
+            return sector_center(make_location_hint(v, settings.hint_area_size, 1));
+        };
+        // Start at a physical crossing from the last sector back into the first.
+        for (int row = hint.min_row; row <= hint.max_row; ++row) {
+            for (int col = hint.min_col; col <= hint.max_col; ++col) {
+                const int start = id({row,col});
+                if (!walkable(start) || sector_of(start) != first) continue;
+                const auto& arms = adjacency[start];
+                if (std::none_of(arms.begin(), arms.end(), [&](int v) {
+                        return v >= 0 && sector_of(v) == order.back();
+                    })) continue;
+                std::unordered_set<int> visited{start};
+                std::vector<std::pair<int, std::size_t>> queue{{start,0}};
+                for (std::size_t i = 0; i < queue.size(); ++i) {
+                    const auto [cell, stage] = queue[i];
+                    for (int v : adjacency[cell]) {
+                        if (v < 0) continue;
+                        if (stage + 1 == order.size() && v == start) return true;
+                        if (visited.count(v)) continue;
+                        const int sector = sector_of(v);
+                        std::size_t next = stage;
+                        if (sector != order[stage]) {
+                            if (++next == order.size() || sector != order[next]) continue;
+                        }
+                        visited.insert(v);
+                        queue.emplace_back(v, next);
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
     /// Count departures and returns between distinct audible sectors, once per transition.
     void observe_footstep(Monster& m, const LocationHint& hint) {
         bool continuous = m.heard_this_hunt;
@@ -930,20 +1072,17 @@ private:
         if (continuous && m.heard_sector >= 0) {
             Point a = point(m.heard_sector), b = point(sector);
             int dir = a.r == b.r ? (b.c < a.c ? 2 : 3) : a.c == b.c ? (b.r < a.r ? 0 : 1) : -1;
-            if (dir >= 0 && m.heading >= 0 && dir == (m.heading ^ 1) && m.reversals < 2) {
-                if (++m.reversals == 2) log_event(monster_name(m) + ": Learned double-back check.");
-            }
+            // A U-turn after a sustained heading, not jitter across a sector edge.
+            if (dir >= 0 && m.heading_streak >= 2 && dir == (m.heading ^ 1)) note_evidence(DoubleBack, hint.revision);
             m.heading_streak = dir >= 0 && m.heading == dir ? std::min(2, m.heading_streak + 1) : 1;
             m.heading = dir;
-            if (m.heading_streak >= 2 && !m.extrapolates) {
-                m.extrapolates = true; log_event(monster_name(m) + ": Learned corridor heading.");
-            }
         }
-        if (continuous && std::find(m.heard_sectors.begin(), m.heard_sectors.end(), sector) != m.heard_sectors.end() && m.loop_returns < 2) {
-            if (++m.loop_returns == 2) log_event(monster_name(m) + ": Learned junction ambush.");
+        if (continuous && !director.lessons[JunctionAmbush] && sector_circuit(m, hint))
+            note_evidence(JunctionAmbush, hint.revision);
+        if (m.heard_sector >= 0) {
+            if (m.heard_sectors.size() == 6) m.heard_sectors.erase(m.heard_sectors.begin());
+            m.heard_sectors.push_back({m.heard_sector, now});
         }
-        if (m.heard_sectors.size() == 6) m.heard_sectors.erase(m.heard_sectors.begin());
-        m.heard_sectors.push_back(sector);
         m.heard_sector = sector;
     }
 
@@ -951,6 +1090,7 @@ private:
     void set_duty(Monster& m, PackDuty duty) {
         if (m.duty == duty) return;
         m.duty = duty;
+        if (duty == PackDuty::Withdraw) m.lost_clue_revision = 0;
         m.return_junction = -1;
         if (!m.sighted && m.role != MonsterRole::Cutter) {
             m.target = -1; m.next_replan = now; m.blocked_turns = 0;
@@ -978,6 +1118,7 @@ private:
 
     /// Give a listener only the delivered sector and its own scent deadline.
     void deliver_hint(Monster& m, const LocationHint& hint) {
+        m.lost_clue_revision = 0;
         bool was_hunting = m.state == MonsterState::Hunting;
         if (!was_hunting) {
             log_event(monster_name(m) + ": Heard the player, switching " +
@@ -995,12 +1136,13 @@ private:
         }
         m.return_junction = -1;
         if (!director.hint_padding) observe_footstep(m, hint);
-        else { m.heard_this_hunt = true; m.heading = -1; m.heading_streak = 0; m.heard_sector = -1; m.heard_sectors.clear(); }
+        else clear_heard_route(m);
     }
 
     /// Direct a remote patrol to investigate a sector. A report never grants
     /// hearing, renews scent, or displaces a live hunt or first-hand sighting.
     void investigate_report(Monster& m, const LocationHint& report) {
+        m.lost_clue_revision = 0;
         const bool was_patrolling = m.state == MonsterState::Patrolling;
         if (was_patrolling)
             log_event(monster_name(m) + ": Director radio, switching ROAMING -> SEARCHING.");
@@ -1033,7 +1175,7 @@ private:
         const int local_interval = director.hint_padding
             ? std::max(settings.hint_interval_ms, 2 * DIRECTOR_TICK_MS) : settings.hint_interval_ms;
         bool publish = first_movement || !latest_hint.revision || now - last_movement_hint_at >= local_interval;
-        const int radio_interval = settings.report_interval_ms * (director.hint_padding ? 2 : 1);
+        const int radio_interval = radio_interval_ms() * (director.hint_padding ? 2 : 1);
         bool radio_due = !director.backstage && !monsters.empty() && now - director.last_report_at >= radio_interval;
         if (publish || radio_due) ++movement_revision;
         if (publish) {
@@ -1093,7 +1235,7 @@ private:
         // A listener that repeatedly heard returns can also cover a junction in its clue.
         for (std::size_t i : listeners) {
             const auto& m = monsters[i];
-            if (m.loop_returns < 2 || m.sighted) continue;
+            if (!director.lessons[JunctionAmbush] || m.sighted) continue;
             int junction = -1, nearest = INF_DISTANCE;
             auto distances = local_field(m.cell);
             for (int r = m.hint.min_row; r <= m.hint.max_row; ++r)
@@ -1127,7 +1269,7 @@ private:
             int best_distance = THREAT_RADIUS + 1;
             for (std::size_t i : pool) {
                 if (std::find(cutters.begin(), cutters.end(), i) != cutters.end()) continue;
-                if (latest_hint.contains(point(choke.first)) && monsters[i].loop_returns < 2) continue;
+                if (latest_hint.contains(point(choke.first)) && !director.lessons[JunctionAmbush]) continue;
                 int d = local_field(monsters[i].cell)->at(choke.first);
                 // Only a monster that can plausibly arrive first is worth sending.
                 if (d > THREAT_RADIUS || Millis(d) * settings.monster_move_ms > Millis(choke.second) * CUTTER_PACE_MS) continue;
@@ -1163,6 +1305,8 @@ private:
             latest_hint = widen_hint(latest_hint, increase);
             director.last_report = widen_hint(director.last_report, increase);
             for (auto& m : monsters) {
+                clear_heard_route(m);
+                m.lost_clue_revision = 0;
                 if (m.role == MonsterRole::Cutter) {
                     m.role = MonsterRole::Chaser; m.role_until = NEVER;
                     m.target = -1; ++released;
@@ -1260,6 +1404,7 @@ private:
         if (director.next_update > now) return;
         director.next_update = now + DIRECTOR_TICK_MS;
         pace_encounter();
+        unlock_lessons();
         if (idle_deadline == NEVER && !auto_solve) {
             director.samples.clear();
             director.samples.push_back({now, player});
@@ -1344,9 +1489,10 @@ private:
             if (m.state == MonsterState::Hunting && now >= m.scent_until) {
                 jobs_changed = true;
                 const Millis last_contact = m.scent_until - settings.scent_ms;
-                if (m.heard_this_hunt && m.scent_losses < 2 && ++m.scent_losses == 2)
-                    log_event(monster_name(m) + ": Learned alcove sweep.");
-                m.heard_this_hunt = false; m.heading = -1; m.heading_streak = 0;
+                if (m.heard_this_hunt && m.heading_streak >= 2) note_evidence(CorridorHeading, m.hint.revision);
+                m.lost_clue_revision = m.heard_this_hunt ? m.hint.revision : 0;
+                m.inspected_alcove = false;
+                clear_heard_route(m);
                 m.scent_until = NEVER; m.sighted = false;
                 m.role = MonsterRole::Chaser; m.role_until = NEVER;
                 m.target = -1; m.blocked_turns = 0; m.planned_revision = 0; m.next_replan = now;
@@ -1354,7 +1500,7 @@ private:
                 // can use a newer, still-live report; this never restarts a hunt.
                 const bool use_radio = director.last_report.revision && director.last_report_at > last_contact &&
                                        now - director.last_report_at < settings.search_ms;
-                if (use_radio) { m.hint = director.last_report; m.clue_at = director.last_report_at; }
+                if (use_radio) { m.lost_clue_revision = 0; m.hint = director.last_report; m.clue_at = director.last_report_at; }
                 if (settings.search_ms > 0 && (m.hint.revision || m.last_seen_at >= last_contact)) {
                     m.state = MonsterState::Searching;
                     m.search_until = (use_radio ? director.last_report_at : now) + settings.search_ms;
@@ -1366,9 +1512,11 @@ private:
                 }
             } else if (m.state == MonsterState::Searching && now >= m.search_until) {
                 jobs_changed = true;
+                if (m.inspected_alcove) note_evidence(AlcoveSweep, m.lost_clue_revision);
+                m.lost_clue_revision = 0;
                 if (m.duty != PackDuty::Withdraw) {
                     set_duty(m, PackDuty::Roam);
-                    if (m.reversals >= 2 && walkable(m.last_junction)) {
+                    if (director.lessons[DoubleBack] && walkable(m.last_junction)) {
                         m.return_junction = m.last_junction; m.departure_steps = 3;
                         log_event(monster_name(m) + ": Double-back check at " + cell_label(m.return_junction));
                     }
@@ -1383,16 +1531,19 @@ private:
         if (jobs_changed) coordinate_pack();
     }
 
-    /// High difficulty only: a monster sees the player down a straight open corridor.
-    bool sees_player(const Monster& m) const { return line_of_sight(m.cell, player); }
-    bool line_of_sight(int from, int to) const {
+    /// A monster sees the player down a straight open corridor within sight_cells.
+    /// A charge keeps tracking at close range; a first sighting needs SIGHT_MIN_CELLS.
+    bool sees_player(const Monster& m) const {
+        return line_of_sight(m.cell, player, m.sighted ? 1 : SIGHT_MIN_CELLS);
+    }
+    bool line_of_sight(int from, int to, int min_cells = SIGHT_MIN_CELLS) const {
         if (settings.sight_cells <= 0 || !walkable(from) || !walkable(to)) return false;
         Point a = point(from), b = point(to);
         if (a.r != b.r && a.c != b.c) return false;
         int distance = std::abs(a.r - b.r) + std::abs(a.c - b.c);
-        // Spotting works at a distance; at close quarters monsters behave normally,
-        // otherwise every adjacent monster would become an instant capture.
-        if (distance < SIGHT_MIN_CELLS || distance > settings.sight_cells) return false;
+        // A first sighting works at a distance; at close quarters monsters rely on
+        // hearing, otherwise every adjacent monster would become an instant capture.
+        if (distance < std::max(1, min_cells) || distance > settings.sight_cells) return false;
         int dr = (b.r > a.r) - (b.r < a.r), dc = (b.c > a.c) - (b.c < a.c);
         for (int k = 1; k < distance; ++k) if (!walkable(id({a.r + dr * k, a.c + dc * k}))) return false;
         return true;
@@ -1446,10 +1597,16 @@ public:
         for (std::size_t k = 0; k < n; ++k) {
             Monster& m = monsters[(priority_rotation + k) % n];
             if (m.next_move > now) continue;
-            m.next_move = now + settings.monster_move_ms;
-            // Sight is a discovery mechanic: a monster that is not already hunting
-            // (or one mid-charge) can spot the player; hunters rely on area clues.
-            if (can_spot(m) && sees_player(m)) {
+            // Every monster, hunters included, can see. A fresh sighting first costs a
+            // move spent stopping and turning to look; a charge keeps tracking.
+            const Sight sight = sight_check(m, now);
+            if (sight == Sight::Noticing) {
+                m.next_move = now + move_period(m);
+                log_event(monster_name(m) + ": NOTICED movement from " + cell_label(m.cell) + "; turning to look.");
+                continue;
+            }
+            if (sight == Sight::Charge) {
+                m.lost_clue_revision = 0;
                 if (!m.sighted)
                     log_event(monster_name(m) + ": SPOTTED the player down a corridor; charging.");
                 if (m.state != MonsterState::Hunting) { m.state = MonsterState::Hunting; m.search_until = NEVER; }
@@ -1460,6 +1617,7 @@ public:
                 m.scent_until = std::max(m.scent_until == NEVER ? Millis(0) : m.scent_until, now + settings.scent_ms);
                 m.target = player; m.planned_revision = m.hint.revision; m.next_replan = now + MONSTER_REPLAN_MS;
             }
+            m.next_move = now + move_period(m);
             if (scan_junction(m, now, true)) { ++director.junction_scans; continue; }
             // Movement hints survive across frames until this particular monster acts.
             if (m.target < 0 || m.planned_revision != m.hint.revision ||
@@ -1494,7 +1652,14 @@ public:
                 m.last_moved_at = now;
                 mark_region(next);
                 overlay_dirty = true;
-                if (m.sighted && m.cell == m.target) m.sighted = false;
+                if (m.sighted && m.cell == m.target) {
+                    // Rounding the corner where the player was last seen: if they are in
+                    // view from here the charge carries on; otherwise the hunt resumes.
+                    if (sees_player(m)) {
+                        m.target = player; m.last_seen = player; m.last_seen_at = now;
+                        m.scent_until = std::max(m.scent_until == NEVER ? Millis(0) : m.scent_until, now + settings.scent_ms);
+                    } else m.sighted = false;
+                }
             } else if (m.cell != m.target) {
                 ++m.blocked_turns;
                 if (m.blocked_turns == 1 || verbose_logs)
@@ -1585,6 +1750,7 @@ private:
             if (!monsters.empty()) log_event("Player started | Monsters released.");
             director.samples.push_back({now, player});
             director.next_update = now + DIRECTOR_TICK_MS;
+            director.next_lesson_at = now + LESSON_SPACING_MS;
             best_exit_distance = (*exit_distances)[player];
             navigation_progress_at = now;
             visits[player] = {now, 1.0};
@@ -1641,11 +1807,35 @@ private:
         return false;
     }
 
-    static bool can_spot(const Monster& m) {
-        return m.state != MonsterState::Hunting || m.sighted || m.duty == PackDuty::Withdraw;
+    /// Milliseconds until this monster's next move, from its current intent.
+    int move_period(const Monster& m) const {
+        const int percent = m.sighted ? CHARGE_PACE_PERCENT
+                          : m.state == MonsterState::Hunting ? 100
+                          : m.state == MonsterState::Searching ? SEARCH_PACE_PERCENT : PATROL_PACE_PERCENT;
+        return std::max(1, settings.monster_move_ms * percent / 100);
+    }
+
+    /// One sight check per monster move, shared by play and solver forecasts so both
+    /// apply the same reaction beat. A charging monster keeps tracking. Any other one
+    /// must hold the player in view on SIGHT_NOTICE_TICKS consecutive moves; the
+    /// earlier ones are spent stopping and facing the player (a readable tell).
+    enum class Sight { None, Noticing, Charge };
+    Sight sight_check(Monster& m, Millis at) const {
+        if (!sees_player(m)) { m.glimpses = 0; return Sight::None; }
+        if (!m.sighted && ++m.glimpses < SIGHT_NOTICE_TICKS) {
+            Point a = point(m.cell), b = point(player);
+            m.gaze = a.r == b.r ? (b.c < a.c ? 2 : 3) : (b.r < a.r ? 0 : 1);
+            m.scan_until = at + move_period(m);
+            return Sight::Noticing;
+        }
+        m.glimpses = 0;
+        return Sight::Charge;
     }
 
     void inspect_cell(Monster& m, int cell) const {
+        if (m.lost_clue_revision && m.lost_clue_revision == m.hint.revision &&
+            m.duty == PackDuty::Investigate && degrees[cell] == 1 && dead_end_depth[cell] > 0 &&
+            m.hint.contains(point(cell))) m.inspected_alcove = true;
         auto seen = std::find_if(m.inspected.begin(), m.inspected.end(),
                                  [cell](const auto& step) { return step.cell == cell; });
         if (seen != m.inspected.end()) m.inspected.erase(seen);
@@ -1674,7 +1864,7 @@ private:
         }
         m.scanned_junction = m.last_junction = m.cell;
         if (direction < 0) return false;
-        m.gaze = direction; m.scan_until = at + settings.monster_move_ms;
+        m.gaze = direction; m.scan_until = at + move_period(m);
         if (record) {
             inspect_cell(m, m.cell);
             int v = m.cell;
@@ -1725,7 +1915,7 @@ private:
             bool mouth = false;
             for (int arm : adjacency[v]) if (arm >= 0 && branch_gate[arm] == v) mouth = true;
             if (degrees[v] >= 3 || mouth) score += 7;
-            if (degrees[v] == 1 && dead_end_depth[v]) score += m.scent_losses >= 2 ? 16 : 4;
+            if (degrees[v] == 1 && dead_end_depth[v]) score += director.lessons[AlcoveSweep] ? 16 : 4;
             if (score > value) { value = score; best = v; }
         }
         return best;
@@ -1752,6 +1942,12 @@ private:
                 !recently_inspected(m, m.target, now)) return m.target;
             return sweep_target(m);
         }
+        // Learned heading: a lead on a sustained heard heading runs ahead to cut the player off.
+        if (director.lessons[CorridorHeading] && m.state == MonsterState::Hunting &&
+            m.duty == PackDuty::Investigate && m.heading_streak >= 2) {
+            const int ahead = junction_ahead(m);
+            if (ahead >= 0 && ahead != m.cell) return ahead;
+        }
         bool area_mode = (m.state == MonsterState::Hunting || m.state == MonsterState::Searching) && m.hint.revision != 0;
         if (walkable(m.target) && m.target != m.cell && m.blocked_turns < 2 &&
             (!area_mode || m.hint.contains(point(m.target)))) return m.target;
@@ -1776,7 +1972,7 @@ private:
                     double weight = 1.0 / (1.0 + (searching ? 0.01 : 0.03) * distance + (searching ? 4.0 : 2.0) * recent);
                     if (m.duty == PackDuty::Perimeter)
                         nearest_side = std::min(nearest_side, side_distance({r,c}));
-                    if (m.extrapolates && m.heading >= 0 && m.duty == PackDuty::Investigate) {
+                    if (director.lessons[CorridorHeading] && m.heading >= 0 && m.duty == PackDuty::Investigate) {
                         Point center = point(sector_center(m.hint)), dir = directions[m.heading];
                         if ((r-center.r)*dir.r + (c-center.c)*dir.c > 0) weight *= 3.0;
                     }
@@ -1832,12 +2028,14 @@ private:
         return best;
     }
 
+public:
     // Intent predictions are estimates: new movement hints/replanning can change them.
     struct Forecast {
         int horizon = AUTO_HORIZON;
         std::vector<std::vector<int>> positions;
         std::vector<std::shared_ptr<const LocalField>> distances;
         std::vector<Millis> first_move_delay;
+        int fastest_step_ms = 0;  // Physical reach uses the fastest legal gait for this profile.
     };
 
     /// Roll out cached intentions at actual deadlines using the same reservation
@@ -1847,6 +2045,8 @@ private:
         Forecast forecast;
         forecast.horizon = std::clamp(horizon, 1, AUTO_HORIZON_MAX);
         forecast.positions.resize(static_cast<std::size_t>(forecast.horizon) + 1);
+        forecast.fastest_step_ms = settings.sight_cells > 0
+            ? std::max(1, settings.monster_move_ms * CHARGE_PACE_PERCENT / 100) : settings.monster_move_ms;
         std::vector<Monster> predicted = monsters;
         for (const auto& m : monsters) {
             forecast.distances.push_back(local_field(m.cell));
@@ -1866,19 +2066,21 @@ private:
                 for (std::size_t k = 0; k < predicted.size(); ++k) {
                     auto& m = predicted[(rotation + k) % predicted.size()];
                     if (m.next_move != event) continue;
-                    // Apply the same corridor-sight rule as the game: a monster that
-                    // can see the player's current cell is predicted to charge it.
-                    bool visual = can_spot(m) && line_of_sight(m.cell, player);
+                    // Apply the same corridor-sight rule as the game, including the
+                    // notice beat: a monster that keeps seeing the player charges it.
+                    const Sight sight = sight_check(m, event);
+                    if (sight == Sight::Noticing) { m.next_move += move_period(m); continue; }
+                    const bool visual = sight == Sight::Charge;
                     if (visual) { m.target = player; m.state = MonsterState::Hunting; m.sighted = true; m.duty = PackDuty::Roam; }
-                    if (!visual && scan_junction(m, event, false)) { m.next_move += settings.monster_move_ms; continue; }
+                    m.next_move += move_period(m);  // Live play commits this deadline before crossing a corner.
+                    if (!visual && scan_junction(m, event, false)) continue;
                     int next = choose_monster_step(m, reserved);
                     if (next != m.cell) {
                         remember(m.recent_cells, m.cell, 12);
                         m.cell = next; reserved.push_back(next); m.blocked_turns = 0;
                         m.scanned_junction = -1;
-                        if (m.sighted && m.cell == m.target) m.sighted = false;
+                        if (m.sighted && m.cell == m.target) { if (sees_player(m)) m.target = player; else m.sighted = false; }
                     } else if (m.cell != m.target) ++m.blocked_turns;
-                    m.next_move += settings.monster_move_ms;
                 }
                 rotation = (rotation + 1) % predicted.size();
             }
@@ -1892,9 +2094,10 @@ private:
     Millis earliest_arrival(const Forecast& forecast, std::size_t monster, int cell) const {
         int distance = forecast.distances[monster]->at(cell);
         if (distance == 0) return 0;
-        return forecast.first_move_delay[monster] + (distance - 1) * settings.monster_move_ms;
+        return forecast.first_move_delay[monster] + (distance - 1) * forecast.fastest_step_ms;
     }
 
+private:
     /// Score time-indexed actions. For the first interval, prefer excluding all
     /// reachable threats; later intervals use soft risk to avoid total paralysis.
     bool evaluate_action(const Forecast& forecast, int cell, int depth, bool conservative,
@@ -1909,12 +2112,12 @@ private:
             if (depth == 0 && conservative && cell != exit_cell && arrival <= end) return false;
             Millis margin = arrival - (cell == exit_cell ? depth * AUTO_SOLVE_SPEED_MS : end);
             if (margin <= 0) risk += 5.0;
-            else if (margin < settings.monster_move_ms) risk += 2.0 * (1.0 - double(margin) / settings.monster_move_ms);
+            else if (margin < forecast.fastest_step_ms) risk += 2.0 * (1.0 - double(margin) / forecast.fastest_step_ms);
             // A deep branch can look safe locally while its only mouth is cut off.
             // Compare the fastest return to that mouth with a monster's arrival.
             if (branch_gate[cell] >= 0 && cell != exit_cell) {
                 Millis return_time = (depth + dead_end_depth[cell]) * AUTO_SOLVE_SPEED_MS;
-                if (earliest_arrival(forecast, i, branch_gate[cell]) <= return_time + settings.monster_move_ms)
+                if (earliest_arrival(forecast, i, branch_gate[cell]) <= return_time + forecast.fastest_step_ms)
                     risk += 3.0 + std::min(dead_end_depth[cell], 12) * 0.2;
             }
         }
@@ -2971,7 +3174,7 @@ struct UiState {
 /// Resolve a small embedded 5x7 font. UI text uses uppercase, digits, and punctuation.
 std::array<unsigned char,7> ui_glyph(char c) {
     switch(c) {
-        case 'a':return {0,0,14,1,15,17,15};case 'b':return {16,16,22,25,17,17,30};
+        case 'a':return {0,0,14,1,15,17,15};case 'b':return {16,16,22,25,17,17,30};case 'c':return {0,0,14,16,16,17,14};
         case 'A':return {14,17,17,31,17,17,17};case 'B':return {30,17,17,30,17,17,30};
         case 'C':return {14,17,16,16,16,17,14};case 'D':return {30,17,17,17,17,17,30};
         case 'E':return {31,16,16,30,16,16,31};case 'F':return {31,16,16,30,16,16,16};

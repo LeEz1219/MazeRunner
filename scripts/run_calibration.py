@@ -21,7 +21,7 @@ args = p.parse_args()
 if args.jobs < 1 or args.seeds < 1 or min(args.holdout_seeds, args.preset_seeds) < 0:
     p.error('jobs and seeds must be positive; optional cohort sizes must be nonnegative')
 
-source = 'src/mazerunnerV5.4.3b.cpp'
+source = 'src/mazerunnerV5.4.3c.cpp'
 binary = ROOT / 'build/calibration/maze-headless'
 binary.parent.mkdir(parents=True, exist_ok=True)
 subprocess.run([args.compiler, source, '-std=c++17', '-O2', '-DNDEBUG', '-DMAZERUNNER_HEADLESS', '-pthread',

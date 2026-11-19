@@ -135,7 +135,7 @@ void test_director_radio_without_local_hearing() {
         for(std::size_t i=0;i<a.monsters.size();++i)
             require(a.monsters[i].target==b.monsters[i].target && a.monsters[i].cell==b.monsters[i].cell,
                     "two different player positions in the same radio sector give identical monster decisions");
-        const int interval=a.settings.report_interval_ms;
+        const int interval=a.radio_interval_ms();
         a.advance_to(interval-1);a.move_player(0,-1);
         require(a.director_reports()==1,"an early movement cannot send another radio report");
         a.advance_to(interval);
@@ -165,9 +165,14 @@ void test_director_relief_retasks_stale_clues_and_guards() {
     // A previous report from elsewhere, retained by an out-of-earshot searcher.
     searcher.state=MonsterState::Searching;searcher.hint={5,9,35,39,47};
     searcher.target=game.id({7,37});searcher.search_until=8000;
+    guard.heading=3;guard.heading_streak=2;guard.heard_sector=game.id({7,4});
+    guard.heard_sectors={{game.id({7,2}),game.now-1000}};
     Millis scent=guard.scent_until;
     auto reports=game.director_reports();
     game.advance_to(4000);
+    require(guard.heading==-1 && !guard.heading_streak && guard.heard_sectors.empty(),
+            "relief immediately invalidates directional evidence before another footstep");
+    const Millis doubled=2*game.radio_interval_ms();  // Progress is settled; relief doubles the cooldown.
     require(game.director_hint_width()==13 && game.director_reports()==reports,
             "relief changes precision without inventing a new movement report");
     require(guard.role==MonsterRole::Chaser && guard.target<0 && guard.role_until==NEVER && guard.scent_until==scent,
@@ -175,9 +180,9 @@ void test_director_relief_retasks_stale_clues_and_guards() {
     require(searcher.target<0 && searcher.search_until==8000 && searcher.scent_until==NEVER &&
             searcher.hint.min_col==31 && searcher.hint.max_col==43 && !searcher.hint.contains(game.point(game.player)),
             "stale radio evidence widens around its own sector without disclosing the current player or extending its life");
-    oscillate(game,7100);
+    oscillate(game,doubled-100);
     require(game.director_reports()==reports && guard.role==MonsterRole::Chaser,"relief spaces reports and suppresses new guards");
-    game.advance_to(7200);game.move_player(0,1);
+    game.advance_to(doubled);game.move_player(0,1);
     require(game.director_reports()==reports+1 && guard.role==MonsterRole::Chaser,"doubled radio cadence resumes with broad search only");
 }
 
@@ -186,7 +191,7 @@ void test_hunter_retains_radio_until_scent_fades() {
     game.player=game.id({20,20});
     game.monsters={monster(0,game.id({20,21+game.hearing_radius()}),NEVER)};
     game.move_player(0,1);
-    const Millis report_time=game.settings.report_interval_ms;
+    const Millis report_time=game.radio_interval_ms();
     game.advance_to(report_time-200);
     game.move_player(0,-1);game.move_player(0,1);
     const auto local=game.monsters[0].hint;

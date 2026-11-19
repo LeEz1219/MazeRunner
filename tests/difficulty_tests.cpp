@@ -56,9 +56,10 @@ void test_movement_and_hint_profiles(){
         require(moving.timer_started,"enabling auto-solve releases patrols before a real step or radio report");
         moving.advance_to(99);require(moving.monsters[0].cell==x.cell,"monster waits for its deadline");
         moving.advance_to(100);require(moving.monsters[0].cell==moving.id({1,2}),"monster moves at deadline");
-        require(moving.monsters[0].next_move==100+moving.settings.monster_move_ms,"monster schedules selected interval");
-        moving.advance_to(100+moving.settings.monster_move_ms-1);require(moving.monsters[0].cell==moving.id({1,2}),"no early second monster movement");
-        moving.advance_to(100+moving.settings.monster_move_ms);require(moving.monsters[0].cell==moving.id({1,3}),"second movement respects profile speed");
+        require(moving.monsters[0].next_move==100+moving.settings.monster_move_ms*PATROL_PACE_PERCENT/100,"monster schedules its patrol pace");
+        const Millis patrol=moving.settings.monster_move_ms*PATROL_PACE_PERCENT/100;
+        moving.advance_to(100+patrol-1);require(moving.monsters[0].cell==moving.id({1,2}),"no early second monster movement");
+        moving.advance_to(100+patrol);require(moving.monsters[0].cell==moving.id({1,3}),"second movement respects patrol pace");
         auto threat=fixture(d);threat.player=threat.id({25,25});
         threat.monsters={monster(0,threat.id({25,26}),10),monster(1,threat.exit_cell,NEVER)};
         auto route=threat.plan_auto_route();require(route.size()>1&&route[1]!=threat.player,"imminent threat overrides scent wait at every speed");
