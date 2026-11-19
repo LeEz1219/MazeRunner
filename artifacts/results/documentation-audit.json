@@ -1,5 +1,5 @@
 {
-  "recorded_utc": "2026-11-19T21:51:30.800754+00:00",
+  "recorded_utc": "2026-11-19T22:06:57.442795+00:00",
   "release": "5.4.3c",
   "status": "passed",
   "checks": {
@@ -13,8 +13,8 @@
     "raw_calibration_matches_all_groups_and_seeds": true,
     "director_evidence": true,
     "smoke_matrix_complete": true,
-    "01-Source-Line-by-Line.md_fences_balanced": true,
-    "01-Source-Line-by-Line.md_no_internal_paths": true,
+    "01-Source-Code-Explanation.md_fences_balanced": true,
+    "01-Source-Code-Explanation.md_no_internal_paths": true,
     "02-AI-Graphics-and-Redesign.md_fences_balanced": true,
     "02-AI-Graphics-and-Redesign.md_no_internal_paths": true,
     "03-Build-Test-and-Reproduce.md_fences_balanced": true,

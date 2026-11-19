@@ -59,8 +59,8 @@
     },
     {
       "path": ".github/README.md",
-      "bytes": 7016,
-      "sha256": "8bebe74507f5fcf6e1548a7e8ce53628da8fc3f9c97058c5a6542e10c40ce3e3"
+      "bytes": 7019,
+      "sha256": "4ddf7e18db856e77d372860d9ac0c4092125a70b0f55e7a06dfb578414700f3b"
     },
     {
       "path": ".github/workflows/validate.yml",
@@ -73,19 +73,19 @@
       "sha256": "3ec63e030dc5e944afed1f3667d72a963cdf852a60c6ebe977337e2fa7f1fffe"
     },
     {
-      "path": "01-Source-Line-by-Line.md",
-      "bytes": 47416,
-      "sha256": "2a166735dda6170bf1d9012c5ccc5b955c67195babc4505302d1b2a2755168a5"
+      "path": "01-Source-Code-Explanation.md",
+      "bytes": 62268,
+      "sha256": "571ba7cc69c79648dfdcac9ac3c4900b1bc2a40ab64bd22239206aa80faa508f"
     },
     {
       "path": "02-AI-Graphics-and-Redesign.md",
-      "bytes": 55377,
-      "sha256": "9be85d006586a58e4eda91c90701dd83fe2c12fbc583b9b39d81c26b5253377f"
+      "bytes": 55381,
+      "sha256": "8dea17f93894701e653eb7385bd46a876fcf54301ef9017fb52e7e383942ab3f"
     },
     {
       "path": "03-Build-Test-and-Reproduce.md",
-      "bytes": 59283,
-      "sha256": "57450a210658e8de3b3787bc383333d85f94b94a4cce56a0fb1baed41cd9c802"
+      "bytes": 59305,
+      "sha256": "85dc1378108af932403939e33b33df78617d62ba2f58a6bd3de6204b853ad0a6"
     },
     {
       "path": "CMakeLists.txt",
@@ -174,8 +174,8 @@
     },
     {
       "path": "artifacts/results/documentation-audit.json",
-      "bytes": 1282,
-      "sha256": "4c55903ae7482bf6c05f35878b57f45d8dce09b5194c9bc9d2946b1f40e3a765"
+      "bytes": 1290,
+      "sha256": "2a037dcc2c0084fc87b66fbc507ceb78b26a74d01a9c62836b66a8e7d8204f7e"
     },
     {
       "path": "artifacts/results/documentation-coverage.json",
@@ -409,13 +409,13 @@
     },
     {
       "path": "scripts/audit_documentation.py",
-      "bytes": 9723,
-      "sha256": "5a8fec844cef60a191b6ab3763145611f5cc97377bf6d05097814f4b63ad2f26"
+      "bytes": 9727,
+      "sha256": "24e4844135dc06793751d3aed62331ba4ae0a11beb1886aa8b5441dfcf9d0887"
     },
     {
       "path": "scripts/devkit-files.txt",
-      "bytes": 3205,
-      "sha256": "041c38a964d9332b913a7b6f912485b3586364273d9155f90e7c5f888afcc500"
+      "bytes": 3209,
+      "sha256": "b508917090c339d3bf96533928a071ab12ede67469ce0baae14bf02f12178255"
     },
     {
       "path": "scripts/package_devkit.py",
@@ -439,8 +439,8 @@
     },
     {
       "path": "scripts/verify_package.py",
-      "bytes": 7478,
-      "sha256": "4384b090135ca9a973e1cb4d0cfe8b5f63a9a9a00e5d8527535f12b7d76db3da"
+      "bytes": 7482,
+      "sha256": "a2bfd77fcbd7f8b036ebd66e3f160c0e8e1e19108e2ee8504d1892c2069e1fc2"
     },
     {
       "path": "src/mazerunnerV5.4.3c.cpp",

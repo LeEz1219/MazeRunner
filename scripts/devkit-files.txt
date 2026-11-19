@@ -2,7 +2,7 @@
 .github/README.md
 .github/workflows/validate.yml
 .gitignore
-01-Source-Line-by-Line.md
+01-Source-Code-Explanation.md
 02-AI-Graphics-and-Redesign.md
 03-Build-Test-and-Reproduce.md
 CMakeLists.txt

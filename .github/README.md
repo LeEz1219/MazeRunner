@@ -62,7 +62,7 @@ Here `42` is the random seed, which makes the run reproducible with the same bui
 |---|---|
 | [src/mazerunnerV5.4.3c.cpp](../src/mazerunnerV5.4.3c.cpp) | Complete game source with embedded sprites and font |
 | [CMakeLists.txt](../CMakeLists.txt) | Graphical, headless, portable regression, and EGL render/app test targets |
-| [01-Source-Line-by-Line.md](../01-Source-Line-by-Line.md) | 193 functions and methods with source links, behavior and design rationale |
+| [01-Source-Code-Explanation.md](../01-Source-Code-Explanation.md) | Beginner walkthrough with examples and a 193-entry function reference |
 | [02-AI-Graphics-and-Redesign.md](../02-AI-Graphics-and-Redesign.md) | AI mechanics, measured escape rates, graphics, UI design, and redesign guidance |
 | [03-Build-Test-and-Reproduce.md](../03-Build-Test-and-Reproduce.md) | Platform-specific compilation and reproduction instructions |
 | [tests/](../tests/) | Gameplay, director, difficulty, V5.4.2 compatibility and V5.4.3c stalker behavior, UI, rendering, and application tests |

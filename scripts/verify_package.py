@@ -4,7 +4,7 @@ from pathlib import Path
 import hashlib, json, re, struct, sys
 ROOT = Path(__file__).resolve().parents[1]
 EXPECTED_RELEASE = '5.4.3c'
-DOCUMENTS = ['01-Source-Line-by-Line.md','02-AI-Graphics-and-Redesign.md','03-Build-Test-and-Reproduce.md']
+DOCUMENTS = ['01-Source-Code-Explanation.md','02-AI-Graphics-and-Redesign.md','03-Build-Test-and-Reproduce.md']
 
 def require(condition, message):
     if not condition: raise RuntimeError(message)

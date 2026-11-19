@@ -1,12 +1,25 @@
-# MazeRunner V5.4.3c function guide
+# How MazeRunner works · V5.4.3c
 
-Each entry links to its definition and gives its behavior and design rationale. The guide follows declaration order and includes named C++ functions, constructors, deleted copy operations and the two embedded GLSL entry points. Local lambdas belong to the enclosing function. [Production source](src/mazerunnerV5.4.3c.cpp)
+Imagine pressing Right in a corridor. The player moves one square, a monster around a corner hears something, and the window shows both characters in their new positions. Three different pieces of code made that happen. The application interpreted a **key**, the simulation decided what changed in the **maze**, and the renderer turned the result into **pixels**. Following that one action is a good way into the [game source](src/mazerunnerV5.4.3c.cpp).
 
-For an encounter, begin with `Maze::advance_to`, `Maze::publish_movement_hint` and `Maze::update_monsters`. For the graphics path, begin with `GameApplication::draw`, `Renderer::draw` and `UiRenderer::draw`.
+A *function* is a named piece of work. The parentheses hold the information it receives, and `return` gives a result back to the caller. Related functions and the data they use can belong to a type such as `Maze`. In this guide, `Maze::move_player` means “the move_player function belonging to Maze.” In the source, `m.cell` means “the cell stored in this particular monster.” Several monsters can use the same function and still remember different things.
+
+**For a first read**, follow [coordinates](#difficulty-and-map-coordinates), [one move](#simulation-events-input-and-sensing), [what the monster hears](#evidence-pack-duties-and-the-director), and [what appears on screen](#font-shaders-and-rendering). Each section teaches one part of the game before its expandable list of source links. Open the lists when you want the definition of a particular function. The sections follow the order of the file. The game itself starts at `main`, near the bottom.
 
 ## Difficulty and map coordinates
 
-Use these entry points to interpret a profile and establish the grid an encounter will use.
+Two integers identify a square. Row counts down from the top and column counts from the left, both starting at zero. The game stores terrain in one long sequence. On a board with seven columns, row 2 starts after fourteen squares, so row 2, column 3 has ID 17. Read the small function that converts it back:
+
+```cpp
+Point point(int cell) const { return {cell / cols, cell % cols}; }
+```
+
+The first `Point` names the kind of result. The lowercase `point` is the function name. Inside the braces, integer division of 17 by 7 gives 2, and the remainder operator `%` gives 3. The pair in the return statement becomes a new point. The trailing `const` promises that looking up coordinates leaves the maze object alone.
+
+Why keep both forms? A drawing routine needs a row and column, while a distance table can use one number as its lookup key. Moving right by adding one directly to an ID can wrap from the last column into the next row. The movement code works in coordinates first and lets `id` check the bounds. It returns −1 for an invalid location, a value no real square can have.
+
+<details>
+<summary>Functions in this section · behavior and design notes</summary>
 
 | Function | What it does | Why it exists |
 |---|---|---|
@@ -24,9 +37,18 @@ Use these entry points to interpret a profile and establish the grid an encounte
 | [`Maze::neighbors`](src/mazerunnerV5.4.3c.cpp#L288) | Return the precomputed four-neighbor array by const reference. Consumers must supply a valid cell index. | A common cardinal adjacency order makes traversals reproducible. |
 | [`Maze::degree`](src/mazerunnerV5.4.3c.cpp#L290) | Expose cached graph degree for junction and dead-end heuristics. | Searchers need to distinguish junctions, corridor interiors and tips. |
 
+</details>
+
 ## Generation, graph and patrol coverage
 
-Generation runs once per map. The resulting graph supplies route diversity, corridor distances and intercept points throughout the run.
+A maze that looks like a grid to a player looks like a *graph* to the route finder. Each open square is a vertex, and each allowed step between adjacent squares is an edge. Picture a T-junction. Its center has three open neighbors, so its degree is three. A corridor tip has degree one. After carving the map, `rebuild_graph` records these facts so each monster can look them up during play.
+
+How far is the exit? Imagine writing 0 on the exit square, 1 on its open neighbors, then 2 on each still-unmarked neighbor of those squares. Continuing outward gives the shortest number of legal steps from every reachable square. This is *breadth-first search* (BFS). A wall can put two squares many steps apart even when their coordinates differ by only two. The full distance field is worth keeping when many actors ask about the same goal. For a footstep audible only nearby, `local_field` can stop after a limited number of layers.
+
+Generation also asks a different question. A loop in a side room gives a monster somewhere to search, yet the player may still have just one simple route to the exit. The diversity checks examine how the entrance and exit connect. Conversely, `exit_chokepoints` finds squares every escape route from a clue must pass. That is what makes a square a plausible guard post.
+
+<details>
+<summary>Functions in this section · behavior and design notes</summary>
 
 | Function | What it does | Why it exists |
 |---|---|---|
@@ -48,9 +70,16 @@ Generation runs once per map. The resulting graph supplies route diversity, corr
 | [`Maze::mark_region`](src/mazerunnerV5.4.3c.cpp#L798) | Record that a monster covered an 8x8 patrol region. | A visit by one agent can spread later patrols across the pack. |
 | [`Maze::region_age`](src/mazerunnerV5.4.3c.cpp#L803) | Time since any monster entered the region containing a cell. | Patrol decisions need a comparable age for each candidate region. |
 
+</details>
+
 ## Diagnostics and encounter measurements
 
-These functions expose profile settings, clocks and counters for the HUD, replays and headless measurements.
+Suppose the log announces a withdrawal. Did a monster actually get farther away? Two small functions answer different parts of that question. `withdrawal_episodes()` counts how often Backstage began. `withdrawal_steps()` counts moves actually taken on withdrawal duty. An episode can begin before a monster gets its next turn. Seeing the first counter rise while the second stays still for a moment makes sense.
+
+These functions illustrate an *accessor*, a function that reads a value another part of the program owns. The HUD (the information shown over the game) and a test can both ask the same maze for its counters. To understand where a number changes, find its accessor in the list, read the field name after `return`, then search the source for that field. For example, `++director.withdrawal_episodes` adds one at the moment a new episode starts.
+
+<details>
+<summary>Functions in this section · behavior and design notes</summary>
 
 | Function | What it does | Why it exists |
 |---|---|---|
@@ -74,9 +103,20 @@ These functions expose profile settings, clocks and counters for the HUD, replay
 | [`Maze::log_status`](src/mazerunnerV5.4.3c.cpp#L897) | Emit a snapshot of player state, director status, and hunting/searching counts. | A compact status snapshot supports comparison across replay seeds. |
 | [`Maze::monster_name`](src/mazerunnerV5.4.3c.cpp#L917) | One-based monster label for logs. | Stable actor names let a reader follow an individual through job changes. |
 
+</details>
+
 ## Evidence, pack duties and the Director
 
-Start with `publish_movement_hint` for a player step and `update_director` for a 200 ms pacing tick. A search can provide evidence long after the footstep that caused it.
+Imagine two listeners on opposite sides of a footstep. `publish_movement_hint` works out who could hear it through open corridors. A local clue describes a rectangle. Two different player squares can produce the same rectangle, so a listener still has a decision to make. A remote monster may receive a broader radio report. Following that report starts an investigation without granting the remote monster the hearing contact of a nearby hunter.
+
+There are three questions to ask about one monster. Its **state** describes what evidence it is acting on, such as Hunting or Searching. Its **duty** describes its part in the pack, such as investigating or withdrawing. Its **role** can give it an interception job. Follow `coordinate_pack` when several agents respond to one clue. One eligible lead investigates while other agents can cover surrounding ground. A Cutter assigned by `assign_interceptors` can guard a passage selected from the terrain.
+
+In `pace_encounter`, look for `peak`. The Director takes the greatest individual pressure, then adds smaller adjustments such as multiple nearby threats. Each tick also subtracts pressure, and the result is limited to 0–100. A high threshold starts Backstage. A lower threshold and a minimum quiet interval govern its end, so a small score change cannot immediately undo a retreat. A monster in live visual contact has priority over a withdrawal order. Confinement relief controls the precision of clues separately.
+
+Learning has a bookkeeping problem. If three monsters hear one movement, counting all three could teach the pack a tactic after just one incident. `note_evidence` records the clue revision, an identifier for the observation. `unlock_lessons` checks for distinct supporting observations and spaces out unlocks. For an example of the consequence, follow the Alcove Sweep lesson into the score for a dead-end square in `sweep_target`.
+
+<details>
+<summary>Functions in this section · behavior and design notes</summary>
 
 | Function | What it does | Why it exists |
 |---|---|---|
@@ -104,9 +144,24 @@ Start with `publish_movement_hint` for a player step and `update_director` for a
 | [`Maze::pace_encounter`](src/mazerunnerV5.4.3c.cpp#L1342) | Initialize the pressure aggregate, sight indicator and withdrawal candidate for one fixed director tick. | Hysteresis and a minimum quiet time prevent rapid flips into and out of withdrawal. |
 | [`Maze::update_director`](src/mazerunnerV5.4.3c.cpp#L1403) | Run one fixed-time director sample: confinement, relief escalation, and recovery hysteresis. A manual player standing still is not counted as confined. | Confinement relief depends on sustained movement history and recovery. |
 
+</details>
+
 ## Simulation events, input and sensing
 
-Follow `advance_to` into expiry and monster decisions to see which event wins when deadlines coincide.
+Press Right from row 2, column 3. In `move_player`, the changes are `dr = 0` and `dc = 1`. The call below therefore asks about row 2, column 4. The final argument identifies a manual move.
+
+```cpp
+return commit_player_move(id({p.r + dr, p.c + dc}), false);
+```
+
+Read nested calls from the inside out. First build the coordinates, then obtain the cell ID, then ask the simulation to commit the move. If the destination is a wall, the commit returns `false` before changing the player or publishing a footstep. On a successful displacement it saves the old square, changes `player`, increments the step counter, and calls `publish_movement_hint()`. It then checks the outcome. A monster occupying the exit can catch a player who steps onto it.
+
+Holding Right raises a timing question. `begin_held_move` tries one immediate step and schedules a repeat after a delay. `advance_to` finds the earliest pending deadline and advances the simulation clock to it. At a shared deadline it expires old states, updates the Director, and processes monsters before a due player repeat. If a monster ends the game there, the repeat never runs. This ordering is why two actions within one drawn frame still have a definite outcome.
+
+Sight has its own rules. `line_of_sight` checks alignment, distance, and the intervening squares. A first sighting has a minimum range, and an already sighted hunter can maintain contact closer in. `sight_check` records glimpses on eligible checks. Losing the qualifying sight line resets that count. Hearing a footstep and seeing the player are separate events.
+
+<details>
+<summary>Functions in this section · behavior and design notes</summary>
 
 | Function | What it does | Why it exists |
 |---|---|---|
@@ -127,9 +182,18 @@ Follow `advance_to` into expiry and monster decisions to see which event wins wh
 | [`Maze::visit_heat`](src/mazerunnerV5.4.3c.cpp#L1764) | Return a linearly time-decayed revisit penalty without mutating stored memory. | Lingering briefly should count differently from repeatedly circling a route. |
 | [`Maze::commit_player_move`](src/mazerunnerV5.4.3c.cpp#L1771) | Common transaction for one cardinal move or wait: validate, update clocks/memory, publish movement information, and resolve capture/escape. | Only a successful displacement can publish movement evidence. |
 
+</details>
+
 ## Target selection, searching and threat prediction
 
-A monster chooses its target from its current job and evidence. The solver estimates what that actor can reach on future actions.
+Watch a searcher reach a fork after losing a clue. It needs two answers. *Which square is worth inspecting?* is the job of `sweep_target`. *Which adjacent square gets me there on this turn?* belongs to `choose_monster_step`. A destination several turns away is a plan. Another monster can still reserve the next square and affect the immediate step.
+
+The sweep begins with the walkable squares in the remembered clue area, or a more recent firsthand sighting. For every 180 milliseconds since that evidence, the possible area can extend one more corridor step, up to a fixed limit. Each candidate then receives a score. Distance costs two points per step in the scoring expression. Recent inspection costs 45 points, and a target another monster has claimed costs 12. Junctions and branch mouths earn a bonus. Holding everything else equal, two equally distant squares can therefore produce very different choices.
+
+At a suitable junction, the investigating searcher can spend a turn looking along one open arm. `scan_junction` records which squares it inspected. That pause changes a later decision through the recent-inspection penalty. To read a forecast, look for the same distinction between **time spent moving** and **time spent scanning**. A predicted pause should consume a turn without writing an inspection into the live monster’s memory.
+
+<details>
+<summary>Functions in this section · behavior and design notes</summary>
 
 | Function | What it does | Why it exists |
 |---|---|---|
@@ -147,9 +211,16 @@ A monster chooses its target from its current job and evidence. The solver estim
 | [`Maze::earliest_arrival`](src/mazerunnerV5.4.3c.cpp#L2094) | Combine the next-move delay with remaining edges at the fastest possible gait for the difficulty. | A player planning a retreat needs a bound even if a hunter accelerates next beat. |
 | [`Maze::evaluate_action`](src/mazerunnerV5.4.3c.cpp#L2103) | Evaluate one time-indexed player action under forecast occupancy and conservative/soft uncertainty rules. | A route into a branch needs enough time to leave before the mouth is sealed. |
 
+</details>
+
 ## Automatic navigation and recovery
 
-Exit guidance, a committed recovery destination and the route drawn on screen serve different lifetimes.
+Imagine the shortest route to the exit bends through a square a monster can reach first. A distance field still correctly says “one step closer.” The automatic player needs an additional estimate of what might happen *when* it enters that square. `evaluate_action` supplies threat information and `beam_plan` explores short sequences of actions. A beam search keeps a limited set of promising partial plans at each stage. That limit makes looking several moves ahead affordable.
+
+A series of individually reasonable evasions can send the player back and forth. The recovery functions give a detour some persistence. `begin_recovery` selects a waypoint, `recovery_step` steers toward it, and `update_recovery` decides whether the commitment still makes sense. When reading a screenshot, distinguish that temporary waypoint from the complete route overlay. The overlay answers where a path to the exit goes. `auto_step` decides what the player actually does at its next deadline.
+
+<details>
+<summary>Functions in this section · behavior and design notes</summary>
 
 | Function | What it does | Why it exists |
 |---|---|---|
@@ -166,9 +237,22 @@ Exit guidance, a committed recovery destination and the route drawn on screen se
 | [`Maze::plan_auto_route`](src/mazerunnerV5.4.3c.cpp#L2436) | Choose between terrain guidance, a bounded wait, a committed detour, time-expanded planning and an emergency action. | A single decision point keeps waiting, emergency moves and normal routing compatible. |
 | [`Maze::auto_step`](src/mazerunnerV5.4.3c.cpp#L2532) | Execute one tactical action and let the common movement transaction update state, scent, outcomes, and the complete overlay. | The next action must go through the same publication and outcome logic as manual play. |
 
+</details>
+
 ## Simulation CLI
 
-The simulator shares the production encounter rules and accepts a seed, profile and simulated deadline.
+The command-line interface (CLI) gives you a way to follow the simulation without opening a window. With the headless executable built, try this argument sequence:
+
+```text
+maze-headless --simulate 21 31 5 8 10000 --difficulty medium --verbose
+```
+
+Give the path to your executable if it is outside your command search path. The numbers mean 21 rows, 31 columns, five monsters, seed 8, and a limit of 10,000 simulated milliseconds. A seed supplies the starting value for the game’s random choices. Reuse the same inputs when comparing event traces.
+
+At the start of `run_simulation`, `argv[2]` is the text supplied for rows. `parse_number` checks the input before it becomes a size. The function constructs a maze, generates the map, enables the automatic player, then calls `advance_to(limit)`. A ten-second simulated deadline does not require ten seconds of waiting at the keyboard. The program times the computation separately.
+
+<details>
+<summary>Functions in this section · behavior and design notes</summary>
 
 | Function | What it does | Why it exists |
 |---|---|---|
@@ -176,9 +260,16 @@ The simulator shares the production encounter rules and accepts a seed, profile 
 | [`parse_number`](src/mazerunnerV5.4.3c.cpp#L2557) | Parse a whole nonnegative decimal argument with a caller-selected maximum, reporting overflow as a readable range error. | External numeric arguments need range and syntax checks. |
 | [`run_simulation`](src/mazerunnerV5.4.3c.cpp#L2569) | Headless CLI entry point using exactly the same Maze implementation. No OpenGL context or desktop is needed. | Automated tests can run the complete simulation with a specified seed and cutoff. |
 
+</details>
+
 ## Artwork, wall geometry and projection
 
-These functions turn embedded artwork, terrain and route data into GPU-ready geometry.
+Think of an open square beside a wall. Movement needs a yes/no answer about crossing that edge. Drawing needs positions and colors for the surface the player sees. The artwork functions turn game data into vertices, individual points carrying information such as position and color. Triangles joined at these points fill the surfaces on screen.
+
+Follow `append_route` for a small example. The simulation has already selected a sequence of route cells. The drawing code converts that sequence into colored geometry for the current view. A camera projection then maps positions into the visible frame. Zooming changes where the cell appears and how large it looks. Its ID and its distance from the exit remain properties of the maze.
+
+<details>
+<summary>Functions in this section · behavior and design notes</summary>
 
 | Function | What it does | Why it exists |
 |---|---|---|
@@ -196,9 +287,18 @@ These functions turn embedded artwork, terrain and route data into GPU-ready geo
 | [`hue_color`](src/mazerunnerV5.4.3c.cpp#L2947) | Convert a hue parameter into full-saturation, full-value RGB for the route highlight. | A hue gradient shows forward progress along a clear route. |
 | [`append_route`](src/mazerunnerV5.4.3c.cpp#L2958) | Render the already-computed complete player-to-exit overlay. This function performs no path search. | Distinct clear and occupied-route colors communicate the overlay’s current cost. |
 
+</details>
+
 ## Setup and input model
 
-The setup form and widgets use one logical coordinate system for validation, painting and hit testing.
+Type 30 into the width box. During editing, the form holds the characters `"30"`. In `SetupForm::number`, the running value starts at zero. Reading the first digit makes it 3. Reading the second multiplies 3 by ten and adds zero, producing 30. A letter or an out-of-range result fails validation. `values` then rounds an even width up, so a valid entry of 30 yields 31 columns.
+
+One signature detail matters here. The parameter `int& result` is a reference, another name for an integer belonging to the caller. On success the function writes the parsed number there and returns `true`. This lets the caller learn both whether parsing succeeded and what number to use.
+
+A click also needs conversion. The operating system reports a position in the window, but buttons are laid out in the UI’s own coordinates. `UiTransform::pointer` accounts for display scaling and the margins around the layout. `UiRect::contains` includes the left edge and excludes the right edge. Two adjacent controls therefore agree which one owns their shared boundary.
+
+<details>
+<summary>Functions in this section · behavior and design notes</summary>
 
 | Function | What it does | Why it exists |
 |---|---|---|
@@ -222,9 +322,18 @@ The setup form and widgets use one logical coordinate system for validation, pai
 | [`UiState::hit`](src/mazerunnerV5.4.3c.cpp#L3162) | Find the control under a logical UI point. | Overlapping or disabled widgets require a single hit-resolution rule. |
 | [`UiState::pointer_button`](src/mazerunnerV5.4.3c.cpp#L3167) | Track a press/release pair for one logical pointer location. | Dragging off a control should cancel an unintended activation. |
 
+</details>
+
 ## Font, shaders and rendering
 
-The two renderer classes own separate graphics resources. The embedded shader entry points are listed alongside their C++ creation functions.
+Follow one letter in the HUD. `ui_glyph` provides seven rows of five possible dots. `UiRenderer::text` expands the lit dots into colored rectangles. `UiRenderer::rect` appends their geometry to a batch, a collection that the renderer can submit together. Drawing “A” uses the same basic machinery as drawing a button border.
+
+The CPU prepares that geometry. The graphics processor runs short programs called shaders. The vertex shader transforms each vertex into drawing coordinates and passes its color along. The fragment shader supplies the output color for the covered pieces of the triangles. The two occurrences of `main` inside the shader strings are entry points for the graphics processor. The C++ program compiles and links those strings when it builds the renderer.
+
+A wall normally stays put across frames, while a monster can change squares. `Renderer` can retain the terrain geometry and draw moving actors using their current state. Look at `~Renderer()` when following shutdown. The tilde marks a *destructor*, a function called when an object’s lifetime ends. Here it releases graphics resources while the application still has the graphics context needed to do so.
+
+<details>
+<summary>Functions in this section · behavior and design notes</summary>
 
 | Function | What it does | Why it exists |
 |---|---|---|
@@ -257,9 +366,18 @@ The two renderer classes own separate graphics resources. The embedded shader en
 | [`UiRenderer::~UiRenderer`](src/mazerunnerV5.4.3c.cpp#L3512) | Delete UI resources while the context is still alive. | Menu graphics resources must be released before destroying the window. |
 | [`UiRenderer::draw`](src/mazerunnerV5.4.3c.cpp#L3514) | Draw either a full menu screen or an overlay above a supplied maze frame. | Only the active screen should contribute UI geometry for a frame. |
 
+</details>
+
 ## Application and native callbacks
 
-The application coordinates input, background generation, window lifetime and the simulation clock.
+Start at `main` to put these pieces in time order. The first argument can select the simulator. In graphical play, `run_graphical` creates the window and runs the application loop. GLFW, the windowing library, calls registered functions when an event arrives. That is what *callback* means. A key callback receives a press or release. A character callback delivers text to the setup form.
+
+When the player chooses Start, `begin_generation` takes the validated settings and launches the maze-building work in the background. The window can keep drawing the loading screen. `finish_generation` checks for a completed maze and installs its world renderer on the thread that owns the graphics context. During play, `tick` advances the simulation and `draw` shows the resulting world and interface.
+
+To retrace the opening example in the source, follow `key_callback` → `press_move` → `begin_held_move` → `move_player` → `commit_player_move`. At the footstep, switch to `publish_movement_hint`. To see the player’s new square on screen, return to the application loop and follow the next `draw`. Those are two consumers of the same movement, one concerned with what a monster knows and the other with what a player sees.
+
+<details>
+<summary>Functions in this section · behavior and design notes</summary>
 
 | Function | What it does | Why it exists |
 |---|---|---|
@@ -280,3 +398,5 @@ The application coordinates input, background generation, window lifetime and th
 | [`initialize_glew`](src/mazerunnerV5.4.3c.cpp#L3717) | Initialize GLEW after making an OpenGL context current, then verify the capabilities this renderer actually requires. | The renderer needs confirmed driver capabilities before creating resources. |
 | [`run_graphical`](src/mazerunnerV5.4.3c.cpp#L3736) | Open the native window with the shared title and run the loop, sleeping to a frame deadline while playing. | Window, context, workers and GPU owners must shut down in a safe order. |
 | [`main`](src/mazerunnerV5.4.3c.cpp#L3793) | Program entry point for both graphical and headless executables. | Both desktop users and automation need one versioned executable entry point. |
+
+</details>

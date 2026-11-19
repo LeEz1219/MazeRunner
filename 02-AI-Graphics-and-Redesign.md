@@ -1,6 +1,6 @@
 # MazeRunner V5.4.3c — AI, graphics, UI, and redesign guide
 
-This guide covers the shipped encounter rules, the automatic player’s threat model, and the OpenGL graphics and UI. Sections 9–11 describe optional redesigns. [Production source](src/mazerunnerV5.4.3c.cpp) · [Function guide](01-Source-Line-by-Line.md) · [Build and validation](03-Build-Test-and-Reproduce.md)
+This guide covers the shipped encounter rules, the automatic player’s threat model, and the OpenGL graphics and UI. Sections 9–11 describe optional redesigns. [Production source](src/mazerunnerV5.4.3c.cpp) · [Function guide](01-Source-Code-Explanation.md) · [Build and validation](03-Build-Test-and-Reproduce.md)
 
 ### Changes since V5.4.3b
 

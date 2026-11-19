@@ -10,7 +10,7 @@ Extract the developer ZIP and enter `MazeRunner-V5.4.3c`, or enter `MazeRunner` 
 
 | Path | Purpose |
 |---|---|
-| [01-Source-Line-by-Line.md](01-Source-Line-by-Line.md) | 193 linked functions and methods with their behavior and design rationale |
+| [01-Source-Code-Explanation.md](01-Source-Code-Explanation.md) | Beginner walkthrough with examples and a linked reference for 193 functions and methods |
 | [02-AI-Graphics-and-Redesign.md](02-AI-Graphics-and-Redesign.md) | AI behavior, exact difficulty settings, rendering, UI, and redesign plans |
 | [src/mazerunnerV5.4.3c.cpp](src/mazerunnerV5.4.3c.cpp) | Production source, including embedded sprites/font |
 | [CMakeLists.txt](CMakeLists.txt) | C++17 graphical/headless targets; portable and EGL CTest registration |

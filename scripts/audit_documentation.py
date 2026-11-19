@@ -12,7 +12,7 @@ from verify_package import function_coverage, release_paths
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 RELEASE = '5.4.3c'
 SOURCE = f'src/mazerunnerV{RELEASE}.cpp'
-DOCUMENTS = ['01-Source-Line-by-Line.md', '02-AI-Graphics-and-Redesign.md', '03-Build-Test-and-Reproduce.md']
+DOCUMENTS = ['01-Source-Code-Explanation.md', '02-AI-Graphics-and-Redesign.md', '03-Build-Test-and-Reproduce.md']
 RESULTS = ROOT / 'artifacts/results'
 # Files that describe the package rather than belong to it, and generated build output.
 EXCLUDED_DIRS = {'.git', 'build', 'dist'}
