@@ -10,7 +10,7 @@ import csv, datetime, hashlib, html, json, os, pathlib, re, struct, sys
 from verify_package import release_paths
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
-RELEASE = '5.4.3a'
+RELEASE = '5.4.3b'
 SOURCE = f'src/mazerunnerV{RELEASE}.cpp'
 DOCUMENTS = ['01-Source-Line-by-Line.md', '02-AI-Graphics-and-Redesign.md', '03-Build-Test-and-Reproduce.md']
 RESULTS = ROOT / 'artifacts/results'
@@ -108,19 +108,23 @@ def main():
         'eighteen_png_screenshots': sum(pathlib.Path(name).parent.as_posix() == 'artifacts/screenshots' and name.endswith('.png') for name in files) == 18,
         'cmake_file_included': (ROOT / 'CMakeLists.txt').is_file(),
     }
-    def status(path, key='status'):
-        try: return json.loads((RESULTS / path).read_text()).get(key)
-        except (OSError, ValueError): return None
     validation = json.loads((RESULTS / 'validation-summary.json').read_text())
+    cmake_path = RESULTS / 'cmake/validation.json'
+    cmake = json.loads(cmake_path.read_text()) if cmake_path.is_file() else {}
+    cmake_summary = cmake.get('summary', {})
     names = {check['name'] for check in validation['checks'] if check['status'] == 'passed'}
     checks['raw_validation_passed'] = (validation['status'] == 'passed' and
         {'gameplay-and-ui', 'app', 'render', 'sanitizers', 'director-radio', 'director-relief'} <= names)
-    checks['cmake_configure_build_ctest_passed'] = status('cmake/validation.json', 'cmake_configure_build_ctest_status') == 'passed'
+    checks['cmake_configure_build_ctest_passed'] = cmake.get('cmake_configure_build_ctest_status') == 'passed'
+    binaries = {name.removesuffix('.exe') for name in cmake_summary.get('executables', [])}
+    checks['cmake_built_release_target'] = (
+        'maze-headless' in binaries and
+        (cmake_summary.get('graphical_target') is False or f'mazerunnerV{RELEASE}' in binaries))
     checks['raw_calibration_matches_all_groups_and_seeds'] = calibration_matches()
     checks['director_evidence'] = (
-        'Investigating by radio: 5 | Using local evidence: 0' in (RESULTS / 'director-radio.log').read_text()
-        and 'Radio area: 21x25 | Retasked: 5 | Interceptors released: 1' in (RESULTS / 'director-relief.log').read_text()
-        and 'NORMAL precision restored' in (RESULTS / 'director-relief.log').read_text())
+        'Remote receivers: 5 | Using local evidence: 0 | Lead investigators: 1' in (RESULTS / 'director-radio.log').read_text()
+        and all(marker in (RESULTS / 'director-relief.log').read_text()
+                for marker in ('RELIEF started','WITHDRAWING to','BACKSTAGE ends','NORMAL precision restored')))
     try:
         smoke = json.loads((RESULTS / 'preset-smoke.json').read_text())
         checks['smoke_matrix_complete'] = len(smoke) == 9 and all(r['repeat_equal'] for r in smoke)
@@ -132,17 +136,16 @@ def main():
         checks[f'{document}_no_internal_paths'] = not re.search(r'/(tmp|root|home)/[A-Za-z]', text)
     audit = dict(recorded_utc=now, release=RELEASE, status='passed' if all(checks.values()) else 'failed', checks=checks,
                  visual_review=['setup.png', 'hud.png', 'game.png', 'result.png'],
-                 review_notes=['Release captures show the V5.4.3a label, the seed-7 relief HUD with RADIO 3 and 21x25 area, the generated exit route and the zero-monster result.',
+                 review_notes=['The release HUD fixture uses seed 8 during withdrawal. The result fixture records a zero-monster escape.',
                                'Native GLFW desktop startup and macOS/Windows builds were not executed.',
                                'Portable/regression assertion counters are cumulative, not independent simulation totals.'])
     (RESULTS / 'documentation-audit.json').write_text(json.dumps(audit, indent=2) + '\n')
 
     env = json.loads((RESULTS / 'environment.json').read_text()) if (RESULTS / 'environment.json').is_file() else {}
     render = (RESULTS / 'render.log').read_text().splitlines()[0] if (RESULTS / 'render.log').is_file() else None
-    cmake = json.loads((RESULTS / 'cmake/validation.json').read_text()) if (RESULTS / 'cmake/validation.json').is_file() else {}
     calibration = json.loads((RESULTS / 'calibration.json').read_text()) if (RESULTS / 'calibration.json').is_file() else {}
     manifest = dict(
-        package=f'MazeRunner V{RELEASE} Documentation and Validation', release=RELEASE, previous_release='5.4.2',
+        package=f'MazeRunner V{RELEASE} Documentation and Validation', release=RELEASE, previous_release='5.4.3a',
         prepared_date=now[:10],
         source=dict(path=SOURCE, bytes=len(source), physical_lines=len(lines), sha256=coverage['source_sha256']),
         validation=dict(platform=env.get('platform'), compiler=env.get('compiler'), renderer=render,

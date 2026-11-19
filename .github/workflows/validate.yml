@@ -10,6 +10,9 @@ on:
       - 'scripts/verify_package.py'
       - 'scripts/package_devkit.py'
       - 'scripts/devkit-files.txt'
+      - 'manifest.json'
+      - 'SHA256SUMS'
+      - 'dist/MazeRunner-V*-Documentation-and-Validation.zip'
       - '.github/workflows/validate.yml'
   workflow_dispatch:
 
@@ -21,10 +24,10 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      - name: Verify the committed developer kit
+        run: python3 scripts/verify_package.py
       - name: Install graphics development packages
         run: sudo apt-get update && sudo apt-get install -y ninja-build libglfw3-dev libglew-dev libgl-dev libegl1-mesa-dev
-      - name: Test release packaging and CTest validation
-        run: python3 tests/test_release_tools.py
       - name: Build desktop and headless targets and run CTest
         run: python3 scripts/run_cmake_validation.py --generator Ninja --jobs 2
       - name: Preserve CMake and CTest logs
@@ -33,3 +36,6 @@ jobs:
         with:
           name: ubuntu-cmake-validation
           path: artifacts/results/cmake/
+      - name: Test release packaging and CTest validation
+        if: ${{ !cancelled() }}
+        run: python3 tests/test_release_tools.py

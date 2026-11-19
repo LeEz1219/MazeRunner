@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Rebuild and test the V5.4.3a source; run from any working directory."""
+"""Rebuild and test the V5.4.3b source; run from any working directory."""
 import argparse, datetime, hashlib, json, os, pathlib, platform, re, subprocess, sys, time
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
@@ -55,7 +55,7 @@ def ppm_to_png(path):
     output=b'\x89PNG\r\n\x1a\n'+chunk(b'IHDR',struct.pack('>IIBBBBB',w,h,8,2,0,0,0))+chunk(b'IDAT',zlib.compress(scan,9))+chunk(b'IEND',b'')
     path.with_suffix('.png').write_bytes(output)
 
-source='src/mazerunnerV5.4.3a.cpp'
+source='src/mazerunnerV5.4.3b.cpp'
 flags=['-std=c++17','-Wall','-Wextra','-Wpedantic','-Werror','-pthread']
 status=0
 try:
@@ -70,13 +70,15 @@ try:
         run('build-headless',[args.compiler,source,*flags,'-O2','-DMAZERUNNER_HEADLESS','-o','build/maze-headless'])
         run('help',['./build/maze-headless','--help'])
         radio = run('director-radio',['./build/maze-headless','--simulate','63','63','5','42','50','--difficulty','medium'])
-        if 'rows 0-16, cols 0-16 | Investigating by radio: 5 | Using local evidence: 0' not in radio:
-            raise RuntimeError('Expected five remote investigations on the first movement report')
-        relief = run('director-relief',['./build/maze-headless','--simulate','21','31','5','7','32000','--difficulty','medium'])
-        for marker in ('Radio area: 21x25 | Retasked: 5 | Interceptors released: 1', 'RELIEF increased',
-                       'Radio area: 21x31', 'NORMAL precision restored', '| ESCAPED | simulation_ms=31400'):
+        if 'Remote receivers: 5 | Using local evidence: 0 | Lead investigators: 1' not in radio:
+            raise RuntimeError('Expected one lead for five remote receivers on the first report')
+        relief = run('director-relief',['./build/maze-headless','--simulate','21','31','5','8','32000','--difficulty','medium'])
+        for marker in ('RELIEF started', 'BACKSTAGE starts', 'WITHDRAWING to', 'BACKSTAGE ends',
+                       'NORMAL precision restored', '| ESCAPED |'):
             if marker not in relief:
                 raise RuntimeError('Missing director transition: '+marker)
+        if not re.search(r'withdrawal_steps=[1-9]\d*', relief):
+            raise RuntimeError('The investigator must physically leave the encounter')
         run('build-regressions',[args.compiler,'tests/ui_tests.cpp',*flags,'-O2','-o','build/regressions'])
         run('gameplay-and-ui',['./build/regressions'])
         if args.skip_sanitizers:

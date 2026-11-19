@@ -1,6 +1,6 @@
 #define MAZERUNNER_NO_MAIN
 #define MAZERUNNER_APP_TEST
-#include "../src/mazerunnerV5.4.3a.cpp"
+#include "../src/mazerunnerV5.4.3b.cpp"
 #include "egl_test_context.h"
 #include <thread>
 #include <tuple>
