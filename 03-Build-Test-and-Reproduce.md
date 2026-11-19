@@ -139,7 +139,7 @@ If you download only the `.cpp` and `CMakeLists.txt`, place them in the same fol
 
 Use a fresh build directory when changing compiler, CPU architecture, or generator. A stale CMake cache can retain the previous toolchain/dependency paths. CMake's multi-configuration generators also accept `cmake --build build/cmake --config Release` and `ctest --test-dir build/cmake -C Release --output-on-failure`; the supported command recipes above use single-configuration Ninja. The file contains MSVC warning handling, but no native MSVC build was executed or established by this package.
 
-Ubuntu CI invokes `python3 scripts/run_cmake_validation.py --generator Ninja --jobs 2`. [Hosted run](https://github.com/LeEz1219/MazeRunner/actions/runs/44459451353) · [CMake results](artifacts/results/cmake/validation.json)
+Ubuntu CI invokes `python3 scripts/run_cmake_validation.py --generator Ninja --jobs 2`. [Hosted run](https://github.com/LeEz1219/MazeRunner/actions/runs/44460611094) · [CMake results](artifacts/results/cmake/validation.json)
 
 ## 3. Ubuntu Linux: direct compiler build
 

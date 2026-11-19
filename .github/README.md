@@ -89,6 +89,6 @@ This command regenerates files under `artifacts/`, so use a separate working cop
 
 ## Recorded validation
 
-The Linux validation covers the headless CLI, deterministic gameplay and UI regressions, ASan/UBSan and offscreen OpenGL. Ubuntu CI builds both the desktop and headless targets. [Ubuntu CMake run](https://github.com/LeEz1219/MazeRunner/actions/runs/44459451353) · [Direct validation](../artifacts/results/validation-summary.json)
+The Linux validation covers the headless CLI, deterministic gameplay and UI regressions, ASan/UBSan and offscreen OpenGL. Ubuntu CI builds both the desktop and headless targets. [Ubuntu CMake run](https://github.com/LeEz1219/MazeRunner/actions/runs/44460611094) · [Direct validation](../artifacts/results/validation-summary.json)
 
 Across 2,400 five-monster calibration games on 21×21 and 31×31, escapes were Low 739/800 (92.38%), Medium 526/800 (65.75%), High 290/800 (36.25%). The full 4,740-game data includes the ten-monster presets, rectangular setup default and fresh-seed holdouts. [All outcomes](../artifacts/results/calibration-runs.csv) · [Cohort results](../artifacts/results/calibration.json)
