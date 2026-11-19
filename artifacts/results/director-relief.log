@@ -530,4 +530,4 @@ Monsters wait for the first move or auto-solve | Director confinement: 4000 ms |
 [13.040s] Movement hint #87 | Local footstep area: rows 15-19, cols 26-30 | Heard by 1 of 5
 [13.040s] Player REACHED THE EXIT at (19,30)
 [13.040s] Player (19,30) | Manual steps: 0 | Auto steps: 190 | Time: 13.04 s | Auto-solve: OFF | Difficulty: Medium | Director: NORMAL | Menace: 0 | Radio reports: 5 | Radio area: 17x17 | Hint width: 5 | Hunting: 1 | Searching: 4
-Maze Runner V5.4.3b | difficulty=Medium | seed=8 | 21x31 | monsters=5 | ESCAPED | simulation_ms=13040 | auto_steps=190 | withdrawals=1 | withdrawal_steps=9 | junction_scans=2 | compute_ms=23.33
+Maze Runner V5.4.3b | difficulty=Medium | seed=8 | 21x31 | monsters=5 | ESCAPED | simulation_ms=13040 | auto_steps=190 | withdrawals=1 | withdrawal_steps=9 | junction_scans=2 | compute_ms=16.41

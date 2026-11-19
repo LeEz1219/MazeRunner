@@ -10,13 +10,15 @@ The setup screen offers Low, Medium, and High difficulty, a configurable monster
 
 ## What's new in V5.4.3b
 
-One investigator follows the center of an encounter. Other informed monsters cover different sides of the reported sector. Eligible Cutters can intercept at a chokepoint. A searcher checks junctions and alcoves, briefly turns toward an unchecked arm, and remembers where it has looked.
+One investigator follows the best clue available to it. Other informed monsters cover different sides of the reported sector. Eligible Cutters can intercept at a chokepoint. A searcher checks junctions and alcoves, briefly turns toward an unchecked arm, and remembers where it has looked.
 
 The Director samples menace every 200 ms. Sustained pressure can send the investigator walking away. During this quiet period the pack still hears real steps and can make contact. The HUD shows *BACKSTAGE* and the menace value (`M`). Individual monsters can learn from repeated audible scent losses, sector returns, sustained headings and reversals. A new run clears this memory.
 
 On seed 8 the lead withdraws at 8.600 seconds. It takes nine steps away before the solver reaches the exit at 13.040 seconds. [Encounter trace](../artifacts/results/director-relief.log)
 
 ![Backstage and menace on the HUD](../artifacts/screenshots/hud.png)
+
+The [player and developer Wiki](https://github.com/LeEz1219/MazeRunner/wiki) includes a first-maze walkthrough, a guide to the Director HUD, and the five-monster calibration and holdout results.
 
 ## Build and play
 
@@ -89,6 +91,6 @@ This command regenerates files under `artifacts/`, so use a separate working cop
 
 ## Recorded validation
 
-The Linux validation covers the headless CLI, deterministic gameplay and UI regressions, ASan/UBSan and offscreen OpenGL. Ubuntu CI builds both the desktop and headless targets. [Ubuntu CMake run](https://github.com/LeEz1219/MazeRunner/actions/runs/44460611094) · [Direct validation](../artifacts/results/validation-summary.json)
+The Linux validation covers the headless CLI, deterministic gameplay and UI regressions, ASan/UBSan and offscreen OpenGL. Ubuntu CI builds both the desktop and headless targets. [Ubuntu CMake run](https://github.com/LeEz1219/MazeRunner/actions/runs/44462877518) · [Direct validation](../artifacts/results/validation-summary.json)
 
 Across 2,400 five-monster calibration games on 21×21 and 31×31, escapes were Low 739/800 (92.38%), Medium 526/800 (65.75%), High 290/800 (36.25%). The full 4,740-game data includes the ten-monster presets, rectangular setup default and fresh-seed holdouts. [All outcomes](../artifacts/results/calibration-runs.csv) · [Cohort results](../artifacts/results/calibration.json)

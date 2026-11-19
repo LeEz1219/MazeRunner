@@ -5,9 +5,9 @@
   "prepared_date": "2026-11-19",
   "source": {
     "path": "src/mazerunnerV5.4.3b.cpp",
-    "bytes": 193866,
+    "bytes": 193905,
     "physical_lines": 3631,
-    "sha256": "b740d887484f1fe3bbfbb712b9caeadc284aa4fdf416ce514a84436326784e06"
+    "sha256": "0ee75560b422a7a9e25aed15e26a5fad81852a3848727593358a7d42e2f4986f"
   },
   "validation": {
     "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
@@ -59,8 +59,8 @@
     },
     {
       "path": ".github/README.md",
-      "bytes": 6733,
-      "sha256": "6018c67d068a6379b699257bcbafbd3b263d7bcb192d1edfd574445f6f9a2372"
+      "bytes": 6932,
+      "sha256": "250f9e6128018cddead455a9e1d2ab2a79424d9cc747176523464a9eec786562"
     },
     {
       "path": ".github/workflows/validate.yml",
@@ -74,18 +74,18 @@
     },
     {
       "path": "01-Source-Line-by-Line.md",
-      "bytes": 808029,
-      "sha256": "f53e7ff48ddbe8c97ff8120a4b6119e69a87ce1fa1d32b2bdfbbbbc00f19af21"
+      "bytes": 808355,
+      "sha256": "954ab63d3455a8e2717a87c71f5d61714d7d8af484102177e02ac589e68b1c25"
     },
     {
       "path": "02-AI-Graphics-and-Redesign.md",
-      "bytes": 51384,
-      "sha256": "29126553750c35352108f70b8520d3d1c09a26e757c8ae8b6ef3df9286f0b66d"
+      "bytes": 53462,
+      "sha256": "c192d77a319d24aab1f1aee0ba515ecd39a2ebd750d0c8c86d2d69ec4518ecc4"
     },
     {
       "path": "03-Build-Test-and-Reproduce.md",
-      "bytes": 58221,
-      "sha256": "5e7ea30217bbb41e00526d8417666ee8279b37195fe1e312a6294f484f6bb4f7"
+      "bytes": 59370,
+      "sha256": "b4e7dfa555c72910c74ad9ccdd4ec4038640e9859c2d52d80cfdaf4454148918"
     },
     {
       "path": "CMakeLists.txt",
@@ -130,7 +130,7 @@
     {
       "path": "artifacts/results/calibration.json",
       "bytes": 9561,
-      "sha256": "1f3c18fbdbabc1337f15655d36f3d740059f2536fa1900c1d39fd642cb4b05b8"
+      "sha256": "9cedec254ad30a142d64f8c54c830cc2fcecbc54ef6fce8e5f331a95dd4ba040"
     },
     {
       "path": "artifacts/results/cmake/build.log",
@@ -145,17 +145,17 @@
     {
       "path": "artifacts/results/cmake/configure.log",
       "bytes": 601,
-      "sha256": "e8804c4e3df72ed39c66ca0a857d8e3769e6e03c6b81e39148dd95cc06917081"
+      "sha256": "176fe945c644fa0a2c4bd9efd630229198eb296636ced6c2e525d70094e746c6"
     },
     {
       "path": "artifacts/results/cmake/ctest.log",
       "bytes": 1505,
-      "sha256": "9fb8f7b9299960d9f10d3beef1f9d91d8fa467419fc13632bfa3139946ef391f"
+      "sha256": "d2a3cf63a088b339ea287f2a8a06cc2396cce8f3bad71cec8d379b2e6b30d9c3"
     },
     {
       "path": "artifacts/results/cmake/validation.json",
       "bytes": 2664,
-      "sha256": "7eff732a20c970acf4e92009c860d6f9f43ee108e0f520bf82d0a3ea913eb5d7"
+      "sha256": "8d9e06e62b53d4ef7e84aad7f28c8e0d68fbd6b2de22e0c183c71f155902b2bd"
     },
     {
       "path": "artifacts/results/compiler.log",
@@ -165,27 +165,27 @@
     {
       "path": "artifacts/results/director-radio.log",
       "bytes": 2128,
-      "sha256": "fabff7c6e44f762f18fbf43a5f0d4bbd27442bdd410823ace63211e00794b5ec"
+      "sha256": "a9fb3ff7de7cbbc815b6c03168f143d6fad8b413b77b349398eae9191de33b78"
     },
     {
       "path": "artifacts/results/director-relief.log",
       "bytes": 34624,
-      "sha256": "8bdd2bf770ea7976ce9d9fffc9266aa680d2a7ff28c39ac5801bd572a4eda942"
+      "sha256": "a407dee3cda39c75327be9797b39739a045dff0b62ed5e0b177e6e54d8740440"
     },
     {
       "path": "artifacts/results/documentation-audit.json",
       "bytes": 1278,
-      "sha256": "876f2d2385bfde6fa42186c341ae35e5d0e0bc664a182839fa33320751a20b25"
+      "sha256": "dca49c3653bc21905ef7e1b7d8505a0393b44cfed5cd6395376f75d31feae7da"
     },
     {
       "path": "artifacts/results/documentation-coverage.json",
       "bytes": 455,
-      "sha256": "341905ff15564fd4c54554b0998f8f6e28455023ab63ce777e4af66abe1e0f2e"
+      "sha256": "a52741fa99d9a23704c362e2879ea37d468cf622d60afb2484c74b04a306dfb6"
     },
     {
       "path": "artifacts/results/environment.json",
       "bytes": 481,
-      "sha256": "718b98a588ebdf9f18dc9671f9bbc3236360e97a2879f52c028cd99ddf1d851f"
+      "sha256": "d544e3e96283f7d82ba6d185bb08010a7a31e8d6e455b3ed0e4af2b0aff2324e"
     },
     {
       "path": "artifacts/results/gameplay-and-ui.log",
@@ -205,92 +205,92 @@
     {
       "path": "artifacts/results/preset-101-high-repeat.log",
       "bytes": 193,
-      "sha256": "b75b4ea25f5ebfa7eb3efdd90a6ca7282cdd3a65dda3d671256ee88fe4036f32"
+      "sha256": "ae163fef57ed6d5334bc3b23db5380b219d1beed92bde92774d52d073bc44315"
     },
     {
       "path": "artifacts/results/preset-101-high.log",
       "bytes": 193,
-      "sha256": "96e41223fca53e45add35851e6af6fec7e3a7228fa2883447beb9845fd7a1c36"
+      "sha256": "2da5bdd9f5eb56455a0c4bfe7dd9bf79764462fe283666e0e877cae730798d7d"
     },
     {
       "path": "artifacts/results/preset-101-low-repeat.log",
       "bytes": 192,
-      "sha256": "05d4f5617dae906ff57078b1277a7c6205afaefae95e50a976d9cbdb9caf1b8f"
+      "sha256": "feeab1d86c10e999a389248580d611033bea8ed82ede5506cf5338cc5a4f36f8"
     },
     {
       "path": "artifacts/results/preset-101-low.log",
       "bytes": 192,
-      "sha256": "c3c6c35d6841c767812e7dfc4246dc7a968820e5b62dc930ab68010f6e88efd5"
+      "sha256": "3c30ca235daa1d033ddbc3d85f5f90f143e73855c93edce18a7af9e9a2cfc4e7"
     },
     {
       "path": "artifacts/results/preset-101-medium-repeat.log",
       "bytes": 195,
-      "sha256": "271a9d414ea2f635854f572b43285cd1dd3692d7991362a2c5b7456dca3466ae"
+      "sha256": "d5c16b1c93effd08d716cff2226498d536488c86157906a087dd84f5d2efca2c"
     },
     {
       "path": "artifacts/results/preset-101-medium.log",
       "bytes": 195,
-      "sha256": "193084a528742d7516c733864dad7b15fe2d14271668e6ad60592b6662ae9500"
+      "sha256": "4829a89fe575f737d45a43e8ab8433227405179157441c6f81e59ad191d5c0f5"
     },
     {
       "path": "artifacts/results/preset-33-high-repeat.log",
       "bytes": 190,
-      "sha256": "05c22095d5c94ed037dfb1ba8f49c57da1e18957a84155a54ebde5b61eec1207"
+      "sha256": "e5ab2f1b9825e2be9a778d852b23c8594cc688abadfe94f5106e8191770c93f9"
     },
     {
       "path": "artifacts/results/preset-33-high.log",
       "bytes": 190,
-      "sha256": "0676612c0bad7a529c4b60edb904cee66498eb15b817cf0921342deec209f9b6"
+      "sha256": "48b6e306c716b46e9771725939d5c66361c67de667ae39a75e95a42e971a3fad"
     },
     {
       "path": "artifacts/results/preset-33-low-repeat.log",
       "bytes": 190,
-      "sha256": "c0dadec5563fad5d42f0712672fe7e85d8c5b8468f5dc76de93e50cce6e2f1c8"
+      "sha256": "bb2753d4bef5e381552179ca72e5fd3fb12f8d37f7188b65cc1e2b86c16471ba"
     },
     {
       "path": "artifacts/results/preset-33-low.log",
       "bytes": 190,
-      "sha256": "9cb82b93a190a094dee4eb428e292497af1207be6d43a1153e39ad4eafb2d0a5"
+      "sha256": "23a7e6da5ca79578c9842baf1365382ba86334e48a5ca74701ed3e5bfe8f5af1"
     },
     {
       "path": "artifacts/results/preset-33-medium-repeat.log",
       "bytes": 193,
-      "sha256": "3853e3cf5e5c8c072ff611d2a4a097171be8a6901e93fe3d27f6a7c0e3613230"
+      "sha256": "893620e3e794bb60fdf25be00ec756c36d4c36bc9532b0fa6a8723f1a12850b9"
     },
     {
       "path": "artifacts/results/preset-33-medium.log",
       "bytes": 193,
-      "sha256": "e4cb6c8b0417e6b72ad5e5b74a7ba97c3efa0725b5b1ea46088683d2757e496a"
+      "sha256": "53e19340f4cfcde6f1edbb87ccc65eedacefcfd344aa3a0fb5a4ed22dce90afc"
     },
     {
       "path": "artifacts/results/preset-63-high-repeat.log",
       "bytes": 191,
-      "sha256": "9e834aa4e5934165bfd24391a05d0b242fc7548612dbd57050239f162065990a"
+      "sha256": "275943a2444293f36294d955261dede83ba71ea327bbb10602534fa4d009bc7e"
     },
     {
       "path": "artifacts/results/preset-63-high.log",
       "bytes": 191,
-      "sha256": "312ba58b209f0a3bee0a3509ac418e6f602f905773a36efda1700580d4db2f6f"
+      "sha256": "1856650eb44e9c3a89dcc85cf69935e70b464863e5ec19fa8586b04efbe3a4d0"
     },
     {
       "path": "artifacts/results/preset-63-low-repeat.log",
       "bytes": 190,
-      "sha256": "5674af11af5895ea67e3b8c99f900fb5becc991b4357572e30066347eef00137"
+      "sha256": "a98bc57b779090c7be42aee7413033e16a5f42fb163f8528ac1b63ab15def696"
     },
     {
       "path": "artifacts/results/preset-63-low.log",
       "bytes": 190,
-      "sha256": "d7c097c942845af245e4d9546fd603393f2612fb5aed9f7670434a61f3255d1a"
+      "sha256": "dc6ea828eb03956e35531d22926044160ca3da0a8d2699d5851e169bc10dabb7"
     },
     {
       "path": "artifacts/results/preset-63-medium-repeat.log",
       "bytes": 193,
-      "sha256": "d2d266ae9e5aac67240d8b1fa8503004895374ff5f48a963db10239deeb76b63"
+      "sha256": "3731047e19c29ff5fc29b38a1c3b29c93461bbf493c086ef514f42bd668bdfc5"
     },
     {
       "path": "artifacts/results/preset-63-medium.log",
       "bytes": 193,
-      "sha256": "12403cb22377c426296aac6424e0661aa0c7c3a11713f9b1be1c95bfe2697704"
+      "sha256": "e45c32c0a5d0d911584c691d0c083a1b32f7fe78671bcd9dbf690ef845e2df09"
     },
     {
       "path": "artifacts/results/preset-smoke.json",
@@ -309,13 +309,13 @@
     },
     {
       "path": "artifacts/results/ubuntu-ci.json",
-      "bytes": 620,
-      "sha256": "e580c9285d5fde9d333073a525a12ad37080c2297be04ddf6f912e2e3bd6ca92"
+      "bytes": 695,
+      "sha256": "343a56e68d774a7073c2f7c1b136412cf6b7131b83de85f692a13d6971887018"
     },
     {
       "path": "artifacts/results/validation-summary.json",
-      "bytes": 10181,
-      "sha256": "11105d0bba8f80b7b6842d624030ddb86ca3e0e30a8430996fe637d7d0672b0b"
+      "bytes": 10182,
+      "sha256": "7b7a8c6472b43acf617ad5f7af93fe8d3a938c7a3ce9d207f63c26cff02a225a"
     },
     {
       "path": "artifacts/screenshots/game.png",
@@ -349,18 +349,18 @@
     },
     {
       "path": "artifacts/screenshots/preset-101.png",
-      "bytes": 18090,
-      "sha256": "7ac850754f7c09f90002176d9f9c9d100e910cdaf880686dad5844a0bc89ad5c"
+      "bytes": 18093,
+      "sha256": "22092987de344fb13c1863dfc69c6231a141a2eeaf0b69fe68a2a9530dfd5d14"
     },
     {
       "path": "artifacts/screenshots/preset-33.png",
-      "bytes": 18006,
-      "sha256": "b7cfdd84c7a2e9173c17fe823627f50fee33f9bef03deec38497392f519b77f1"
+      "bytes": 18009,
+      "sha256": "133ebefdc140c6046f61ac6d0216fb6916bcb981076f0866309f611559c7692b"
     },
     {
       "path": "artifacts/screenshots/preset-63.png",
-      "bytes": 18049,
-      "sha256": "18cb201f3c26139d0392c45a04685e18297c3f531367cc41fac0c14acefb45ef"
+      "bytes": 18052,
+      "sha256": "093444d399888b09c15d167c1bdef18c7b180007061cf62adc22a1e5f3b4f4f9"
     },
     {
       "path": "artifacts/screenshots/result.png",
@@ -369,28 +369,28 @@
     },
     {
       "path": "artifacts/screenshots/setup-invalid.png",
-      "bytes": 17696,
-      "sha256": "4759fcc63f21bb2e3d401426d1cbcc0a9629aede96490d4e81bf939555540db3"
+      "bytes": 17700,
+      "sha256": "18c412327416ebb7f8fdd0a51b1a003e7bb7aa0b6d13a782346a688b0b724fbd"
     },
     {
       "path": "artifacts/screenshots/setup-portrait.png",
-      "bytes": 9867,
-      "sha256": "908b159a7f29b4b807c70268b20ba9e649ebb1b95d9ba80a57a72bf07bccba43"
+      "bytes": 9869,
+      "sha256": "e93a941bd15f69f79e1f4e576cca5cfec6e69abef8b2ce7767a568ae3048ce07"
     },
     {
       "path": "artifacts/screenshots/setup-small.png",
-      "bytes": 11207,
-      "sha256": "f4bac703cdb264d68b9f313851d937f9ed50d8f8a7009ab0fe8adb5892579caf"
+      "bytes": 11200,
+      "sha256": "6a41710092d1d8d38881a1e038a920307f67ef1e924b30a9ad461213f330a138"
     },
     {
       "path": "artifacts/screenshots/setup-wide.png",
-      "bytes": 14812,
-      "sha256": "b3c398d1e67f34db75858ad5c9dc03fec702abac256811ecec14bd4b1406bc44"
+      "bytes": 14814,
+      "sha256": "f57852a893a99dc0c770351b858611f4bbe9551a49abf5727ad8ed91ec89d724"
     },
     {
       "path": "artifacts/screenshots/setup.png",
-      "bytes": 18006,
-      "sha256": "381ccfd59511e87b98f6229ff2a1b17f9dfbaac1a5291108d0ccebc269052f92"
+      "bytes": 18009,
+      "sha256": "731fa5a3821c4f6600121c7b114d5719bd1a6a0e7cdd035dffbb9a10024ad31d"
     },
     {
       "path": "artifacts/screenshots/showcase.png",
@@ -444,8 +444,8 @@
     },
     {
       "path": "src/mazerunnerV5.4.3b.cpp",
-      "bytes": 193866,
-      "sha256": "b740d887484f1fe3bbfbb712b9caeadc284aa4fdf416ce514a84436326784e06"
+      "bytes": 193905,
+      "sha256": "0ee75560b422a7a9e25aed15e26a5fad81852a3848727593358a7d42e2f4986f"
     },
     {
       "path": "tests/app_tests.cpp",
@@ -474,8 +474,8 @@
     },
     {
       "path": "tests/render_tests.cpp",
-      "bytes": 9467,
-      "sha256": "12ea4dc6addc1d4398910e6f678045ac6103b4976b0a650c30d1cb0e1ccf6466"
+      "bytes": 10545,
+      "sha256": "84474bc81bb4652a72bc6da6169879c113bacfed976e1a397be8837b1df69f0b"
     },
     {
       "path": "tests/stalker_tests.cpp",
@@ -519,8 +519,8 @@
     },
     {
       "path": "tests/ui_tests.cpp",
-      "bytes": 6375,
-      "sha256": "39dcaf7877a3e68aee84902ae3a5fe8548706a8406875ec626dea73a508f7042"
+      "bytes": 6540,
+      "sha256": "c358e86dd67c2516648790cf1d9260c481cf0df070402e968d84e7a53445ac92"
     },
     {
       "path": "tests/v542_tests.cpp",

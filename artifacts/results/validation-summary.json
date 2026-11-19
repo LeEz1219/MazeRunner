@@ -28,7 +28,7 @@
         "build/maze-headless"
       ],
       "exit_code": 0,
-      "seconds": 7.796,
+      "seconds": 6.187,
       "status": "passed"
     },
     {
@@ -38,7 +38,7 @@
         "--help"
       ],
       "exit_code": 0,
-      "seconds": 0.01,
+      "seconds": 0.005,
       "status": "passed"
     },
     {
@@ -55,7 +55,7 @@
         "medium"
       ],
       "exit_code": 0,
-      "seconds": 0.004,
+      "seconds": 0.003,
       "status": "passed"
     },
     {
@@ -72,7 +72,7 @@
         "medium"
       ],
       "exit_code": 0,
-      "seconds": 0.028,
+      "seconds": 0.018,
       "status": "passed"
     },
     {
@@ -91,7 +91,7 @@
         "build/regressions"
       ],
       "exit_code": 0,
-      "seconds": 13.148,
+      "seconds": 13.08,
       "status": "passed"
     },
     {
@@ -100,7 +100,7 @@
         "./build/regressions"
       ],
       "exit_code": 0,
-      "seconds": 2.589,
+      "seconds": 2.281,
       "status": "passed"
     },
     {
@@ -121,7 +121,7 @@
         "build/regressions-asan"
       ],
       "exit_code": 0,
-      "seconds": 30.424,
+      "seconds": 30.086,
       "status": "passed"
     },
     {
@@ -130,7 +130,7 @@
         "./build/regressions-asan"
       ],
       "exit_code": 0,
-      "seconds": 19.919,
+      "seconds": 19.074,
       "status": "passed"
     },
     {
@@ -148,7 +148,7 @@
         "--quiet"
       ],
       "exit_code": 0,
-      "seconds": 0.006,
+      "seconds": 0.008,
       "status": "passed"
     },
     {
@@ -166,7 +166,7 @@
         "--quiet"
       ],
       "exit_code": 0,
-      "seconds": 0.005,
+      "seconds": 0.006,
       "status": "passed"
     },
     {
@@ -202,7 +202,7 @@
         "--quiet"
       ],
       "exit_code": 0,
-      "seconds": 0.007,
+      "seconds": 0.006,
       "status": "passed"
     },
     {
@@ -220,7 +220,7 @@
         "--quiet"
       ],
       "exit_code": 0,
-      "seconds": 0.007,
+      "seconds": 0.004,
       "status": "passed"
     },
     {
@@ -238,7 +238,7 @@
         "--quiet"
       ],
       "exit_code": 0,
-      "seconds": 0.007,
+      "seconds": 0.004,
       "status": "passed"
     },
     {
@@ -256,7 +256,7 @@
         "--quiet"
       ],
       "exit_code": 0,
-      "seconds": 0.007,
+      "seconds": 0.009,
       "status": "passed"
     },
     {
@@ -274,7 +274,7 @@
         "--quiet"
       ],
       "exit_code": 0,
-      "seconds": 0.007,
+      "seconds": 0.006,
       "status": "passed"
     },
     {
@@ -328,7 +328,7 @@
         "--quiet"
       ],
       "exit_code": 0,
-      "seconds": 0.006,
+      "seconds": 0.008,
       "status": "passed"
     },
     {
@@ -346,7 +346,7 @@
         "--quiet"
       ],
       "exit_code": 0,
-      "seconds": 0.008,
+      "seconds": 0.007,
       "status": "passed"
     },
     {
@@ -382,7 +382,7 @@
         "--quiet"
       ],
       "exit_code": 0,
-      "seconds": 0.011,
+      "seconds": 0.014,
       "status": "passed"
     },
     {
@@ -400,7 +400,7 @@
         "--quiet"
       ],
       "exit_code": 0,
-      "seconds": 0.013,
+      "seconds": 0.01,
       "status": "passed"
     },
     {
@@ -418,7 +418,7 @@
         "--quiet"
       ],
       "exit_code": 0,
-      "seconds": 0.013,
+      "seconds": 0.011,
       "status": "passed"
     },
     {
@@ -436,7 +436,7 @@
         "--quiet"
       ],
       "exit_code": 0,
-      "seconds": 0.012,
+      "seconds": 0.011,
       "status": "passed"
     },
     {
@@ -472,7 +472,7 @@
         "-fsyntax-only"
       ],
       "exit_code": 0,
-      "seconds": 1.229,
+      "seconds": 1.234,
       "status": "passed"
     },
     {
@@ -494,7 +494,7 @@
         "build/render-tests"
       ],
       "exit_code": 0,
-      "seconds": 7.61,
+      "seconds": 7.235,
       "status": "passed"
     },
     {
@@ -503,7 +503,7 @@
         "./build/render-tests"
       ],
       "exit_code": 0,
-      "seconds": 0.829,
+      "seconds": 0.408,
       "status": "passed"
     },
     {
@@ -525,7 +525,7 @@
         "build/app-tests"
       ],
       "exit_code": 0,
-      "seconds": 8.078,
+      "seconds": 7.387,
       "status": "passed"
     },
     {
@@ -534,7 +534,7 @@
         "./build/app-tests"
       ],
       "exit_code": 0,
-      "seconds": 0.13,
+      "seconds": 0.101,
       "status": "passed"
     }
   ]

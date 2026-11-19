@@ -2,7 +2,7 @@
 
 This guide explains every one of the **3,631 physical lines** in [mazerunnerV5.4.3b.cpp](src/mazerunnerV5.4.3b.cpp). It covers executable code, declarations, preprocessor branches, comments, blank separators, sprite rows, and glyph data. The final newline terminates line 3,631; it is not an additional source line.
 
-**Source identity:** 193,866 bytes; SHA-256 `b740d887484f1fe3bbfbb712b9caeadc284aa4fdf416ce514a84436326784e06`. Line numbers apply only to this exact copy.
+**Source identity:** 193,905 bytes; SHA-256 `0ee75560b422a7a9e25aed15e26a5fad81852a3848727593358a7d42e2f4986f`. Line numbers apply only to this exact copy.
 
 Read [02-AI-Graphics-and-Redesign.md](02-AI-Graphics-and-Redesign.md) for a connected explanation of the architecture and design choices. Use [03-Build-Test-and-Reproduce.md](03-Build-Test-and-Reproduce.md) for compilation, evidence, screenshots, and reproduction.
 
@@ -13,6 +13,8 @@ Each `L####` entry reproduces one source line and then explains its purpose and 
 Coordinates are `(row,column)` in the simulation and `(x=column,y=row,z=height)` in geometry. Times such as 40 or 560 are simulation milliseconds unless explicitly described as host time. A “path” in the generation checks is a distinct simple entrance-to-exit route; it does not mean a monster-free route or a guaranteed win.
 
 The core is a discrete-event simulation. The graphical layer advances it only while Playing, and the CLI advances the same core without a window. Monsters stay frozen until the player’s first move or auto-solve toggle. The full route overlay and the short tactical auto-player forecast are separate computations. The AI guide explains why this distinction matters.
+
+To trace a stalker encounter, follow [footstep observations](#l0925), [pack duties](#l0961), [menace and withdrawal](#l1198), [junction scans](#l1664), and [suspicion sweeps](#l1692). For the visible cues, see the [scan marker](#l3148) and [Director HUD](#l3276).
 
 ## Section index
 
@@ -15154,9 +15156,9 @@ Resolve a character to seven five-bit font rows; this embedded bitmap font needs
 Select the glyph by character. UiRenderer uppercases labels before calling this function.
 
 <a id="l2974"></a>
-**L2974** — <code>        case 'a':return {0,0,14,1,15,17,15};</code>
+**L2974** — <code>        case 'a':return {0,0,14,1,15,17,15};case 'b':return {16,16,22,25,17,17,30};</code>
 
-Define the seven bitmap rows of the lowercase a needed to display the exact release suffix.
+Define the seven bitmap rows for lowercase a and b. The setup renderer preserves the suffix in the release label.
 
 <a id="l2975"></a>
 **L2975** — <code>        case 'A':return {14,17,17,31,17,17,17};case 'B':return {30,17,17,30,17,17,30};</code>

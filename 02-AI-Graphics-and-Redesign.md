@@ -1,12 +1,12 @@
 # MazeRunner V5.4.3b — AI, graphics, UI, and redesign guide
 
-This guide describes the V5.4.3b encounter system. The source has 3,631 physical lines and SHA-256 `b740d887484f1fe3bbfbb712b9caeadc284aa4fdf416ce514a84436326784e06`. The visual redesign proposals in sections 9–11 are options a designer can implement. [Production source](src/mazerunnerV5.4.3b.cpp)
+This guide describes the V5.4.3b encounter system. The source has 3,631 physical lines and SHA-256 `0ee75560b422a7a9e25aed15e26a5fad81852a3848727593358a7d42e2f4986f`. The visual redesign proposals in sections 9–11 are options a designer can implement. [Production source](src/mazerunnerV5.4.3b.cpp)
 
 The companion [line-by-line reference](01-Source-Line-by-Line.md) explains every physical source line. The [build, test, and reproduction guide](03-Build-Test-and-Reproduce.md) contains commands, evidence, platform limitations, and a screenshot index. All images below were captured from this source by the included real-OpenGL test harness; the gallery is a deliberately arranged fixture.
 
 ### Changes since V5.4.3a
 
-One investigator follows the center of an encounter. Other informed monsters cover different sides of the reported sector. Eligible Cutters can intercept at a chokepoint. A searcher checks junctions and alcoves, briefly turns toward an unchecked arm, and remembers where it has looked.
+One investigator follows the best clue available to it. Other informed monsters cover different sides of the reported sector. Eligible Cutters can intercept at a chokepoint. A searcher checks junctions and alcoves, briefly turns toward an unchecked arm, and remembers where it has looked.
 
 The Director samples menace every 200 ms. Sustained pressure can send the investigator walking away. During this quiet period the pack still hears real steps and can make contact. The HUD shows *BACKSTAGE* and the menace value (`M`). Individual monsters can learn from repeated audible scent losses, sector returns, sustained headings and reversals. A new run clears this memory.
 
@@ -58,11 +58,13 @@ At the maximum 501×501 grid there are 251,001 cells, so repeated whole-grid wor
 
 Every monster uses the same behavioral rules. The ten creature appearances are visual variants, not classes with different speed, vision, damage, or intelligence. Spawn IDs give them distinct stable artwork. Spawn selection excludes the entrance/player and exit and keeps monsters on unique open cells. It favors positions sufficiently far from the player using graph distance, but can fall back to nearer candidates when necessary; there is no universal minimum separation guarantee on all allowed sizes. On a very small maze, the requested monster count is also capped by the number of distinct available spawn cells.
 
-A monster is in one of three states: `Patrolling`, `Hunting`, or `Searching`. A hunter has one of two roles: a **chaser** converges on the clue area; a **cutter** waits at a chokepoint between the clue area and the exit.
+Each monster has three independent pieces of state. Its sensory state is `Patrolling`, `Hunting`, or `Searching`. Its role is `Chaser` or `Cutter`. Its pack duty is `Roam`, `Investigate`, `Perimeter`, or `Withdraw`. A listener can still be hunting while it walks away under a withdrawal order. Eye color shows its sensory state.
+
+The Director prefers an eligible hunter for the lead and uses the monster’s own clue to rank candidates. It favors keeping the existing investigator. Other informed monsters cover the outer two usable bands on the side assigned by spawn ID modulo four. Larger packs can share a side. An active Cutter holds its assigned interception target, and a first-hand sighting takes priority. A solo predator remains eligible to investigate.
 
 ### Patrol behavior
 
-A patrolling monster has no player information. It samples 32 random open cells and scores each one. A cell scores higher the longer it has been since any monster entered its 8×8 region, capped at 20 seconds. Travel distance (capped at 20 steps) adds a small amount. The score is penalized for cells this monster visited recently, for cells another monster already claimed, and for each other monster positioned or heading within six cells. Together the monsters therefore cover the map instead of clumping. Patrol is not a stationary guard waiting for an alarm.
+A patrolling monster ordinarily has no active clue. A monster that learned to double back can revisit its last junction during patrol. It samples 32 random open cells and scores each one. A cell scores higher the longer it has been since any monster entered its 8×8 region, capped at 20 seconds. Travel distance (capped at 20 steps) adds a small amount. The score is penalized for cells this monster visited recently, for cells another monster already claimed, and for each other monster positioned or heading within six cells. Together the monsters therefore cover the map instead of clumping. Patrol is not a stationary guard waiting for an alarm.
 
 Following a target uses a reverse BFS distance gradient. Recent-cell penalties discourage immediate repetition. When blocked, a monster can accept limited non-improving movement to sidestep congestion, and repeated blockage causes a new target choice. Targets are reviewed on a 700-ms schedule, but review can preserve a still-valid waypoint. Each monster keeps a bounded recent-cell history rather than a permanent visited map.
 
@@ -78,14 +80,14 @@ An actual displacement can create two clues. A blocked keypress, a solver wait a
 
 Hearing uses `base + floor(per_100 × max(rows, cols) / 100)`. Manhattan distance is a cheap first rejection. A bounded BFS decides which remaining monsters really hear around walls. One acoustic field serves all possible listeners for that displacement. A Medium 63×63 map has a budget of 26 steps.
 
-The local sector side is 9/5/6 cells in Low/Medium/High. The nominal radio side is 19/17/11. Its normal side is limited to `min(profile_radio, max(local_side, floor((2 × max_dimension + 1) / 3)))`. Width and height are separately clipped at map edges. Relief adds padding on both sides. A radio recipient gets these bounds and a revision. The lead uses this as the seed of its sweep. Perimeter agents sample the outermost two usable bands on their assigned sides.
+The local sector side is 9/5/6 cells in Low/Medium/High. The nominal radio side is 19/17/11. Its normal side is limited to `min(profile_radio, max(local_side, floor((2 × max_dimension + 1) / 3)))`. Width and height are separately clipped at map edges. Relief adds padding on both sides. A radio recipient gets these bounds and a revision. The lead uses this as the seed of its sweep. Perimeter agents give positive weight to the nearest usable edge band and its adjacent band on their assigned side.
 
 Each audible step renews the listener's own scent even between clue publications. Normal continuing-motion publication intervals are 200/0/0 ms. During relief they are at least 400 ms. First motion after an idle spell immediately qualifies for a fresh local clue. The radio still observes its own cooldown after an idle spell. [First-step terminal trace](artifacts/results/director-radio.log)
 A hunting target is sampled inside the clue rectangle with weights favoring nearby cells and penalizing recent visits. A candidate already claimed by another hunter is strongly downweighted, encouraging a distributed search. A valid existing target may be retained after an updated clue.
 
 ### Searching after losing the scent
 
-The investigator seeds a bounded multi-source breadth-first search with every walkable cell in the best-known sector. A more recent firsthand sighting can supply a single exact seed. Uncertainty expands through one corridor edge per 180 simulated ms, up to five layers. Junctions and branch mouths have priority. An individual discounts its last 40 inspections for 1,800 ms. Low and Medium physically inspect traversed cells. A High junction scan can also inspect an unobstructed straight arm in its existing visual range. The amber direction marker lasts for one movement opportunity.
+The investigator seeds a bounded multi-source breadth-first search with every walkable cell in the best-known sector. A more recent firsthand sighting can supply a single exact seed. Uncertainty expands through one corridor edge per 180 simulated ms, up to five layers. Junctions and branch mouths have priority. An individual discounts its last 40 inspections for 1,800 ms. Low and Medium physically inspect traversed cells. A High junction scan can also inspect an unobstructed straight arm in its existing visual range. At an eligible junction, the lead pauses for one monster period and inspects an unchecked arm. The marker points down that arm until the next movement opportunity.
 
 ### Tactics learned within a run
 
@@ -139,7 +141,7 @@ The HUD capture shows the default five-monster setup on seed 8 at 8.800 seconds,
 
 ### Tactical forecast and beam search
 
-The planner normally looks ahead 12 actions (480 ms). It extends to **18 actions** when the nearest monster is 10–36 corridor steps away, close enough to shape the route but beyond the default window's view. It retains at most 64 candidates at each depth and considers five actions per expansion: stay or move to one of four neighbors. The forecast copies current monster positions, targets, states, deadlines, and reservation behavior, and projects scheduled movement within the horizon. It also applies the game's sight rule: an unalerted or charging monster that can see the player's current cell is predicted to charge it. It does not simulate future random target selection or new clues. Predictions are therefore useful estimates rather than perfect future knowledge.
+The planner normally looks ahead 12 actions (480 ms). It extends to **18 actions** when the nearest monster is 10–36 corridor steps away, close enough to shape the route but beyond the default window's view. It retains at most 64 candidates at each depth and considers five actions per expansion: stay or move to one of four neighbors. The forecast copies current monster positions, targets, states, deadlines, and reservation behavior, and projects scheduled movement within the horizon. It also applies the game's sight rule: an unalerted or charging monster that can see the player's current cell is predicted to charge it. It also projects junction pauses and eligible direct sightings using copies of the actors. These speculative inspections leave the real monsters’ memories untouched. Future random target choices and new clues are outside the forecast. Predictions are therefore useful estimates rather than perfect future knowledge.
 
 An earliest-arrival estimate combines the remaining delay until a monster's next move with bounded corridor distance at that profile's movement period. The conservative first action rejects cells that may be reached within the next action interval, with special exit handling. Predicted collisions and near approaches influence later search layers. Dead-end gate analysis also discourages entering a branch that a nearby threat could seal.
 
@@ -159,7 +161,7 @@ If conservative planning fails, the planner tries a relaxed interpretation of un
 
 ## 5. Overwatch/director intensity control
 
-The Director manages radio, confinement relief and encounter pacing. Every 200 ms it measures corridor distance to a walkable representative of each hunter's own clue and checks for genuine visual contact. It uses peak pressure, a capped contribution from a second hunter, separation after a close encounter and current confinement. Menace stays between 0 and 100. At 76, the Director releases guards and requests one physical retreat. The chosen agent uses ordinary movement, occupancy, and collision rules. Current sight takes priority. Normal broadcast eligibility returns at pressure 26 or lower after at least 1,400 ms. Silence supplies no fresh radio clue.
+The Director manages radio, confinement relief and encounter pacing. Every 200 ms it measures corridor distance to a walkable representative of each hunter's own clue and checks for genuine visual contact. It uses peak pressure, a capped contribution from a second hunter, separation after a close encounter and current confinement. Menace stays between 0 and 100. At 76, the Director releases guards and requests one physical retreat. The chosen agent uses ordinary movement, occupancy, and collision rules. A current sighting takes priority. Backstage can begin while the only eligible hunter still sees the player. Its withdrawal request stays pending until a candidate can disengage. After at least 1,400 ms, pressure at 26 or below permits backstage to end unless a pending withdrawal still has visual contact. A new broadcast then requires an eligible player step and the usual cooldown. Silence supplies no fresh radio clue.
 
 Every 200 ms of active play the director samples the player on the simulation clock. A full profile-sized window containing at most 12 unique cells and spanning at most eight cells per axis counts as confinement. In auto mode, prolonged absence of navigation progress is another trigger. Voluntary manual idling clears the history. An active solver accumulates samples while waiting or backtracking, even when the exit field contains a technically open route.
 
@@ -254,6 +256,8 @@ The knight, exit, and ten monsters are each **20×20** arrays of palette charact
 
 One pixel is 0.044 cells wide, giving a sprite a nominal 0.88-cell width. Sprites are horizontally mirrored after left/right movement. The knight has a brief step bob and a blue octagonal ground ring. Wraith, Bat, and Evil eye receive a small sinusoidal hover. **Eye pixels show monster state: gold while roaming, red while hunting, orange while searching.** These animations are visual offsets based on simulation time; they do not interpolate actor collision positions or introduce animated sprite frames.
 
+A searching investigator briefly draws an amber diamond 0.45 cells toward the inspected corridor arm. East and west scans also turn the sprite. The diamond disappears at the scan deadline. Its direction shows where the investigator looked. The amber route overlay separately indicates a potentially obstructed player route.
+
 | Spawn ID | Appearance | Sprite constant | Cosmetic hover |
 |---:|---|---|---|
 | 0 | Goblin | `GOBLIN_SPRITE` | No |
@@ -308,7 +312,7 @@ The UI is custom immediate geometry over a **1000×760 logical canvas**. `UiTran
 
 **Esc never quits.** It pauses and resumes play, and on the result screen it returns to setup. On the setup screen it leaves a numeric field (focusing Start) and otherwise does nothing; during loading it is ignored. Quitting is explicit, through Q or the QUIT button. V5.4.1 quit immediately on Esc from setup, even while a field was being edited.
 
-The HUD shows difficulty, elapsed time and steps, plus the director phase, radio count and current row-by-column footprint. Hunting counts appear in red, or searching counts in orange when no monster is hunting. Before the first input it shows “MOVE OR PRESS G TO START”. Keep the phase and radio labels legible at the smallest supported viewport.
+The HUD shows difficulty, elapsed time and steps, plus the Director phase, menace (`M0`–`M100`), cumulative radio count and radio footprint in rows × columns. During withdrawal, `BACKSTAGE` takes the place of the normal or relief label. A widened footprint can remain visible during backstage. Hunting counts appear in red, or searching counts in orange when no monster is hunting. Before the first input it shows “MOVE OR PRESS G TO START”. Keep the phase and radio labels legible at the smallest supported viewport.
 
 ```mermaid
 stateDiagram-v2
@@ -327,7 +331,7 @@ stateDiagram-v2
 
 Generation runs on a worker that owns its captured configuration and creates only the CPU-side Maze. The loading screen is presented before that work starts. Once the future is ready, the main thread constructs the OpenGL renderer and installs both objects. Every GL object must be created and destroyed while its context remains current. A future designer change that loads GPU assets on the generation worker would violate the present threading model unless a deliberate shared-context strategy were added.
 
-The embedded bitmap font stores seven five-bit rows per glyph. Most labels uppercase their input. The version passes a case-preserving option and supplies the lowercase `a` glyph for V5.4.3b. An unsupported character renders as a question mark. Advance is six pixels times scale and text positions are manually chosen. Test new labels at narrow and high-DPI sizes and keep them clear of the HUD controls.
+The embedded bitmap font stores seven five-bit rows per glyph. Most labels uppercase their input. The version passes a case-preserving option and supplies lowercase `a` and `b` glyphs, including the suffix in `V5.4.3b`. An unsupported character renders as a question mark. Advance is six pixels times scale and text positions are manually chosen. Test new labels at narrow and high-DPI sizes and keep them clear of the HUD controls.
 
 ## 9. Redesign path A: keep the single-file art pipeline
 
@@ -341,20 +345,21 @@ For UI rearrangement, change rectangles in `UiState::widgets` and matching descr
 
 | Desired edit | Primary source location | Related constraints |
 |---|---|---|
-| Knight or exit drawing | [L2054](01-Source-Line-by-Line.md#l2054), [L2186](01-Source-Line-by-Line.md#l2186) | 20 rows × 20 symbols; shared palette |
-| Ten monster drawings | [L2066](01-Source-Line-by-Line.md#l2066) onward | Keep registry pointers and stable IDs |
-| Registry names/hover flags | [L2205](01-Source-Line-by-Line.md#l2205) | Hover is cosmetic; registry size must cover max count |
-| Sprite validation | [L2226](01-Source-Line-by-Line.md#l2226) | Add new palette symbols here as well as color mapping |
-| Wall style | [L2261](01-Source-Line-by-Line.md#l2261) | Static upload, exposed faces, large-map policy |
-| Sprite and eye colors | [L2305](01-Source-Line-by-Line.md#l2305) | Global effect across all art using a symbol |
-| World sprite size/anchor | [L2330](01-Source-Line-by-Line.md#l2330) | Camera-facing construction and wall occlusion |
-| Camera fit/tilt/zoom | [L2362](01-Source-Line-by-Line.md#l2362) | Projection and sprite orientation must agree |
-| Route colors/thickness | [L2393](01-Source-Line-by-Line.md#l2393) | Preserve monster-free/amber semantics |
-| Widget rectangles and labels | [L2485](01-Source-Line-by-Line.md#l2485) | Shared hit testing and keyboard order |
-| Font shapes | [L2610](01-Source-Line-by-Line.md#l2610) | Seven rows, five bits; text metrics elsewhere |
-| Menu palette and layout | [L2809](01-Source-Line-by-Line.md#l2809) | Labels, panels, and widgets need coordinated spacing |
-| HUD text and counters | [L2897](01-Source-Line-by-Line.md#l2897) | Keep start prompt and counters clear of the HUD buttons |
-| Difficulty balance | [L0112](01-Source-Line-by-Line.md#l0112) | Re-run the calibration script after any change |
+| Knight or exit drawing | [L2416](01-Source-Line-by-Line.md#l2416), [L2548](01-Source-Line-by-Line.md#l2548) | 20 rows × 20 symbols; shared palette |
+| Ten monster drawings | [L2428](01-Source-Line-by-Line.md#l2428) onward | Keep registry pointers and stable IDs |
+| Registry names/hover flags | [L2567](01-Source-Line-by-Line.md#l2567) | Hover is cosmetic; registry size must cover max count |
+| Sprite validation | [L2588](01-Source-Line-by-Line.md#l2588) | Add new palette symbols here as well as color mapping |
+| Wall style | [L2623](01-Source-Line-by-Line.md#l2623) | Static upload, exposed faces, large-map policy |
+| Sprite and eye colors | [L2667](01-Source-Line-by-Line.md#l2667) | Global effect across all art using a symbol |
+| World sprite size/anchor | [L2692](01-Source-Line-by-Line.md#l2692) | Camera-facing construction and wall occlusion |
+| Camera fit/tilt/zoom | [L2724](01-Source-Line-by-Line.md#l2724) | Projection and sprite orientation must agree |
+| Route colors/thickness | [L2755](01-Source-Line-by-Line.md#l2755) | Preserve monster-free/amber semantics |
+| Widget rectangles and labels | [L2847](01-Source-Line-by-Line.md#l2847) | Shared hit testing and keyboard order |
+| Font shapes | [L2972](01-Source-Line-by-Line.md#l2972) | Seven rows, five bits; text metrics elsewhere |
+| Menu palette and layout | [L3179](01-Source-Line-by-Line.md#l3179) | Labels, panels, and widgets need coordinated spacing |
+| HUD text and counters | [L3267](01-Source-Line-by-Line.md#l3267) | Keep start prompt and counters clear of the HUD buttons |
+| Junction scan diamond | [L3148](01-Source-Line-by-Line.md#l3148) | Keep its direction legible and let the scan deadline control visibility. |
+| Difficulty balance | [L0116](01-Source-Line-by-Line.md#l0116) | Re-run the calibration script after any change |
 
 ## 10. Redesign path B: external texture sprites and richer animation
 
@@ -376,7 +381,7 @@ The current portable renderer targets OpenGL 3.3 core and uses GLSL 3.30. Any ne
 
 ## 12. Validation workflow for visual changes
 
-Begin with a reproducible seed and unchanged dimensions, count, difficulty, compiler, and standard library. Compare headless simulation outputs before/after after excluding measured host compute time. An art-only edit should not change the simulation state or consume additional simulation randomness. Run the portable regression suite for sprite validity, geometry/camera invariants, all profiles, the V5.4.2 feature tests, and UI state. Then run the real-GL render and injected-application suites on Linux (both run under CTest when EGL is available) and inspect the generated PNGs. A gameplay or balance change should also re-run `scripts/run_calibration.py`.
+Begin with a reproducible seed and unchanged dimensions, count, difficulty, compiler, and standard library. Compare headless simulation outputs before/after after excluding measured host compute time. An art-only edit should not change the simulation state or consume additional simulation randomness. Run the portable regression suite for sprite validity, geometry/camera invariants, all profiles, pack coordination, clue privacy, learned search choices, the release-label glyphs, and UI state. The EGL suite compares the horizontal positions of the scan diamond for left and right gazes and checks that the pixels disappear at expiry. Then run the real-GL render and injected-application suites on Linux (both run under CTest when EGL is available) and inspect the generated PNGs. A gameplay or balance change should also re-run `scripts/run_calibration.py`.
 
 Use the gallery to check that all ten appearances are distinct and visible, then inspect a naturally generated crowded map. Review whole-map and zoomed views, amber and cycling routes, player overlap/occlusion, the green exit, the start prompt and hunting/searching counters, invalid setup fields, keyboard focus, pause, and results. Rerun native-window checks on each intended release platform: offscreen rendering cannot establish native DPI behavior, compositor behavior, actual keyboard mappings, or macOS/Windows driver compatibility.
 

@@ -23,4 +23,4 @@ Monsters wait for the first move or auto-solve | Director confinement: 4000 ms |
 [0.040s] Monster 5: Director radio, switching ROAMING -> SEARCHING.
 [0.040s] Director: REPORT 1 | NORMAL | Estimated player area: rows 0-16, cols 0-16 | Remote receivers: 5 | Using local evidence: 0 | Lead investigators: 1
 [0.050s] Monster 5 | SEARCHING area target (1,16) | From (49,45)
-Maze Runner V5.4.3b | difficulty=Medium | seed=42 | 63x63 | monsters=5 | RUNNING | simulation_ms=50 | auto_steps=1 | withdrawals=0 | withdrawal_steps=0 | junction_scans=0 | compute_ms=0.52
+Maze Runner V5.4.3b | difficulty=Medium | seed=42 | 63x63 | monsters=5 | RUNNING | simulation_ms=50 | auto_steps=1 | withdrawals=0 | withdrawal_steps=0 | junction_scans=0 | compute_ms=0.34

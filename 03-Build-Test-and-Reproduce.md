@@ -10,7 +10,7 @@ Extract the developer ZIP and enter `MazeRunner-V5.4.3b`, or enter `MazeRunner` 
 
 | Path | Purpose |
 |---|---|
-| [01-Source-Line-by-Line.md](01-Source-Line-by-Line.md) | Every physical line with an exact source quote, explanation, and 166 indexed functions or methods |
+| [01-Source-Line-by-Line.md](01-Source-Line-by-Line.md) | Every physical line with an exact source quote, explanation, and 183 indexed functions or methods |
 | [02-AI-Graphics-and-Redesign.md](02-AI-Graphics-and-Redesign.md) | AI behavior, exact difficulty settings, rendering, UI, and redesign plans |
 | [src/mazerunnerV5.4.3b.cpp](src/mazerunnerV5.4.3b.cpp) | Production source, including embedded sprites/font |
 | [CMakeLists.txt](CMakeLists.txt) | C++17 graphical/headless targets; portable and EGL CTest registration |
@@ -18,7 +18,7 @@ Extract the developer ZIP and enter `MazeRunner-V5.4.3b`, or enter `MazeRunner` 
 | `tests/support/` | Narrow test-only GL/GLFW declarations/adapters |
 | [scripts/run_validation.py](scripts/run_validation.py) | Linux build/test runner and screenshot conversion |
 | [scripts/run_cmake_validation.py](scripts/run_cmake_validation.py) | Real CMake configure/build/CTest run with recorded logs |
-| [scripts/run_calibration.py](scripts/run_calibration.py) | Four benchmark cohorts and an ordered row for each game |
+| [scripts/run_calibration.py](scripts/run_calibration.py) | Square calibration, presets, default setup, and fresh square and rectangular holdouts, with one row per game |
 | [scripts/package_devkit.py](scripts/package_devkit.py) | Verify and package a deterministic ZIP from the release manifest |
 | [.github/workflows/validate.yml](.github/workflows/validate.yml) | Repeat Ubuntu graphical and headless CMake validation on relevant repo pushes |
 | [scripts/audit_documentation.py](scripts/audit_documentation.py) | Regenerates the documentation coverage/audit records and package checksums |
@@ -29,10 +29,10 @@ Extract the developer ZIP and enter `MazeRunner-V5.4.3b`, or enter `MazeRunner` 
 
 Compiled executables, temporary PPM images, dependency packages, and private authoring files are deliberately absent from the repository. Reproduction creates its own `build/` directory and can regenerate PPM/PNG captures. There are no external art or font files to download for the game: artwork and glyphs are embedded in the source. GLFW/GLEW and the platform's OpenGL implementation remain external runtime dependencies for the graphical binary.
 
-The source is **193,866 bytes**, **3,631 physical lines**, with SHA-256:
+The source is **193,905 bytes**, **3,631 physical lines**, with SHA-256:
 
 ```text
-b740d887484f1fe3bbfbb712b9caeadc284aa4fdf416ce514a84436326784e06
+0ee75560b422a7a9e25aed15e26a5fad81852a3848727593358a7d42e2f4986f
 ```
 
 If your editor adds a byte-order mark or converts LF newlines to CRLF, the checksum changes even when C++ behavior does not. Keep the packaged source unchanged when reproducing the recorded artifact identity. A terminal's width or soft wrapping does not change physical source line numbers.
@@ -139,7 +139,7 @@ If you download only the `.cpp` and `CMakeLists.txt`, place them in the same fol
 
 Use a fresh build directory when changing compiler, CPU architecture, or generator. A stale CMake cache can retain the previous toolchain/dependency paths. CMake's multi-configuration generators also accept `cmake --build build/cmake --config Release` and `ctest --test-dir build/cmake -C Release --output-on-failure`; the supported command recipes above use single-configuration Ninja. The file contains MSVC warning handling, but no native MSVC build was executed or established by this package.
 
-Ubuntu CI invokes `python3 scripts/run_cmake_validation.py --generator Ninja --jobs 2`. [Hosted run](https://github.com/LeEz1219/MazeRunner/actions/runs/44460611094) · [CMake results](artifacts/results/cmake/validation.json)
+Ubuntu CI invokes `python3 scripts/run_cmake_validation.py --generator Ninja --jobs 2`. [Hosted run](https://github.com/LeEz1219/MazeRunner/actions/runs/44462877518) · [CMake results](artifacts/results/cmake/validation.json)
 
 ## 3. Ubuntu Linux: direct compiler build
 
@@ -494,7 +494,7 @@ The graphics harness requests a real offscreen desktop-OpenGL core context via M
 | Stage | Coverage and output |
 |---|---|
 | Headless compilation/help | C++17, `-O2`, `-Wall -Wextra -Wpedantic -Werror -pthread`; real CLI help |
-| Full portable regressions | `ui_tests.cpp` includes the previous suites and V5.4.3b director, weighted-overlay and hearing regressions |
+| Full portable regressions | `ui_tests.cpp` includes the previous suites and the stalker fixtures, earlier director, weighted-overlay and hearing regressions, and release-label glyph coverage |
 | Director traces | First report on 63×63 and a complete Medium relief/recovery cycle on the default rectangle |
 | Sanitized regressions | Same suite with `-O1 -g -fsanitize=address,undefined` |
 | Preset/profile smoke matrix | Sizes 33/63/101 × Low/Medium/High; ten monsters, seed 42, 1,000 ms; each case run twice |
@@ -515,12 +515,18 @@ The sanitizer run sets `ASAN_OPTIONS=detect_leaks=0` and `UBSAN_OPTIONS=halt_on_
 | [v543a_tests.cpp](tests/v543a_tests.cpp) | Radio delivery beyond hearing, quantized privacy and cooldowns, scent expiry and fallback, relief cycles, guard release/cap, weighted path detour and hearing through corridors |
 | [visual_tests.cpp](tests/visual_tests.cpp) | Wall/sprite geometry, camera projection, silhouette uniqueness, inclusion of gameplay/profile regressions |
 | [stalker_tests.cpp](tests/stalker_tests.cpp) | Same-clue withdrawal privacy, pack jobs, active scans, learned alcove and return choices, and replay under different frame partitions |
-| [ui_tests.cpp](tests/ui_tests.cpp) | 33/63/101 presets, dimensions/count validation, pointer and keyboard focus, DPI transform, transitions; top-level portable runner |
-| [render_tests.cpp](tests/render_tests.cpp) | Real offscreen draw/readback, screenshot fixtures, actual shaders, sprite visibility, large-map mesh |
+| [ui_tests.cpp](tests/ui_tests.cpp) | Release-label glyphs, 33/63/101 presets, dimensions/count validation, pointer and keyboard focus, DPI transform, transitions; top-level portable runner |
+| [render_tests.cpp](tests/render_tests.cpp) | Real offscreen draw/readback, screenshot fixtures, actual shaders, sprite visibility, scan-marker direction and expiry, large-map mesh |
 | [app_tests.cpp](tests/app_tests.cpp) | Injected production callbacks, async loading, pauses, Esc never quitting, hold-to-move timing and release, replay seeding, real-GL UI/world composition, error recovery |
 | [egl_test_context.h](tests/egl_test_context.h) | Offscreen application-test context creation and destruction |
 
 Tests include the production `.cpp` with macros that remove its normal `main` or selected window-startup sections. Compile the specified test entry point **alone**; do not also append the production `.cpp` to that test compile command, or duplicate definitions will result. Helper test files are included transitively and are not all standalone executables.
+
+### Reproduce a withdrawal and a junction scan
+
+Use the default five-monster Medium setup with seed 8. Start auto-solving with G. At 8.800 s the HUD reads `BACKSTAGE M70 | RADIO 3 | 21X25`. The log records one withdrawal episode, nine physical withdrawal steps and two junction scans by the time the solver escapes. Radio becomes eligible again when backstage ends and a qualifying step occurs. A visible hunter can still pursue you during that interval.
+
+For an isolated check, `test_suspicion_scan` in the portable suite arranges a lead at a known junction, verifies one pause, then advances one monster period and checks a physical step. `test_scan_marker` in the EGL suite compares the left and right diamond on a rendered monster and checks its disappearance at expiry. Run `ctest --test-dir build/cmake -R '^(gameplay-and-ui|render-egl)$' --output-on-failure` on an EGL-enabled build. [Portable fixtures](tests/stalker_tests.cpp) · [Rendering fixture](tests/render_tests.cpp)
 
 ## 8. Manual portable tests on macOS and Windows
 
