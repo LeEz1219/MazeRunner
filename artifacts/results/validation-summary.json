@@ -15,7 +15,7 @@
       "name": "build-headless",
       "command": [
         "g++",
-        "src/mazerunnerV5.4.3b.cpp",
+        "src/mazerunnerV5.4.3c.cpp",
         "-std=c++17",
         "-Wall",
         "-Wextra",
@@ -28,7 +28,7 @@
         "build/maze-headless"
       ],
       "exit_code": 0,
-      "seconds": 6.187,
+      "seconds": 6.923,
       "status": "passed"
     },
     {
@@ -38,7 +38,7 @@
         "--help"
       ],
       "exit_code": 0,
-      "seconds": 0.005,
+      "seconds": 0.002,
       "status": "passed"
     },
     {
@@ -66,13 +66,13 @@
         "21",
         "31",
         "5",
-        "8",
+        "26",
         "32000",
         "--difficulty",
         "medium"
       ],
       "exit_code": 0,
-      "seconds": 0.018,
+      "seconds": 0.033,
       "status": "passed"
     },
     {
@@ -91,7 +91,7 @@
         "build/regressions"
       ],
       "exit_code": 0,
-      "seconds": 13.08,
+      "seconds": 9.847,
       "status": "passed"
     },
     {
@@ -100,7 +100,7 @@
         "./build/regressions"
       ],
       "exit_code": 0,
-      "seconds": 2.281,
+      "seconds": 1.844,
       "status": "passed"
     },
     {
@@ -121,7 +121,7 @@
         "build/regressions-asan"
       ],
       "exit_code": 0,
-      "seconds": 30.086,
+      "seconds": 29.177,
       "status": "passed"
     },
     {
@@ -130,7 +130,7 @@
         "./build/regressions-asan"
       ],
       "exit_code": 0,
-      "seconds": 19.074,
+      "seconds": 18.301,
       "status": "passed"
     },
     {
@@ -148,7 +148,7 @@
         "--quiet"
       ],
       "exit_code": 0,
-      "seconds": 0.008,
+      "seconds": 0.007,
       "status": "passed"
     },
     {
@@ -202,7 +202,7 @@
         "--quiet"
       ],
       "exit_code": 0,
-      "seconds": 0.006,
+      "seconds": 0.007,
       "status": "passed"
     },
     {
@@ -220,7 +220,7 @@
         "--quiet"
       ],
       "exit_code": 0,
-      "seconds": 0.004,
+      "seconds": 0.005,
       "status": "passed"
     },
     {
@@ -238,7 +238,7 @@
         "--quiet"
       ],
       "exit_code": 0,
-      "seconds": 0.004,
+      "seconds": 0.006,
       "status": "passed"
     },
     {
@@ -256,7 +256,7 @@
         "--quiet"
       ],
       "exit_code": 0,
-      "seconds": 0.009,
+      "seconds": 0.007,
       "status": "passed"
     },
     {
@@ -274,7 +274,7 @@
         "--quiet"
       ],
       "exit_code": 0,
-      "seconds": 0.006,
+      "seconds": 0.007,
       "status": "passed"
     },
     {
@@ -292,7 +292,7 @@
         "--quiet"
       ],
       "exit_code": 0,
-      "seconds": 0.006,
+      "seconds": 0.005,
       "status": "passed"
     },
     {
@@ -310,7 +310,7 @@
         "--quiet"
       ],
       "exit_code": 0,
-      "seconds": 0.006,
+      "seconds": 0.005,
       "status": "passed"
     },
     {
@@ -328,7 +328,7 @@
         "--quiet"
       ],
       "exit_code": 0,
-      "seconds": 0.008,
+      "seconds": 0.006,
       "status": "passed"
     },
     {
@@ -364,7 +364,7 @@
         "--quiet"
       ],
       "exit_code": 0,
-      "seconds": 0.011,
+      "seconds": 0.01,
       "status": "passed"
     },
     {
@@ -382,7 +382,7 @@
         "--quiet"
       ],
       "exit_code": 0,
-      "seconds": 0.014,
+      "seconds": 0.01,
       "status": "passed"
     },
     {
@@ -418,7 +418,7 @@
         "--quiet"
       ],
       "exit_code": 0,
-      "seconds": 0.011,
+      "seconds": 0.01,
       "status": "passed"
     },
     {
@@ -436,7 +436,7 @@
         "--quiet"
       ],
       "exit_code": 0,
-      "seconds": 0.011,
+      "seconds": 0.01,
       "status": "passed"
     },
     {
@@ -454,14 +454,14 @@
         "--quiet"
       ],
       "exit_code": 0,
-      "seconds": 0.011,
+      "seconds": 0.009,
       "status": "passed"
     },
     {
       "name": "graphical-syntax",
       "command": [
         "g++",
-        "src/mazerunnerV5.4.3b.cpp",
+        "src/mazerunnerV5.4.3c.cpp",
         "-std=c++17",
         "-Wall",
         "-Wextra",
@@ -472,7 +472,7 @@
         "-fsyntax-only"
       ],
       "exit_code": 0,
-      "seconds": 1.234,
+      "seconds": 1.399,
       "status": "passed"
     },
     {
@@ -494,7 +494,7 @@
         "build/render-tests"
       ],
       "exit_code": 0,
-      "seconds": 7.235,
+      "seconds": 7.853,
       "status": "passed"
     },
     {
@@ -503,7 +503,7 @@
         "./build/render-tests"
       ],
       "exit_code": 0,
-      "seconds": 0.408,
+      "seconds": 0.464,
       "status": "passed"
     },
     {
@@ -525,7 +525,7 @@
         "build/app-tests"
       ],
       "exit_code": 0,
-      "seconds": 7.387,
+      "seconds": 8.185,
       "status": "passed"
     },
     {
@@ -534,7 +534,7 @@
         "./build/app-tests"
       ],
       "exit_code": 0,
-      "seconds": 0.101,
+      "seconds": 0.098,
       "status": "passed"
     }
   ]

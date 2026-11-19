@@ -76,7 +76,7 @@ scripts/run_calibration.py
 scripts/run_cmake_validation.py
 scripts/run_validation.py
 scripts/verify_package.py
-src/mazerunnerV5.4.3b.cpp
+src/mazerunnerV5.4.3c.cpp
 tests/app_tests.cpp
 tests/difficulty_tests.cpp
 tests/director_tests.cpp

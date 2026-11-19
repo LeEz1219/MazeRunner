@@ -10,6 +10,7 @@ import unittest
 import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
 
 
 def run(*args, cwd, check=True):
@@ -17,6 +18,14 @@ def run(*args, cwd, check=True):
 
 
 class ReleaseToolsTests(unittest.TestCase):
+    def test_function_guide_links_and_rationales(self):
+        from scripts.verify_package import function_coverage
+        source = 'int main() { return 0; }\n'
+        row = '| [`main`](game.cpp#L1) | Select the game mode. | Both builds share a CLI. |'
+        self.assertTrue(function_coverage(source, row, 'game.cpp')['exact_match'])
+        for broken in ('', row.replace('L1', 'L2'), row.replace('Both builds share a CLI.', ' '), row+'\n'+row):
+            self.assertFalse(function_coverage(source, broken, 'game.cpp')['exact_match'])
+
     def test_local_files_stay_out_of_the_kit(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)

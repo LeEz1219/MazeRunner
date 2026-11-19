@@ -5,10 +5,10 @@
 [0.000s] Monster 4 spawned at (35,19) | ROAMING
 [0.000s] Monster 5 spawned at (49,45) | ROAMING
 [0.000s] Player spawned at (1,0) | Exit (61,62)
-Maze Runner V5.4.3b | Difficulty: Medium | seed=42 | 63x63 | Monsters: 5
+Maze Runner V5.4.3c | Difficulty: Medium | seed=42 | 63x63 | Monsters: 5
 Monster interval: 148 ms | Player interval: 40 ms | Scent timeout: 560 ms | Search sweep: 2500 ms
 Normal hint: up to 5x5 | Moving updates: every successful move | Hearing radius: 26 corridor steps | Interceptors: 1 | Corridor sight: off
-Director radio: first successful step, then every 1800 ms on a successful step | Normal radio area: 17x17 | Remote monsters investigate without gaining scent.
+Director radio: first successful step, then every 5000 ms near the entrance, 1800 ms from 50% of the route, on a successful step | Normal radio area: 17x17 | Remote monsters investigate without gaining scent.
 Monsters wait for the first move or auto-solve | Director confinement: 4000 ms | Relief hold: 6000 ms | Minimum maze solutions: 2 | Extra-connection budget: 135% of base
 [0.000s] Player started | Monsters released.
 [0.000s] Auto-solve activated.
@@ -23,4 +23,4 @@ Monsters wait for the first move or auto-solve | Director confinement: 4000 ms |
 [0.040s] Monster 5: Director radio, switching ROAMING -> SEARCHING.
 [0.040s] Director: REPORT 1 | NORMAL | Estimated player area: rows 0-16, cols 0-16 | Remote receivers: 5 | Using local evidence: 0 | Lead investigators: 1
 [0.050s] Monster 5 | SEARCHING area target (1,16) | From (49,45)
-Maze Runner V5.4.3b | difficulty=Medium | seed=42 | 63x63 | monsters=5 | RUNNING | simulation_ms=50 | auto_steps=1 | withdrawals=0 | withdrawal_steps=0 | junction_scans=0 | compute_ms=0.34
+Maze Runner V5.4.3c | difficulty=Medium | seed=42 | 63x63 | monsters=5 | RUNNING | simulation_ms=50 | auto_steps=1 | withdrawals=0 | withdrawal_steps=0 | junction_scans=0 | compute_ms=0.34

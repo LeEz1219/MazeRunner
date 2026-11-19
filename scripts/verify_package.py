@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""Verify the committed package (release, payload hashes, line guide, links, screenshots) before rerunning tests or editing files."""
+"""Verify the committed package (release, payload hashes, function guide, links, screenshots) before rerunning tests or editing files."""
 from pathlib import Path
-import hashlib, html, json, re, struct, sys
+import hashlib, json, re, struct, sys
 ROOT = Path(__file__).resolve().parents[1]
-EXPECTED_RELEASE = '5.4.3b'
+EXPECTED_RELEASE = '5.4.3c'
 DOCUMENTS = ['01-Source-Line-by-Line.md','02-AI-Graphics-and-Redesign.md','03-Build-Test-and-Reproduce.md']
 
 def require(condition, message):
@@ -19,6 +19,45 @@ def release_paths():
                 'Invalid release path: ' + name)
         require(path.resolve() == path, 'Release paths must not be symlinks: ' + name)
     return sorted(names)
+
+def source_functions(source):
+    """Index named file and class functions in this single translation unit, including GLSL."""
+    tokens = r'//[^\n]*|/\*.*?\*/|R"(?P<delim>\w*)\(.*?\)(?P=delim)"|"(?:\\.|[^"\\])*"|\'(?:\\.|[^\'\\])*\''
+    masked = re.sub(tokens, lambda m: re.sub(r'[^\n]', ' ', m.group()), source, flags=re.S)
+    entries, scopes, depth = [], [], 0
+    for number, line in enumerate(masked.splitlines(), 1):
+        code = line.strip()
+        if not code or code.startswith('#'):
+            continue
+        if depth == len(scopes):
+            owner = re.match(r'(?:class|struct)\s+(\w+)[^{;]*\{', code)
+            if owner:
+                scopes.append(owner[1])
+            elif '(' in code:
+                prefix = code.split('(', 1)[0].strip()
+                name = re.search(r'(operator[!=]+|~?\w+)$', prefix)
+                if (name and not any(c in prefix[:name.start()] for c in '=;{}') and
+                    (name.start() > 0 or (scopes and name[0].lstrip('~') == scopes[-1])) and
+                    not prefix.startswith((':', 'return '))):
+                    entries.append((number, '::'.join([*scopes, name[0]])))
+        depth += line.count('{') - line.count('}')
+        del scopes[depth:]
+    for stage, shader in re.findall(r'(vertex|fragment)_source\s*=\s*R"glsl\((.*?)\)glsl"', source, re.S):
+        first = source.index(shader, source.index(stage + '_source'))
+        position = first + shader.index('void main(')
+        entries.append((source.count('\n', 0, position) + 1, 'GLSL ' + stage + '::main'))
+    return sorted(entries)
+
+
+def function_coverage(source, guide, source_path):
+    """Match each purpose and design rationale to a real definition at its linked line."""
+    rows = re.findall(r'^\| \[`([^`]+)`\]\(' + re.escape(source_path) +
+                      r'#L(\d+)\) \| ([^|\n]+) \| ([^|\n]+) \|$', guide, re.M)
+    documented = [(int(line), name) for name, line, purpose, reason in rows if purpose.strip() and reason.strip()]
+    expected = source_functions(source)
+    return dict(defined_functions=len(expected), documented_functions=len(documented),
+                missing=[name for line, name in expected if (line, name) not in documented],
+                exact_match=bool(expected) and documented == expected)
 
 def main():
     manifest=json.loads((ROOT/'manifest.json').read_text(encoding='utf-8'))
@@ -50,16 +89,9 @@ def main():
     require(manifest['source']['path']==source_path,'Manifest names an unexpected source file')
     source=(ROOT/source_path).read_bytes()
     require(hashlib.sha256(source).hexdigest()==manifest['source']['sha256'],f'Production source differs from the V{EXPECTED_RELEASE} manifest')
-    lines=source.decode('utf-8').splitlines()
     guide=(ROOT/DOCUMENTS[0]).read_text(encoding='utf-8')
-    entries=re.findall(r'^\*\*L(\d{4})\*\* — <code>(.*?)</code>$',guide,re.M)
-    require(len(entries)==len(lines),'Annotation count differs from physical source-line count')
-    for expected,(number,code) in enumerate(entries,1):
-        require(int(number)==expected,'Annotation ordering/duplication at '+number)
-        decoded=html.unescape(code)
-        if decoded=='[blank line]': decoded=''
-        require(decoded==lines[expected-1],f'Quoted source differs at L{expected:04d}')
-        require(f'<a id="l{expected:04d}"></a>' in guide,f'Missing source anchor L{expected:04d}')
+    coverage = function_coverage(source.decode('utf-8'), guide, source_path)
+    require(coverage['exact_match'], 'Function guide definitions, source links or rationales differ from production')
     for document in [*DOCUMENTS, '.github/README.md']:
         data=(ROOT/document).read_text(encoding='utf-8')
         data=re.sub(r'<code>.*?</code>', '', data, flags=re.S)
@@ -71,8 +103,9 @@ def main():
             resolved=(ROOT/document).parent.joinpath(path).resolve() if path else ROOT/document
             require(resolved.is_relative_to(ROOT),'Local link escapes the package: '+target)
             require(resolved.exists(),f'Broken local link in {document}: {target}')
-            if anchor and re.fullmatch(r'l\d{4}',anchor):
-                require(f'<a id="{anchor}"></a>' in resolved.read_text(encoding='utf-8'),'Missing link anchor: '+target)
+            if resolved.suffix == '.cpp' and anchor.startswith('L'):
+                require(re.fullmatch(r'L[1-9]\d*',anchor) and int(anchor[1:]) <= len(resolved.read_text(encoding='utf-8').splitlines()),
+                        'Invalid source line: '+target)
     pngs=[ROOT/name for name in approved if Path(name).parent.as_posix()=='artifacts/screenshots' and name.endswith('.png')]
     require(len(pngs)==18,'Expected eighteen screenshots')
     for path in pngs:
@@ -80,7 +113,7 @@ def main():
         require(raw[:8]==b'\x89PNG\r\n\x1a\n','Invalid PNG signature: '+path.name)
         w,h=struct.unpack('>II',raw[16:24])
         require(w>0 and h>0,'Invalid PNG dimensions: '+path.name)
-    print(f'PASS: V{EXPECTED_RELEASE}; {len(manifest["files"])} payload hashes; source matches manifest; {len(lines)} exact line annotations; three Markdown guides; local links; eighteen PNGs.')
+    print(f'PASS: V{EXPECTED_RELEASE}; {len(manifest["files"])} payload hashes; source matches manifest; {coverage["documented_functions"]} documented functions; three Markdown guides; local links; eighteen PNGs.')
     print('This validates package integrity, not native-platform build or gameplay behavior.')
 
 if __name__=='__main__':

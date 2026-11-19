@@ -1,21 +1,20 @@
 {
-  "workflow": "Validate V5.4.3b release graphics",
-  "run_id": 44462877518,
-  "job_id": 135353628758,
-  "tested_commit": "be0d06bc4420044042a4f3d2ec693a9b3183f386",
-  "run_url": "https://github.com/LeEz1219/MazeRunner/actions/runs/44462877518",
+  "workflow": "Build the V5.4.3c release candidate",
+  "run_id": 44621893162,
+  "job_id": 135905444585,
+  "tested_commit": "7f26e2dced58590b7da0cf57dbd329af26ea5be9",
+  "run_url": "https://github.com/LeEz1219/MazeRunner/actions/runs/44621893162",
   "conclusion": "success",
   "cmake_step_conclusion": "success",
   "runner": "ubuntu-24.04",
   "artifact_name": "ubuntu-cmake-validation",
-  "artifact_id": 14501550407,
-  "artifact_zip_sha256": "2e822e268e8a4dcb5b85b6ab55ac4b6e38b2da7afaece29ee73922995878579b",
+  "artifact_id": 14578141071,
+  "artifact_zip_sha256": "5160604568a1aa76461d986a81d3d5eff419eb19118f2de0180788d1bde41197",
   "files": [
     "build.log",
     "cmake-version.log",
     "configure.log",
     "ctest.log",
     "validation.json"
-  ],
-  "workflow_commit": "5c1201056cabaf3adbda39459b06e3f948f0342b"
+  ]
 }

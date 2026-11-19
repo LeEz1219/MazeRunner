@@ -1,9 +1,9 @@
 {
-  "recorded_utc": "2026-11-19T05:09:54.395174+00:00",
-  "release": "5.4.3b",
+  "recorded_utc": "2026-11-19T21:51:30.800754+00:00",
+  "release": "5.4.3c",
   "status": "passed",
   "checks": {
-    "source_matches_line_guide": true,
+    "source_matches_function_guide": true,
     "exactly_three_markdown_files": true,
     "eighteen_png_screenshots": true,
     "cmake_file_included": true,

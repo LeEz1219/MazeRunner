@@ -1,533 +1,1003 @@
 [0.000s] Maze generated after 1 attempt(s) | At least TWO distinct entrance-to-exit paths verified.
-[0.000s] Monster 1 spawned at (18,21) | ROAMING
-[0.000s] Monster 2 spawned at (19,24) | ROAMING
-[0.000s] Monster 3 spawned at (11,14) | ROAMING
-[0.000s] Monster 4 spawned at (3,11) | ROAMING
-[0.000s] Monster 5 spawned at (15,29) | ROAMING
+[0.000s] Monster 1 spawned at (19,13) | ROAMING
+[0.000s] Monster 2 spawned at (12,23) | ROAMING
+[0.000s] Monster 3 spawned at (5,4) | ROAMING
+[0.000s] Monster 4 spawned at (11,23) | ROAMING
+[0.000s] Monster 5 spawned at (11,25) | ROAMING
 [0.000s] Player spawned at (1,0) | Exit (19,30)
-Maze Runner V5.4.3b | Difficulty: Medium | seed=8 | 21x31 | Monsters: 5
+Maze Runner V5.4.3c | Difficulty: Medium | seed=26 | 21x31 | Monsters: 5
 Monster interval: 148 ms | Player interval: 40 ms | Scent timeout: 560 ms | Search sweep: 2500 ms
 Normal hint: up to 5x5 | Moving updates: every successful move | Hearing radius: 22 corridor steps | Interceptors: 1 | Corridor sight: off
-Director radio: first successful step, then every 1800 ms on a successful step | Normal radio area: 17x17 | Remote monsters investigate without gaining scent.
+Director radio: first successful step, then every 5000 ms near the entrance, 1800 ms from 50% of the route, on a successful step | Normal radio area: 17x17 | Remote monsters investigate without gaining scent.
 Monsters wait for the first move or auto-solve | Director confinement: 4000 ms | Relief hold: 6000 ms | Minimum maze solutions: 2 | Extra-connection budget: 135% of base
 [0.000s] Player started | Monsters released.
 [0.000s] Auto-solve activated.
-[0.000s] Auto-solve: Full path to exit updated | 94 steps | Current monster cells avoided.
-[0.033s] Monster 5 | ROAMING waypoint (7,2) | From (15,29)
-[0.040s] Player AUTO: (1,0) -> (1,1)
-[0.040s] Movement hint #1 | Local footstep area: rows 0-4, cols 0-4 | Heard by 0 of 5
-[0.040s] Monster 1: Director radio, switching ROAMING -> SEARCHING.
-[0.040s] Monster 2: Director radio, switching ROAMING -> SEARCHING.
-[0.040s] Monster 3: Director radio, switching ROAMING -> SEARCHING.
-[0.040s] Monster 4: Director radio, switching ROAMING -> SEARCHING.
-[0.040s] Monster 5: Director radio, switching ROAMING -> SEARCHING.
-[0.040s] Director: REPORT 1 | NORMAL | Estimated player area: rows 0-16, cols 0-16 | Remote receivers: 5 | Using local evidence: 0 | Lead investigators: 1
-[0.044s] Monster 3 | SEARCHING area target (10,1) | From (11,14)
-[0.068s] Monster 2 | SEARCHING area target (16,15) | From (19,24)
-[0.080s] Player AUTO: (1,1) -> (1,2)
-[0.080s] Movement hint #2 | Local footstep area: rows 0-4, cols 0-4 | Heard by 0 of 5
-[0.120s] Player AUTO: (1,2) -> (1,3)
-[0.120s] Movement hint #3 | Local footstep area: rows 0-4, cols 0-4 | Heard by 1 of 5
-[0.120s] Monster 4: Heard the player, switching SEARCHING -> HUNTING.
-[0.120s] Monster 4 | INTERCEPTING at chokepoint (3,9)
-[0.146s] Monster 1 | SEARCHING area target (1,9) | From (18,21)
-[0.160s] Player AUTO: (1,3) -> (2,3)
-[0.160s] Movement hint #4 | Local footstep area: rows 0-4, cols 0-4 | Heard by 1 of 5
-[0.160s] Monster 4 | INTERCEPTING at chokepoint (4,9)
-[0.181s] Monster 5 | SEARCHING area target (1,11) | From (16,29)
-[0.192s] Monster 3 | SEARCHING area target (13,15) | From (11,15)
-[0.200s] Player AUTO: (2,3) -> (3,3)
-[0.200s] Movement hint #5 | Local footstep area: rows 0-4, cols 0-4 | Heard by 1 of 5
-[0.240s] Player AUTO: (3,3) -> (3,4)
-[0.240s] Movement hint #6 | Local footstep area: rows 0-4, cols 0-4 | Heard by 1 of 5
-[0.280s] Player AUTO: (3,4) -> (3,5)
-[0.280s] Movement hint #7 | Local footstep area: rows 0-4, cols 5-9 | Heard by 1 of 5
-[0.282s] Monster 4 | HUNTING area target (2,7) | From (2,11)
-[0.320s] Player AUTO: (3,5) -> (2,5)
-[0.320s] Movement hint #8 | Local footstep area: rows 0-4, cols 5-9 | Heard by 1 of 5
-[0.320s] Auto-solve: Path crosses monster(s) | Full route shown in AMBER | Evasion active.
-[0.340s] Monster 3 | SEARCHING area target (5,1) | From (12,15)
-[0.360s] Player AUTO: (2,5) -> (1,5)
-[0.360s] Movement hint #9 | Local footstep area: rows 0-4, cols 5-9 | Heard by 1 of 5
-[0.400s] Auto-solve: All exit routes blocked; standing still so monsters lose the movement hint. Bounded wait; then try a detour or backtrack.
-[0.400s] Auto-solve: WAITING at (1,5) for a safer move.
-[0.920s] Player stopped moving for 560 ms | Scent fading.
-[0.920s] Monster 4: Lost the scent, switching HUNTING -> SEARCHING the last clue area.
-[1.022s] Monster 4 | SEARCHING area target (2,9) | From (3,9)
-[1.170s] Monster 4 | SEARCHING area target (3,9) | From (2,9)
-[1.318s] Monster 4 | SEARCHING area target (4,9) | From (3,9)
-[1.466s] Monster 4 | SEARCHING area target (5,9) | From (4,9)
-[1.520s] Auto-solve: DETOUR committed toward (4,7) | 5 steps | Rechecking safety every action.
-[1.520s] Player AUTO: (1,5) -> (1,6)
-[1.520s] Movement hint #10 | Local footstep area: rows 0-4, cols 5-9 | Heard by 1 of 5
-[1.520s] Monster 4: Heard the player, switching SEARCHING -> HUNTING.
-[1.560s] Player AUTO: (1,6) -> (1,7)
-[1.560s] Movement hint #11 | Local footstep area: rows 0-4, cols 5-9 | Heard by 1 of 5
-[1.600s] Player AUTO: (1,7) -> (2,7)
-[1.600s] Movement hint #12 | Local footstep area: rows 0-4, cols 5-9 | Heard by 1 of 5
-[1.614s] Monster 4 | HUNTING area target (1,7) | From (5,9)
-[1.640s] Player AUTO: (2,7) -> (3,7)
-[1.640s] Movement hint #13 | Local footstep area: rows 0-4, cols 5-9 | Heard by 1 of 5
-[1.680s] Player AUTO: (3,7) -> (4,7)
-[1.680s] Movement hint #14 | Local footstep area: rows 0-4, cols 5-9 | Heard by 1 of 5
-[1.720s] Auto-solve: Detour reached at (4,7) | Previous waypoint (4,7)
-[1.720s] Auto-solve: All exit routes blocked; standing still so monsters lose the movement hint. Bounded wait; then try a detour or backtrack.
-[1.720s] Auto-solve: WAITING at (4,7) for a safer move.
-[1.760s] Auto-solve: EVADING toward (3,7); replanning full exit path.
-[1.760s] Player AUTO: (4,7) -> (3,7)
-[1.760s] Movement hint #15 | Local footstep area: rows 0-4, cols 5-9 | Heard by 1 of 5
-[1.800s] Auto-solve: All exit routes blocked; standing still so monsters lose the movement hint. Bounded wait; then try a detour or backtrack.
-[1.800s] Auto-solve: WAITING at (3,7) for a safer move.
-[1.880s] Auto-solve: EVADING toward (2,7); replanning full exit path.
-[1.880s] Player AUTO: (3,7) -> (2,7)
-[1.880s] Movement hint #16 | Local footstep area: rows 0-4, cols 5-9 | Heard by 1 of 5
-[1.880s] Director: REPORT 2 | NORMAL | Estimated player area: rows 0-16, cols 0-16 | Remote receivers: 4 | Using local evidence: 1 | Lead investigators: 1
-[1.920s] Auto-solve: All exit routes blocked; standing still so monsters lose the movement hint. Bounded wait; then try a detour or backtrack.
-[1.920s] Auto-solve: WAITING at (2,7) for a safer move.
-[2.040s] Auto-solve: EVADING toward (1,7); replanning full exit path.
-[2.040s] Player AUTO: (2,7) -> (1,7)
-[2.040s] Movement hint #17 | Local footstep area: rows 0-4, cols 5-9 | Heard by 1 of 5
-[2.080s] Auto-solve: All exit routes blocked; standing still so monsters lose the movement hint. Bounded wait; then try a detour or backtrack.
-[2.080s] Auto-solve: WAITING at (1,7) for a safer move.
-[2.200s] Auto-solve: EVADING toward (1,6); replanning full exit path.
-[2.200s] Player AUTO: (1,7) -> (1,6)
-[2.200s] Movement hint #18 | Local footstep area: rows 0-4, cols 5-9 | Heard by 1 of 5
-[2.240s] Auto-solve: All exit routes blocked; standing still so monsters lose the movement hint. Bounded wait; then try a detour or backtrack.
-[2.240s] Auto-solve: WAITING at (1,6) for a safer move.
-[2.320s] Auto-solve: EVADING toward (1,5); replanning full exit path.
-[2.320s] Player AUTO: (1,6) -> (1,5)
-[2.320s] Movement hint #19 | Local footstep area: rows 0-4, cols 5-9 | Heard by 1 of 5
-[2.360s] Auto-solve: All exit routes blocked; standing still so monsters lose the movement hint. Bounded wait; then try a detour or backtrack.
-[2.360s] Auto-solve: WAITING at (1,5) for a safer move.
-[2.440s] Auto-solve: BACKTRACK committed toward (1,1) | 8 steps | Rechecking safety every action.
-[2.440s] Auto-solve: EVADING toward (2,5); replanning full exit path.
-[2.440s] Player AUTO: (1,5) -> (2,5)
-[2.440s] Movement hint #20 | Local footstep area: rows 0-4, cols 5-9 | Heard by 1 of 5
-[2.480s] Auto-solve: 2 detours in 20 s | Boldness 1 | Shorter waits, detours favor exit progress.
-[2.480s] Auto-solve: EVADING toward (3,5); replanning full exit path.
-[2.480s] Player AUTO: (2,5) -> (3,5)
-[2.480s] Movement hint #21 | Local footstep area: rows 0-4, cols 5-9 | Heard by 1 of 5
-[2.502s] Monster 4 | HUNTING area target (4,7) | From (1,7)
-[2.520s] Auto-solve: EVADING toward (3,4); replanning full exit path.
-[2.520s] Player AUTO: (3,5) -> (3,4)
-[2.520s] Movement hint #22 | Local footstep area: rows 0-4, cols 0-4 | Heard by 1 of 5
-[2.520s] Monster 4 | INTERCEPTING at chokepoint (1,6)
-[2.560s] Monster 3 | SEARCHING area target (16,17) | From (17,9)
-[2.560s] Auto-solve: EVADING toward (3,3); replanning full exit path.
-[2.560s] Player AUTO: (3,4) -> (3,3)
-[2.560s] Movement hint #23 | Local footstep area: rows 0-4, cols 0-4 | Heard by 1 of 5
-[2.600s] Auto-solve: EVADING toward (2,3); replanning full exit path.
-[2.600s] Player AUTO: (3,3) -> (2,3)
-[2.600s] Movement hint #24 | Local footstep area: rows 0-4, cols 0-4 | Heard by 1 of 5
-[2.640s] Auto-solve: EVADING toward (1,3); replanning full exit path.
-[2.640s] Player AUTO: (2,3) -> (1,3)
-[2.640s] Movement hint #25 | Local footstep area: rows 0-4, cols 0-4 | Heard by 1 of 5
-[2.680s] Auto-solve: EVADING toward (1,2); replanning full exit path.
-[2.680s] Player AUTO: (1,3) -> (1,2)
-[2.680s] Movement hint #26 | Local footstep area: rows 0-4, cols 0-4 | Heard by 1 of 5
-[2.720s] Auto-solve: EVADING toward (1,1); replanning full exit path.
-[2.720s] Player AUTO: (1,2) -> (1,1)
-[2.720s] Movement hint #27 | Local footstep area: rows 0-4, cols 0-4 | Heard by 1 of 5
-[2.760s] Auto-solve: Detour reached at (1,1) | Previous waypoint (1,1)
-[2.760s] Auto-solve: All exit routes blocked; standing still so monsters lose the movement hint. Bounded wait; then try a detour or backtrack.
-[2.760s] Auto-solve: WAITING at (1,1) for a safer move.
-[3.280s] Player stopped moving for 560 ms | Scent fading.
-[3.280s] Monster 4: Learned alcove sweep.
-[3.280s] Monster 4: Lost the scent, switching HUNTING -> SEARCHING the last clue area.
-[3.390s] Monster 4 | SEARCHING area target (3,3) | From (1,6)
-[3.480s] Auto-solve: DETOUR committed toward (3,4) | 5 steps | Rechecking safety every action.
-[3.480s] Player AUTO: (1,1) -> (1,2)
-[3.480s] Movement hint #28 | Local footstep area: rows 0-4, cols 0-4 | Heard by 1 of 5
-[3.480s] Monster 4: Heard the player, switching SEARCHING -> HUNTING.
-[3.480s] Monster 4 | INTERCEPTING at chokepoint (1,6)
-[3.520s] Auto-solve: 3 detours in 20 s | Boldness 2 | Shorter waits, detours favor exit progress.
-[3.520s] Player AUTO: (1,2) -> (1,3)
-[3.520s] Movement hint #29 | Local footstep area: rows 0-4, cols 0-4 | Heard by 1 of 5
-[3.560s] Player AUTO: (1,3) -> (2,3)
-[3.560s] Movement hint #30 | Local footstep area: rows 0-4, cols 0-4 | Heard by 1 of 5
-[3.600s] Player AUTO: (2,3) -> (3,3)
-[3.600s] Movement hint #31 | Local footstep area: rows 0-4, cols 0-4 | Heard by 1 of 5
-[3.640s] Player AUTO: (3,3) -> (3,4)
-[3.640s] Movement hint #32 | Local footstep area: rows 0-4, cols 0-4 | Heard by 1 of 5
-[3.680s] Auto-solve: Detour reached at (3,4) | Previous waypoint (3,4)
-[3.680s] Auto-solve: All exit routes blocked; standing still so monsters lose the movement hint. Bounded wait; then try a detour or backtrack.
-[3.680s] Auto-solve: WAITING at (3,4) for a safer move.
-[4.000s] Director: RELIEF started; player confined, widening monster search areas | Radio area: 21x25 | Retasked: 5 | Interceptors released: 1
-[4.029s] Monster 5 | SEARCHING area target (1,10) | From (8,27)
-[4.064s] Monster 2 | SEARCHING area target (19,9) | From (11,21)
-[4.130s] Monster 4 | HUNTING area target (5,12) | From (1,6)
-[4.142s] Monster 1 | SEARCHING area target (2,23) | From (9,23)
-[4.188s] Monster 3 | SEARCHING area target (17,17) | From (16,17)
-[4.200s] Player stopped moving for 560 ms | Scent fading.
-[4.200s] Monster 4: Lost the scent, switching HUNTING -> SEARCHING the last clue area.
-[4.278s] Monster 4 | SEARCHING area target (2,11) | From (1,7)
-[4.336s] Monster 3 | SEARCHING area target (13,17) | From (17,17)
-[4.380s] Monster 1: Search found nothing, switching SEARCHING -> ROAMING.
-[4.380s] Monster 2: Search found nothing, switching SEARCHING -> ROAMING.
-[4.380s] Monster 3: Search found nothing, switching SEARCHING -> ROAMING.
-[4.380s] Monster 5: Search found nothing, switching SEARCHING -> ROAMING.
-[4.400s] Auto-solve: BACKTRACK committed toward (1,1) | 5 steps | Rechecking safety every action.
-[4.400s] Auto-solve: EVADING toward (3,3); replanning full exit path.
-[4.400s] Player AUTO: (3,4) -> (3,3)
-[4.400s] Movement hint #33 | Local footstep area: rows 0-12, cols 0-12 | Heard by 1 of 5
-[4.400s] Monster 4: Heard the player, switching SEARCHING -> HUNTING.
-[4.426s] Monster 4 | HUNTING area target (7,8) | From (2,7)
-[4.438s] Monster 1 | ROAMING waypoint (12,5) | From (8,22)
-[4.440s] Auto-solve: 4 detours in 20 s | Boldness 3 | Shorter waits, detours favor exit progress.
-[4.440s] Auto-solve: EVADING toward (2,3); replanning full exit path.
-[4.440s] Player AUTO: (3,3) -> (2,3)
-[4.473s] Monster 5 | ROAMING waypoint (18,3) | From (5,27)
-[4.480s] Auto-solve: EVADING toward (1,3); replanning full exit path.
-[4.480s] Player AUTO: (2,3) -> (1,3)
-[4.484s] Monster 3 | ROAMING waypoint (14,11) | From (16,17)
-[4.508s] Monster 2 | ROAMING waypoint (5,13) | From (11,18)
-[4.520s] Auto-solve: EVADING toward (1,2); replanning full exit path.
-[4.520s] Player AUTO: (1,3) -> (1,2)
-[4.560s] Auto-solve: EVADING toward (1,1); replanning full exit path.
-[4.560s] Player AUTO: (1,2) -> (1,1)
-[4.600s] Auto-solve: Detour reached at (1,1) | Previous waypoint (1,1)
-[4.600s] Auto-solve: All exit routes blocked; standing still so monsters lose the movement hint. Bounded wait; then try a detour or backtrack.
-[4.600s] Auto-solve: WAITING at (1,1) for a safer move.
-[4.880s] Player AUTO: (1,1) -> (1,2)
-[4.880s] Movement hint #34 | Local footstep area: rows 0-12, cols 0-12 | Heard by 1 of 5
-[4.920s] Auto-solve: All exit routes blocked; standing still so monsters lose the movement hint. Bounded wait; then try a detour or backtrack.
-[4.920s] Auto-solve: WAITING at (1,2) for a safer move.
-[5.040s] Player AUTO: (1,2) -> (1,3)
-[5.080s] Auto-solve: All exit routes blocked; standing still so monsters lose the movement hint. Bounded wait; then try a detour or backtrack.
-[5.080s] Auto-solve: WAITING at (1,3) for a safer move.
-[5.200s] Player AUTO: (1,3) -> (2,3)
-[5.213s] Monster 5: Movement blocked at (9,26)
-[5.240s] Auto-solve: All exit routes blocked; standing still so monsters lose the movement hint. Bounded wait; then try a detour or backtrack.
-[5.240s] Auto-solve: WAITING at (2,3) for a safer move.
-[5.320s] Auto-solve: DETOUR committed toward (4,7) | 10 steps | Rechecking safety every action.
-[5.320s] Player AUTO: (2,3) -> (3,3)
-[5.320s] Movement hint #35 | Local footstep area: rows 0-12, cols 0-12 | Heard by 1 of 5
-[5.326s] Monster 1: Movement blocked at (9,25)
+[0.000s] Auto-solve: Path crosses monster(s) | Full route shown in AMBER | Evasion active.
+[0.018s] Monster 3 | ROAMING waypoint (4,11) | From (5,4)
+[0.040s] Auto-solve: All exit routes blocked; standing still so monsters lose the movement hint. Bounded wait; then try a detour or backtrack.
+[0.040s] Auto-solve: WAITING at (1,0) for a safer move.
+[0.076s] Monster 2 | ROAMING waypoint (14,7) | From (12,23)
+[0.076s] Monster 5 | ROAMING waypoint (17,1) | From (11,25)
+[0.135s] Monster 4 | ROAMING waypoint (13,15) | From (11,23)
+[0.138s] Monster 1 | ROAMING waypoint (3,21) | From (19,13)
+[0.440s] Player AUTO: (1,0) -> (1,1)
+[0.440s] Movement hint #1 | Local footstep area: rows 0-4, cols 0-4 | Heard by 1 of 5
+[0.440s] Monster 3: Heard the player, switching ROAMING -> HUNTING.
+[0.440s] Monster 1: Director radio, switching ROAMING -> SEARCHING.
+[0.440s] Monster 2: Director radio, switching ROAMING -> SEARCHING.
+[0.440s] Monster 4: Director radio, switching ROAMING -> SEARCHING.
+[0.440s] Monster 5: Director radio, switching ROAMING -> SEARCHING.
+[0.440s] Monster 3 | INTERCEPTING at chokepoint (5,5)
+[0.440s] Director: REPORT 1 | NORMAL | Estimated player area: rows 0-16, cols 0-16 | Remote receivers: 4 | Using local evidence: 1 | Lead investigators: 1
+[0.460s] Monster 5 | SEARCHING area target (1,3) | From (11,23)
+[0.460s] Monster 2 | SEARCHING area target (15,9) | From (14,23)
+[0.480s] Auto-solve: All exit routes blocked; standing still so monsters lose the movement hint. Bounded wait; then try a detour or backtrack.
+[0.480s] Auto-solve: WAITING at (1,1) for a safer move.
+[0.519s] Monster 4 | SEARCHING area target (1,15) | From (13,23)
+[0.522s] Monster 1 | SEARCHING area target (15,12) | From (17,13)
+[1.000s] Player stopped moving for 560 ms | Scent fading.
+[1.000s] Monster 3: Lost the scent, switching HUNTING -> SEARCHING the last clue area.
+[1.038s] Monster 3 | SEARCHING area target (3,1) | From (5,5)
+[1.160s] Auto-solve: DETOUR committed toward (4,1) | 7 steps | Rechecking safety every action.
+[1.160s] Player AUTO: (1,1) -> (1,2)
+[1.160s] Movement hint #2 | Local footstep area: rows 0-4, cols 0-4 | Heard by 1 of 5
+[1.160s] Monster 3: Heard the player, switching SEARCHING -> HUNTING.
+[1.160s] Monster 3 | INTERCEPTING at chokepoint (5,4)
+[1.200s] Player AUTO: (1,2) -> (1,3)
+[1.200s] Movement hint #3 | Local footstep area: rows 0-4, cols 0-4 | Heard by 1 of 5
+[1.202s] Monster 1 | SEARCHING area target (15,13) | From (15,12)
+[1.240s] Player AUTO: (1,3) -> (2,3)
+[1.240s] Movement hint #4 | Local footstep area: rows 0-4, cols 0-4 | Heard by 1 of 5
+[1.280s] Player AUTO: (2,3) -> (3,3)
+[1.280s] Movement hint #5 | Local footstep area: rows 0-4, cols 0-4 | Heard by 1 of 5
+[1.320s] Player AUTO: (3,3) -> (3,2)
+[1.320s] Movement hint #6 | Local footstep area: rows 0-4, cols 0-4 | Heard by 1 of 5
+[1.360s] Player AUTO: (3,2) -> (3,1)
+[1.360s] Movement hint #7 | Local footstep area: rows 0-4, cols 0-4 | Heard by 1 of 5
+[1.400s] Player AUTO: (3,1) -> (4,1)
+[1.400s] Movement hint #8 | Local footstep area: rows 0-4, cols 0-4 | Heard by 1 of 5
+[1.440s] Auto-solve: Detour reached at (4,1) | Previous waypoint (4,1)
+[1.440s] Auto-solve: All exit routes blocked; standing still so monsters lose the movement hint. Bounded wait; then try a detour or backtrack.
+[1.440s] Auto-solve: WAITING at (4,1) for a safer move.
+[1.542s] Monster 1 | SEARCHING area target (14,13) | From (15,13)
+[1.712s] Monster 1 | SEARCHING area target (13,13) | From (14,13)
+[1.882s] Monster 1 | SEARCHING area target (11,11) | From (13,13)
+[1.960s] Player stopped moving for 560 ms | Scent fading.
+[1.960s] Monster 3: Lost the scent, switching HUNTING -> SEARCHING the last clue area.
+[2.096s] Monster 3 | SEARCHING area target (1,0) | From (5,4)
+[2.160s] Auto-solve: BACKTRACK committed toward (1,2) | 6 steps | Rechecking safety every action.
+[2.160s] Auto-solve: EVADING toward (3,1); replanning full exit path.
+[2.160s] Player AUTO: (4,1) -> (3,1)
+[2.160s] Movement hint #9 | Local footstep area: rows 0-4, cols 0-4 | Heard by 1 of 5
+[2.160s] Monster 3: Heard the player, switching SEARCHING -> HUNTING.
+[2.160s] Monster 3 | INTERCEPTING at chokepoint (5,4)
+[2.200s] Auto-solve: 2 detours in 20 s | Boldness 1 | Shorter waits, detours favor exit progress.
+[2.200s] Auto-solve: EVADING toward (3,2); replanning full exit path.
+[2.200s] Player AUTO: (3,1) -> (3,2)
+[2.200s] Movement hint #10 | Local footstep area: rows 0-4, cols 0-4 | Heard by 1 of 5
+[2.240s] Auto-solve: EVADING toward (3,3); replanning full exit path.
+[2.240s] Player AUTO: (3,2) -> (3,3)
+[2.240s] Movement hint #11 | Local footstep area: rows 0-4, cols 0-4 | Heard by 1 of 5
+[2.280s] Auto-solve: EVADING toward (2,3); replanning full exit path.
+[2.280s] Player AUTO: (3,3) -> (2,3)
+[2.280s] Movement hint #12 | Local footstep area: rows 0-4, cols 0-4 | Heard by 1 of 5
+[2.320s] Auto-solve: EVADING toward (1,3); replanning full exit path.
+[2.320s] Player AUTO: (2,3) -> (1,3)
+[2.320s] Movement hint #13 | Local footstep area: rows 0-4, cols 0-4 | Heard by 1 of 5
+[2.360s] Auto-solve: EVADING toward (1,2); replanning full exit path.
+[2.360s] Player AUTO: (1,3) -> (1,2)
+[2.360s] Movement hint #14 | Local footstep area: rows 0-4, cols 0-4 | Heard by 1 of 5
+[2.400s] Auto-solve: Detour reached at (1,2) | Previous waypoint (1,2)
+[2.400s] Auto-solve: All exit routes blocked; standing still so monsters lose the movement hint. Bounded wait; then try a detour or backtrack.
+[2.400s] Auto-solve: WAITING at (1,2) for a safer move.
+[2.732s] Monster 1 | SEARCHING area target (11,9) | From (11,11)
+[2.920s] Player stopped moving for 560 ms | Scent fading.
+[2.920s] Monster 3: Lost the scent, switching HUNTING -> SEARCHING the last clue area.
+[2.940s] Monster 1: Search found nothing, switching SEARCHING -> ROAMING.
+[2.940s] Monster 2: Search found nothing, switching SEARCHING -> ROAMING.
+[2.940s] Monster 4: Search found nothing, switching SEARCHING -> ROAMING.
+[2.940s] Monster 5: Search found nothing, switching SEARCHING -> ROAMING.
+[3.006s] Monster 3 | SEARCHING area target (5,2) | From (5,4)
+[3.010s] Monster 2 | ROAMING waypoint (13,2) | From (19,29)
+[3.010s] Monster 5 | ROAMING waypoint (16,21) | From (16,29)
+[3.069s] Monster 4 | ROAMING waypoint (5,13) | From (7,24)
+[3.072s] Monster 1 | ROAMING waypoint (19,4) | From (11,9)
+[3.120s] Auto-solve: DETOUR committed toward (3,1) | 5 steps | Rechecking safety every action.
+[3.120s] Player AUTO: (1,2) -> (1,3)
+[3.120s] Movement hint #15 | Local footstep area: rows 0-4, cols 0-4 | Heard by 1 of 5
+[3.120s] Monster 3: Heard the player, switching SEARCHING -> HUNTING.
+[3.120s] Monster 3 | INTERCEPTING at chokepoint (5,4)
+[3.160s] Auto-solve: 3 detours in 20 s | Boldness 2 | Shorter waits, detours favor exit progress.
+[3.160s] Player AUTO: (1,3) -> (2,3)
+[3.160s] Movement hint #16 | Local footstep area: rows 0-4, cols 0-4 | Heard by 1 of 5
+[3.200s] Player AUTO: (2,3) -> (3,3)
+[3.200s] Movement hint #17 | Local footstep area: rows 0-4, cols 0-4 | Heard by 1 of 5
+[3.240s] Player AUTO: (3,3) -> (3,2)
+[3.240s] Movement hint #18 | Local footstep area: rows 0-4, cols 0-4 | Heard by 1 of 5
+[3.280s] Player AUTO: (3,2) -> (3,1)
+[3.280s] Movement hint #19 | Local footstep area: rows 0-4, cols 0-4 | Heard by 1 of 5
+[3.320s] Auto-solve: Detour reached at (3,1) | Previous waypoint (3,1)
+[3.320s] Auto-solve: All exit routes blocked; standing still so monsters lose the movement hint. Bounded wait; then try a detour or backtrack.
+[3.320s] Auto-solve: WAITING at (3,1) for a safer move.
+[3.840s] Player stopped moving for 560 ms | Scent fading.
+[3.840s] Monster 3: Lost the scent, switching HUNTING -> SEARCHING the last clue area.
+[3.916s] Monster 3 | SEARCHING area target (5,2) | From (5,4)
+[4.000s] Director: RELIEF started; player confined, widening monster search areas | Radio area: 21x25 | Retasked: 1 | Interceptors released: 0
+[4.040s] Auto-solve: BACKTRACK committed toward (1,3) | 4 steps | Rechecking safety every action.
+[4.040s] Auto-solve: EVADING toward (3,2); replanning full exit path.
+[4.040s] Player AUTO: (3,1) -> (3,2)
+[4.040s] Movement hint #20 | Local footstep area: rows 0-12, cols 0-12 | Heard by 1 of 5
+[4.040s] Monster 3: Heard the player, switching SEARCHING -> HUNTING.
+[4.080s] Auto-solve: 4 detours in 20 s | Boldness 3 | Shorter waits, detours favor exit progress.
+[4.080s] Auto-solve: EVADING toward (3,3); replanning full exit path.
+[4.080s] Player AUTO: (3,2) -> (3,3)
+[4.086s] Monster 3 | HUNTING area target (1,0) | From (5,3)
+[4.120s] Auto-solve: EVADING toward (2,3); replanning full exit path.
+[4.120s] Player AUTO: (3,3) -> (2,3)
+[4.160s] Auto-solve: EVADING toward (1,3); replanning full exit path.
+[4.160s] Player AUTO: (2,3) -> (1,3)
+[4.200s] Auto-solve: Detour reached at (1,3) | Previous waypoint (1,3)
+[4.200s] Auto-solve: All exit routes blocked; standing still so monsters lose the movement hint. Bounded wait; then try a detour or backtrack.
+[4.200s] Auto-solve: WAITING at (1,3) for a safer move.
+[4.720s] Player stopped moving for 560 ms | Scent fading.
+[4.720s] Monster 3: Lost the scent, switching HUNTING -> SEARCHING the last clue area.
+[4.826s] Monster 3 | SEARCHING area target (3,1) | From (3,2)
+[4.920s] Auto-solve: EVADING toward (1,2); replanning full exit path.
+[4.920s] Player AUTO: (1,3) -> (1,2)
+[4.920s] Movement hint #21 | Local footstep area: rows 0-12, cols 0-12 | Heard by 1 of 5
+[4.920s] Monster 3: Heard the player, switching SEARCHING -> HUNTING.
+[4.960s] Auto-solve: EVADING toward (1,1); replanning full exit path.
+[4.960s] Player AUTO: (1,2) -> (1,1)
+[4.996s] Monster 3 | HUNTING area target (7,5) | From (3,1)
+[5.000s] Auto-solve: EVADING toward (1,0); replanning full exit path.
+[5.000s] Player AUTO: (1,1) -> (1,0)
+[5.040s] Auto-solve: WAITING at (1,0) for a safer move.
+[5.080s] Player AUTO: (1,0) -> (1,1)
+[5.120s] Auto-solve: EVADING toward (1,0); replanning full exit path.
+[5.120s] Player AUTO: (1,1) -> (1,0)
+[5.160s] Player AUTO: (1,0) -> (1,1)
+[5.200s] Player AUTO: (1,1) -> (1,2)
+[5.240s] Auto-solve: EVADING toward (1,1); replanning full exit path.
+[5.240s] Player AUTO: (1,2) -> (1,1)
+[5.280s] Auto-solve: EVADING toward (1,0); replanning full exit path.
+[5.280s] Player AUTO: (1,1) -> (1,0)
+[5.320s] Auto-solve: DETOUR committed toward (2,3) | 4 steps | Rechecking safety every action.
+[5.320s] Player AUTO: (1,0) -> (1,1)
+[5.320s] Movement hint #22 | Local footstep area: rows 0-12, cols 0-12 | Heard by 1 of 5
 [5.360s] Auto-solve: 5 detours in 20 s | Boldness 4 | Shorter waits, detours favor exit progress.
-[5.360s] Player AUTO: (3,3) -> (3,4)
-[5.400s] Player AUTO: (3,4) -> (3,5)
-[5.440s] Player AUTO: (3,5) -> (2,5)
-[5.480s] Player AUTO: (2,5) -> (1,5)
-[5.480s] Monster 1: Director radio, switching ROAMING -> SEARCHING.
-[5.480s] Monster 2: Director radio, switching ROAMING -> SEARCHING.
-[5.480s] Monster 3: Director radio, switching ROAMING -> SEARCHING.
-[5.480s] Monster 5: Director radio, switching ROAMING -> SEARCHING.
-[5.480s] Director: REPORT 3 | RELIEF | Estimated player area: rows 0-20, cols 0-24 | Remote receivers: 4 | Using local evidence: 1 | Lead investigators: 1
-[5.509s] Monster 5 | SEARCHING area target (1,0) | From (9,27)
-[5.520s] Monster 3 | SEARCHING area target (12,1) | From (17,11)
-[5.520s] Player AUTO: (1,5) -> (1,6)
-[5.544s] Monster 2 | SEARCHING area target (19,14) | From (8,22)
-[5.560s] Player AUTO: (1,6) -> (1,7)
-[5.600s] Player AUTO: (1,7) -> (2,7)
-[5.622s] Monster 1 | SEARCHING area target (2,11) | From (9,26)
-[5.640s] Player AUTO: (2,7) -> (3,7)
-[5.680s] Player AUTO: (3,7) -> (4,7)
-[5.720s] Auto-solve: Detour reached at (4,7) | Previous waypoint (4,7)
-[5.720s] Auto-solve: All exit routes blocked; standing still so monsters lose the movement hint. Bounded wait; then try a detour or backtrack.
-[5.720s] Auto-solve: WAITING at (4,7) for a safer move.
-[6.080s] Player AUTO: (4,7) -> (5,7)
-[6.080s] Movement hint #37 | Local footstep area: rows 1-13, cols 1-13 | Heard by 1 of 5
-[6.080s] Auto-solve: Full path to exit updated | 79 steps | Current monster cells avoided.
-[6.120s] Player AUTO: (5,7) -> (5,8)
-[6.160s] Player AUTO: (5,8) -> (5,9)
-[6.200s] Player AUTO: (5,9) -> (4,9)
-[6.240s] Player AUTO: (4,9) -> (3,9)
-[6.280s] Player AUTO: (3,9) -> (2,9)
-[6.320s] Player AUTO: (2,9) -> (1,9)
-[6.360s] Player AUTO: (1,9) -> (1,10)
-[6.400s] Player AUTO: (1,10) -> (1,11)
-[6.400s] Monster 5: Heard the player, switching SEARCHING -> HUNTING.
-[6.440s] Player AUTO: (1,11) -> (1,12)
-[6.440s] Monster 1: Heard the player, switching SEARCHING -> HUNTING.
-[6.480s] Player AUTO: (1,12) -> (1,13)
-[6.480s] Movement hint #38 | Local footstep area: rows 0-12, cols 6-18 | Heard by 3 of 5
-[6.510s] Monster 1 | HUNTING area target (2,14) | From (4,27)
-[6.520s] Player AUTO: (1,13) -> (1,14)
-[6.545s] Monster 5 | HUNTING area target (1,15) | From (3,26)
-[6.560s] Player AUTO: (1,14) -> (2,14)
-[6.560s] Auto-solve: Path crosses monster(s) | Full route shown in AMBER | Evasion active.
-[6.600s] Player AUTO: (2,14) -> (3,14)
-[6.640s] Player AUTO: (3,14) -> (4,14)
-[6.680s] Player AUTO: (4,14) -> (5,14)
-[6.720s] Player AUTO: (5,14) -> (5,13)
-[6.760s] Player AUTO: (5,13) -> (5,12)
-[6.800s] Player AUTO: (5,12) -> (5,11)
-[6.840s] Player AUTO: (5,11) -> (6,11)
-[6.840s] Monster 3: Heard the player, switching SEARCHING -> HUNTING.
-[6.852s] Monster 3 | HUNTING area target (9,7) | From (19,4)
-[6.880s] Player AUTO: (6,11) -> (7,11)
-[6.880s] Movement hint #39 | Local footstep area: rows 1-13, cols 6-18 | Heard by 2 of 5
-[6.920s] Player AUTO: (7,11) -> (7,10)
-[6.960s] Player AUTO: (7,10) -> (7,9)
-[7.000s] Player AUTO: (7,9) -> (8,9)
-[7.040s] Player AUTO: (8,9) -> (9,9)
-[7.080s] Player AUTO: (9,9) -> (9,8)
-[7.120s] Auto-solve: All exit routes blocked; standing still so monsters lose the movement hint. Bounded wait; then try a detour or backtrack.
-[7.120s] Auto-solve: WAITING at (9,8) for a safer move.
-[7.240s] Monster 1: Lost the scent, switching HUNTING -> SEARCHING the last clue area.
-[7.250s] Monster 1 | SEARCHING area target (1,11) | From (1,25)
-[7.320s] Monster 5: Lost the scent, switching HUNTING -> SEARCHING the last clue area.
-[7.433s] Monster 5 | SEARCHING area target (1,7) | From (2,23)
-[7.640s] Player stopped moving for 560 ms | Scent fading.
-[7.640s] Monster 3: Lost the scent, switching HUNTING -> SEARCHING the last clue area.
-[7.640s] Monster 4: Lost the scent, switching HUNTING -> SEARCHING the last clue area.
-[7.680s] Auto-solve: DETOUR committed toward (14,7) | 6 steps | Rechecking safety every action.
-[7.680s] Player AUTO: (9,8) -> (9,7)
-[7.680s] Movement hint #40 | Local footstep area: rows 1-13, cols 1-13 | Heard by 2 of 5
-[7.680s] Monster 3: Heard the player, switching SEARCHING -> HUNTING.
-[7.680s] Monster 4: Heard the player, switching SEARCHING -> HUNTING.
-[7.682s] Monster 4 | HUNTING area target (1,7) | From (6,11)
-[7.720s] Player AUTO: (9,7) -> (10,7)
-[7.740s] Monster 3 | HUNTING area target (5,1) | From (15,4)
-[7.760s] Player AUTO: (10,7) -> (11,7)
-[7.800s] Player AUTO: (11,7) -> (12,7)
-[7.840s] Player AUTO: (12,7) -> (13,7)
-[7.880s] Player AUTO: (13,7) -> (14,7)
-[7.920s] Auto-solve: Detour reached at (14,7) | Previous waypoint (14,7)
-[7.920s] Auto-solve: All exit routes blocked; standing still so monsters lose the movement hint. Bounded wait; then try a detour or backtrack.
-[7.920s] Auto-solve: WAITING at (14,7) for a safer move.
-[7.980s] Monster 2: Search found nothing, switching SEARCHING -> ROAMING.
-[8.000s] Auto-solve: EVADING toward (13,7); replanning full exit path.
-[8.000s] Player AUTO: (14,7) -> (13,7)
-[8.040s] Auto-solve: All exit routes blocked; standing still so monsters lose the movement hint. Bounded wait; then try a detour or backtrack.
-[8.040s] Auto-solve: WAITING at (13,7) for a safer move.
-[8.060s] Monster 2 | ROAMING waypoint (17,26) | From (17,14)
-[8.160s] Auto-solve: EVADING toward (12,7); replanning full exit path.
-[8.160s] Player AUTO: (13,7) -> (12,7)
-[8.160s] Movement hint #41 | Local footstep area: rows 6-18, cols 1-13 | Heard by 2 of 5
-[8.184s] Monster 3 | HUNTING area target (9,1) | From (15,7)
-[8.200s] Auto-solve: All exit routes blocked; standing still so monsters lose the movement hint. Bounded wait; then try a detour or backtrack.
-[8.200s] Auto-solve: WAITING at (12,7) for a safer move.
-[8.274s] Monster 4 | HUNTING area target (9,12) | From (5,14)
-[8.280s] Auto-solve: EVADING toward (11,7); replanning full exit path.
-[8.280s] Player AUTO: (12,7) -> (11,7)
-[8.320s] Player AUTO: (11,7) -> (10,7)
-[8.320s] Monster 5: Heard the player, switching SEARCHING -> HUNTING.
-[8.321s] Monster 5 | HUNTING area target (6,11) | From (1,20)
-[8.360s] Player AUTO: (10,7) -> (9,7)
-[8.360s] Monster 1: Heard the player, switching SEARCHING -> HUNTING.
-[8.400s] Player AUTO: (9,7) -> (9,8)
-[8.434s] Monster 1 | HUNTING area target (7,9) | From (1,21)
-[8.440s] Auto-solve: All exit routes blocked; standing still so monsters lose the movement hint. Bounded wait; then try a detour or backtrack.
-[8.440s] Auto-solve: WAITING at (9,8) for a safer move.
-[8.600s] Director: BACKSTAGE starts | Menace 77
-[8.600s] Monster 4: WITHDRAWING to (5,9)
-[8.600s] Auto-solve: EVADING toward (9,9); replanning full exit path.
-[8.600s] Player AUTO: (9,8) -> (9,9)
-[8.600s] Movement hint #42 | Local footstep area: rows 1-13, cols 1-13 | Heard by 4 of 5
-[8.640s] Player AUTO: (9,9) -> (8,9)
-[8.680s] Player AUTO: (8,9) -> (7,9)
-[8.720s] Auto-solve: BACKTRACK committed toward (4,15) | 9 steps | Rechecking safety every action.
-[8.720s] Auto-solve: EVADING toward (7,10); replanning full exit path.
-[8.720s] Player AUTO: (7,9) -> (7,10)
-[8.760s] Auto-solve: EVADING toward (7,11); replanning full exit path.
-[8.760s] Player AUTO: (7,10) -> (7,11)
-[8.800s] Auto-solve: EVADING toward (6,11); replanning full exit path.
-[8.800s] Player AUTO: (7,11) -> (6,11)
-[8.840s] Auto-solve: EVADING toward (5,11); replanning full exit path.
-[8.840s] Player AUTO: (6,11) -> (5,11)
-[8.880s] Auto-solve: EVADING toward (5,12); replanning full exit path.
-[8.880s] Player AUTO: (5,11) -> (5,12)
-[8.920s] Player AUTO: (5,12) -> (5,13)
-[8.960s] Player AUTO: (5,13) -> (5,14)
-[9.000s] Auto-solve: EVADING toward (5,15); replanning full exit path.
-[9.000s] Player AUTO: (5,14) -> (5,15)
-[9.000s] Movement hint #43 | Local footstep area: rows 1-13, cols 11-23 | Heard by 4 of 5
-[9.026s] Monster 1 | HUNTING area target (1,12) | From (1,17)
-[9.040s] Player AUTO: (5,15) -> (4,15)
-[9.072s] Monster 3 | HUNTING area target (3,12) | From (9,7)
-[9.080s] Auto-solve: Detour reached at (4,15) | Previous waypoint (4,15)
-[9.080s] Auto-solve: All exit routes blocked; standing still so monsters lose the movement hint. Bounded wait; then try a detour or backtrack.
-[9.080s] Auto-solve: WAITING at (4,15) for a safer move.
-[9.480s] Auto-solve: EVADING toward (5,15); replanning full exit path.
-[9.480s] Player AUTO: (4,15) -> (5,15)
-[9.480s] Movement hint #44 | Local footstep area: rows 1-13, cols 11-23 | Heard by 4 of 5
-[9.520s] Player AUTO: (5,15) -> (4,15)
-[9.520s] Auto-solve: Full path to exit updated | 58 steps | Current monster cells avoided.
-[9.560s] Player AUTO: (4,15) -> (3,15)
-[9.600s] Player AUTO: (3,15) -> (3,14)
-[9.640s] Player AUTO: (3,14) -> (2,14)
-[9.680s] Player AUTO: (2,14) -> (1,14)
-[9.720s] Player AUTO: (1,14) -> (1,15)
-[9.760s] Player AUTO: (1,15) -> (1,16)
-[9.766s] Monster 1 | HUNTING area target (1,11) | From (1,12)
-[9.800s] Player AUTO: (1,16) -> (1,17)
-[9.840s] Player AUTO: (1,17) -> (1,18)
-[9.880s] Player AUTO: (1,18) -> (1,19)
-[9.880s] Movement hint #45 | Local footstep area: rows 0-12, cols 11-23 | Heard by 4 of 5
-[9.914s] Monster 1 | HUNTING area target (2,11) | From (1,11)
-[9.920s] Player AUTO: (1,19) -> (1,20)
-[9.960s] Player AUTO: (1,20) -> (1,21)
-[10.000s] Director: BACKSTAGE ends | Menace 0
-[10.000s] Player AUTO: (1,21) -> (2,21)
-[10.000s] Monster 2: Director radio, switching ROAMING -> SEARCHING.
-[10.000s] Director: REPORT 4 | RELIEF | Estimated player area: rows 0-20, cols 6-30 | Remote receivers: 1 | Using local evidence: 4 | Lead investigators: 1
-[10.040s] Player AUTO: (2,21) -> (3,21)
-[10.050s] Monster 4 | HUNTING area target (9,23) | From (4,9)
-[10.062s] Monster 1 | HUNTING area target (2,21) | From (2,11)
-[10.080s] Player AUTO: (3,21) -> (3,22)
-[10.108s] Monster 3 | HUNTING area target (3,13) | From (6,11)
-[10.108s] Monster 3: Movement blocked at (6,11)
-[10.120s] Player AUTO: (3,22) -> (3,23)
-[10.132s] Monster 2 | SEARCHING area target (18,27) | From (10,21)
-[10.160s] Player AUTO: (3,23) -> (2,23)
-[10.200s] Player AUTO: (2,23) -> (1,23)
-[10.200s] Monster 2: Heard the player, switching SEARCHING -> HUNTING.
-[10.240s] Player AUTO: (1,23) -> (1,24)
-[10.245s] Monster 5: Movement blocked at (5,11)
-[10.280s] Monster 2 | HUNTING area target (11,13) | From (9,21)
-[10.280s] Player AUTO: (1,24) -> (1,25)
-[10.280s] Movement hint #47 | Local footstep area: rows 0-12, cols 18-30 | Heard by 4 of 5
-[10.320s] Player AUTO: (1,25) -> (2,25)
-[10.360s] Player AUTO: (2,25) -> (3,25)
-[10.393s] Monster 5 | HUNTING area target (2,29) | From (5,11)
-[10.400s] Player AUTO: (3,25) -> (3,26)
-[10.428s] Monster 2 | HUNTING area target (12,29) | From (10,21)
-[10.440s] Player AUTO: (3,26) -> (3,27)
-[10.480s] Player AUTO: (3,27) -> (4,27)
-[10.520s] Player AUTO: (4,27) -> (5,27)
-[10.560s] Player AUTO: (5,27) -> (6,27)
-[10.600s] Player AUTO: (6,27) -> (7,27)
-[10.640s] Player AUTO: (7,27) -> (8,27)
-[10.680s] Player AUTO: (8,27) -> (9,27)
-[10.680s] Movement hint #48 | Local footstep area: rows 1-13, cols 18-30 | Heard by 1 of 5
-[10.720s] Player AUTO: (9,27) -> (9,26)
-[10.760s] Player AUTO: (9,26) -> (9,25)
-[10.800s] Monster 3: Learned alcove sweep.
-[10.800s] Monster 3: Lost the scent, switching HUNTING -> SEARCHING the last clue area.
-[10.800s] Player AUTO: (9,25) -> (8,25)
-[10.840s] Monster 5: Learned alcove sweep.
-[10.840s] Monster 5: Lost the scent, switching HUNTING -> SEARCHING the last clue area.
-[10.840s] Player AUTO: (8,25) -> (7,25)
-[10.848s] Monster 3 | SEARCHING area target (9,11) | From (5,12)
-[10.872s] Monster 2 | HUNTING area target (7,19) | From (9,23)
-[10.880s] Player AUTO: (7,25) -> (7,24)
-[10.920s] Monster 4: Lost the scent, switching HUNTING -> SEARCHING the last clue area.
-[10.920s] Player AUTO: (7,24) -> (7,23)
-[10.938s] Monster 4 | SEARCHING area target (5,29) | From (1,12)
-[10.960s] Player AUTO: (7,23) -> (7,22)
-[10.985s] Monster 5 | SEARCHING area target (1,23) | From (4,14)
-[11.000s] Player AUTO: (7,22) -> (7,21)
-[11.040s] Player AUTO: (7,21) -> (7,20)
-[11.080s] Player AUTO: (7,20) -> (7,19)
-[11.080s] Movement hint #49 | Local footstep area: rows 1-13, cols 11-23 | Heard by 1 of 5
-[11.120s] Monster 1: Learned alcove sweep.
-[11.120s] Monster 1: Lost the scent, switching HUNTING -> SEARCHING the last clue area.
-[11.120s] Player AUTO: (7,19) -> (8,19)
-[11.160s] Player AUTO: (8,19) -> (9,19)
-[11.200s] Player AUTO: (9,19) -> (9,18)
-[11.240s] Player AUTO: (9,18) -> (9,17)
-[11.246s] Monster 1 | SEARCHING area target (1,27) | From (1,18)
-[11.280s] Player AUTO: (9,17) -> (9,16)
-[11.320s] Player AUTO: (9,16) -> (9,15)
-[11.360s] Player AUTO: (9,15) -> (9,14)
-[11.400s] Player AUTO: (9,14) -> (9,13)
-[11.440s] Player AUTO: (9,13) -> (9,12)
-[11.480s] Player AUTO: (9,12) -> (9,11)
-[11.480s] Movement hint #50 | Local footstep area: rows 1-13, cols 6-18 | Heard by 1 of 5
-[11.520s] Player AUTO: (9,11) -> (10,11)
-[11.560s] Player AUTO: (10,11) -> (11,11)
-[11.600s] Director: NORMAL precision restored after sustained escape from confinement | Radio area: 17x17 | Retasked: 0 | Interceptors released: 0
-[11.600s] Player AUTO: (11,11) -> (11,12)
-[11.600s] Movement hint #51 | Local footstep area: rows 10-14, cols 10-14 | Heard by 1 of 5
-[11.612s] Monster 2 | HUNTING area target (11,12) | From (7,20)
-[11.640s] Player AUTO: (11,12) -> (11,13)
-[11.640s] Movement hint #52 | Local footstep area: rows 10-14, cols 10-14 | Heard by 1 of 5
-[11.680s] Player AUTO: (11,13) -> (11,14)
-[11.680s] Movement hint #53 | Local footstep area: rows 10-14, cols 10-14 | Heard by 1 of 5
-[11.720s] Player AUTO: (11,14) -> (11,15)
-[11.720s] Movement hint #54 | Local footstep area: rows 10-14, cols 15-19 | Heard by 1 of 5
-[11.760s] Monster 2 | HUNTING area target (11,15) | From (7,19)
-[11.760s] Player AUTO: (11,15) -> (12,15)
-[11.760s] Movement hint #55 | Local footstep area: rows 10-14, cols 15-19 | Heard by 1 of 5
-[11.800s] Player AUTO: (12,15) -> (13,15)
-[11.800s] Movement hint #56 | Local footstep area: rows 10-14, cols 15-19 | Heard by 1 of 5
-[11.800s] Director: REPORT 5 | NORMAL | Estimated player area: rows 0-16, cols 0-16 | Remote receivers: 4 | Using local evidence: 1 | Lead investigators: 1
-[11.826s] Monster 4 | SEARCHING area target (9,16) | From (1,18)
-[11.838s] Monster 1 | SEARCHING area target (2,9) | From (2,21)
-[11.840s] Player AUTO: (13,15) -> (13,16)
-[11.840s] Movement hint #57 | Local footstep area: rows 10-14, cols 15-19 | Heard by 1 of 5
-[11.873s] Monster 5 | SEARCHING area target (1,6) | From (1,17)
-[11.880s] Player AUTO: (13,16) -> (13,17)
-[11.880s] Movement hint #58 | Local footstep area: rows 10-14, cols 15-19 | Heard by 1 of 5
-[11.884s] Monster 3: Movement blocked at (1,15)
-[11.920s] Player AUTO: (13,17) -> (12,17)
-[11.920s] Movement hint #59 | Local footstep area: rows 10-14, cols 15-19 | Heard by 1 of 5
-[11.960s] Player AUTO: (12,17) -> (11,17)
-[11.960s] Movement hint #60 | Local footstep area: rows 10-14, cols 15-19 | Heard by 1 of 5
-[11.986s] Monster 1: Movement blocked at (1,21)
-[12.000s] Player AUTO: (11,17) -> (11,18)
-[12.000s] Movement hint #61 | Local footstep area: rows 10-14, cols 15-19 | Heard by 1 of 5
-[12.021s] Monster 5: Movement blocked at (1,16)
-[12.040s] Player AUTO: (11,18) -> (11,19)
-[12.040s] Movement hint #62 | Local footstep area: rows 10-14, cols 15-19 | Heard by 1 of 5
-[12.080s] Player AUTO: (11,19) -> (11,20)
-[12.080s] Movement hint #63 | Local footstep area: rows 10-14, cols 20-24 | Heard by 1 of 5
-[12.080s] Monster 2: Learned corridor heading.
-[12.120s] Player AUTO: (11,20) -> (11,21)
-[12.120s] Movement hint #64 | Local footstep area: rows 10-14, cols 20-24 | Heard by 1 of 5
-[12.122s] Monster 4: Movement blocked at (1,20)
-[12.160s] Player AUTO: (11,21) -> (10,21)
-[12.160s] Movement hint #65 | Local footstep area: rows 10-14, cols 20-24 | Heard by 1 of 5
-[12.180s] Monster 3: Movement blocked at (1,14)
-[12.200s] Player AUTO: (10,21) -> (9,21)
-[12.200s] Movement hint #66 | Local footstep area: rows 5-9, cols 20-24 | Heard by 1 of 5
-[12.204s] Monster 2 | HUNTING area target (7,20) | From (9,18)
-[12.240s] Player AUTO: (9,21) -> (9,22)
-[12.240s] Movement hint #67 | Local footstep area: rows 5-9, cols 20-24 | Heard by 1 of 5
-[12.280s] Player AUTO: (9,22) -> (9,23)
-[12.280s] Movement hint #68 | Local footstep area: rows 5-9, cols 20-24 | Heard by 1 of 5
-[12.282s] Monster 1: Movement blocked at (2,21)
-[12.317s] Monster 5: Movement blocked at (1,15)
-[12.320s] Player AUTO: (9,23) -> (10,23)
-[12.320s] Movement hint #69 | Local footstep area: rows 10-14, cols 20-24 | Heard by 1 of 5
-[12.352s] Monster 2 | HUNTING area target (13,22) | From (9,19)
-[12.360s] Player AUTO: (10,23) -> (11,23)
-[12.360s] Movement hint #70 | Local footstep area: rows 10-14, cols 20-24 | Heard by 1 of 5
-[12.400s] Player AUTO: (11,23) -> (11,24)
-[12.400s] Movement hint #71 | Local footstep area: rows 10-14, cols 20-24 | Heard by 1 of 5
-[12.418s] Monster 4: Movement blocked at (1,21)
-[12.440s] Player AUTO: (11,24) -> (11,25)
-[12.440s] Movement hint #72 | Local footstep area: rows 10-14, cols 25-29 | Heard by 1 of 5
-[12.476s] Monster 3: Movement blocked at (1,13)
-[12.480s] Player AUTO: (11,25) -> (11,26)
-[12.480s] Movement hint #73 | Local footstep area: rows 10-14, cols 25-29 | Heard by 1 of 5
-[12.500s] Monster 2 | HUNTING area target (11,28) | From (8,19)
-[12.520s] Player AUTO: (11,26) -> (11,27)
-[12.520s] Movement hint #74 | Local footstep area: rows 10-14, cols 25-29 | Heard by 1 of 5
-[12.560s] Player AUTO: (11,27) -> (11,28)
-[12.560s] Movement hint #75 | Local footstep area: rows 10-14, cols 25-29 | Heard by 1 of 5
-[12.578s] Monster 1: Movement blocked at (3,21)
-[12.600s] Player AUTO: (11,28) -> (11,29)
-[12.600s] Movement hint #76 | Local footstep area: rows 10-14, cols 25-29 | Heard by 1 of 5
-[12.613s] Monster 5: Movement blocked at (1,14)
-[12.640s] Player AUTO: (11,29) -> (12,29)
-[12.640s] Movement hint #77 | Local footstep area: rows 10-14, cols 25-29 | Heard by 1 of 5
-[12.680s] Player AUTO: (12,29) -> (13,29)
-[12.680s] Movement hint #78 | Local footstep area: rows 10-14, cols 25-29 | Heard by 1 of 5
-[12.714s] Monster 4: Movement blocked at (2,21)
-[12.720s] Player AUTO: (13,29) -> (13,28)
-[12.720s] Movement hint #79 | Local footstep area: rows 10-14, cols 25-29 | Heard by 1 of 5
-[12.760s] Player AUTO: (13,28) -> (14,28)
-[12.760s] Movement hint #80 | Local footstep area: rows 10-14, cols 25-29 | Heard by 1 of 5
-[12.772s] Monster 3: Movement blocked at (1,12)
-[12.800s] Player AUTO: (14,28) -> (15,28)
-[12.800s] Movement hint #81 | Local footstep area: rows 15-19, cols 25-29 | Heard by 1 of 5
-[12.840s] Player AUTO: (15,28) -> (15,29)
-[12.840s] Movement hint #82 | Local footstep area: rows 15-19, cols 25-29 | Heard by 1 of 5
-[12.874s] Monster 1: Movement blocked at (4,21)
-[12.880s] Player AUTO: (15,29) -> (16,29)
-[12.880s] Movement hint #83 | Local footstep area: rows 15-19, cols 25-29 | Heard by 1 of 5
-[12.909s] Monster 5: Movement blocked at (1,13)
-[12.920s] Player AUTO: (16,29) -> (17,29)
-[12.920s] Movement hint #84 | Local footstep area: rows 15-19, cols 25-29 | Heard by 1 of 5
-[12.944s] Monster 2 | HUNTING area target (15,28) | From (7,21)
-[12.960s] Player AUTO: (17,29) -> (18,29)
-[12.960s] Movement hint #85 | Local footstep area: rows 15-19, cols 25-29 | Heard by 1 of 5
-[13.000s] Player AUTO: (18,29) -> (19,29)
-[13.000s] Movement hint #86 | Local footstep area: rows 15-19, cols 25-29 | Heard by 1 of 5
-[13.040s] Player AUTO: (19,29) -> (19,30)
-[13.040s] Movement hint #87 | Local footstep area: rows 15-19, cols 26-30 | Heard by 1 of 5
-[13.040s] Player REACHED THE EXIT at (19,30)
-[13.040s] Player (19,30) | Manual steps: 0 | Auto steps: 190 | Time: 13.04 s | Auto-solve: OFF | Difficulty: Medium | Director: NORMAL | Menace: 0 | Radio reports: 5 | Radio area: 17x17 | Hint width: 5 | Hunting: 1 | Searching: 4
-Maze Runner V5.4.3b | difficulty=Medium | seed=8 | 21x31 | monsters=5 | ESCAPED | simulation_ms=13040 | auto_steps=190 | withdrawals=1 | withdrawal_steps=9 | junction_scans=2 | compute_ms=16.41
+[5.360s] Player AUTO: (1,1) -> (1,2)
+[5.400s] Player AUTO: (1,2) -> (1,3)
+[5.440s] Player AUTO: (1,3) -> (2,3)
+[5.480s] Auto-solve: Detour reached at (2,3) | Previous waypoint (2,3)
+[5.480s] Auto-solve: All exit routes blocked; standing still so monsters lose the movement hint. Bounded wait; then try a detour or backtrack.
+[5.480s] Auto-solve: WAITING at (2,3) for a safer move.
+[6.000s] Player stopped moving for 560 ms | Scent fading.
+[6.000s] Monster 3: Lost the scent, switching HUNTING -> SEARCHING the last clue area.
+[6.032s] Monster 3 | SEARCHING area target (5,5) | From (6,5)
+[6.200s] Auto-solve: DETOUR committed toward (5,1) | 5 steps | Rechecking safety every action.
+[6.200s] Player AUTO: (2,3) -> (3,3)
+[6.200s] Movement hint #23 | Local footstep area: rows 0-12, cols 0-12 | Heard by 1 of 5
+[6.200s] Monster 3: Heard the player, switching SEARCHING -> HUNTING.
+[6.202s] Monster 3 | HUNTING area target (1,3) | From (5,5)
+[6.240s] Player AUTO: (3,3) -> (3,2)
+[6.280s] Player AUTO: (3,2) -> (3,1)
+[6.320s] Player AUTO: (3,1) -> (4,1)
+[6.360s] Player AUTO: (4,1) -> (5,1)
+[6.400s] Auto-solve: Detour reached at (5,1) | Previous waypoint (5,1)
+[6.400s] Auto-solve: All exit routes blocked; standing still so monsters lose the movement hint. Bounded wait; then try a detour or backtrack.
+[6.400s] Auto-solve: WAITING at (5,1) for a safer move.
+[6.480s] Auto-solve: EVADING toward (4,1); replanning full exit path.
+[6.480s] Player AUTO: (5,1) -> (4,1)
+[6.520s] Auto-solve: All exit routes blocked; standing still so monsters lose the movement hint. Bounded wait; then try a detour or backtrack.
+[6.520s] Auto-solve: WAITING at (4,1) for a safer move.
+[6.640s] Auto-solve: EVADING toward (3,1); replanning full exit path.
+[6.640s] Player AUTO: (4,1) -> (3,1)
+[6.640s] Movement hint #24 | Local footstep area: rows 0-12, cols 0-12 | Heard by 1 of 5
+[6.680s] Auto-solve: All exit routes blocked; standing still so monsters lose the movement hint. Bounded wait; then try a detour or backtrack.
+[6.680s] Auto-solve: WAITING at (3,1) for a safer move.
+[6.760s] Auto-solve: EVADING toward (3,2); replanning full exit path.
+[6.760s] Player AUTO: (3,1) -> (3,2)
+[6.800s] Auto-solve: All exit routes blocked; standing still so monsters lose the movement hint. Bounded wait; then try a detour or backtrack.
+[6.800s] Auto-solve: WAITING at (3,2) for a safer move.
+[6.920s] Auto-solve: EVADING toward (3,3); replanning full exit path.
+[6.920s] Player AUTO: (3,2) -> (3,3)
+[6.960s] Auto-solve: All exit routes blocked; standing still so monsters lose the movement hint. Bounded wait; then try a detour or backtrack.
+[6.960s] Auto-solve: WAITING at (3,3) for a safer move.
+[7.080s] Auto-solve: EVADING toward (2,3); replanning full exit path.
+[7.080s] Player AUTO: (3,3) -> (2,3)
+[7.080s] Movement hint #25 | Local footstep area: rows 0-12, cols 0-12 | Heard by 1 of 5
+[7.104s] Monster 1 | ROAMING waypoint (8,7) | From (19,4)
+[7.120s] Auto-solve: BACKTRACK committed toward (1,0) | 4 steps | Rechecking safety every action.
+[7.120s] Auto-solve: EVADING toward (1,3); replanning full exit path.
+[7.120s] Player AUTO: (2,3) -> (1,3)
+[7.160s] Auto-solve: EVADING toward (1,2); replanning full exit path.
+[7.160s] Player AUTO: (1,3) -> (1,2)
+[7.200s] Auto-solve: EVADING toward (1,1); replanning full exit path.
+[7.200s] Player AUTO: (1,2) -> (1,1)
+[7.234s] Monster 5 | ROAMING waypoint (17,29) | From (16,21)
+[7.240s] Auto-solve: EVADING toward (1,0); replanning full exit path.
+[7.240s] Player AUTO: (1,1) -> (1,0)
+[7.280s] Auto-solve: Detour reached at (1,0) | Previous waypoint (1,0)
+[7.280s] Auto-solve: All exit routes blocked; standing still so monsters lose the movement hint. Bounded wait; then try a detour or backtrack.
+[7.280s] Auto-solve: WAITING at (1,0) for a safer move.
+[7.682s] Monster 3 | HUNTING area target (11,9) | From (1,3)
+[7.800s] Player stopped moving for 560 ms | Scent fading.
+[7.800s] Monster 3: Lost the scent, switching HUNTING -> SEARCHING the last clue area.
+[7.830s] Monster 3 | SEARCHING area target (1,3) | From (2,3)
+[8.000s] Monster 3 | SEARCHING area target (1,2) | From (1,3)
+[8.000s] Player AUTO: (1,0) -> (1,1)
+[8.000s] Movement hint #26 | Local footstep area: rows 0-12, cols 0-12 | Heard by 1 of 5
+[8.000s] Monster 3: Heard the player, switching SEARCHING -> HUNTING.
+[8.040s] Auto-solve: EVADING toward (1,0); replanning full exit path.
+[8.040s] Player AUTO: (1,1) -> (1,0)
+[8.080s] Auto-solve: WAITING at (1,0) for a safer move.
+[8.170s] Monster 3 | HUNTING area target (3,12) | From (1,2)
+[8.200s] Player AUTO: (1,0) -> (1,1)
+[8.240s] Auto-solve: WAITING at (1,1) for a safer move.
+[8.320s] Player AUTO: (1,1) -> (1,2)
+[8.360s] Auto-solve: EVADING toward (1,1); replanning full exit path.
+[8.360s] Player AUTO: (1,2) -> (1,1)
+[8.400s] Player AUTO: (1,1) -> (1,2)
+[8.400s] Movement hint #27 | Local footstep area: rows 0-12, cols 0-12 | Heard by 1 of 5
+[8.440s] Auto-solve: EVADING toward (1,1); replanning full exit path.
+[8.440s] Player AUTO: (1,2) -> (1,1)
+[8.480s] Player AUTO: (1,1) -> (1,2)
+[8.520s] Player AUTO: (1,2) -> (1,3)
+[8.560s] Auto-solve: WAITING at (1,3) for a safer move.
+[8.600s] Auto-solve: EVADING toward (1,2); replanning full exit path.
+[8.600s] Player AUTO: (1,3) -> (1,2)
+[8.640s] Player AUTO: (1,2) -> (1,3)
+[8.680s] Player AUTO: (1,3) -> (2,3)
+[8.720s] Auto-solve: WAITING at (2,3) for a safer move.
+[8.760s] Auto-solve: EVADING toward (1,3); replanning full exit path.
+[8.760s] Player AUTO: (2,3) -> (1,3)
+[8.800s] Player AUTO: (1,3) -> (2,3)
+[8.800s] Movement hint #28 | Local footstep area: rows 0-12, cols 0-12 | Heard by 1 of 5
+[8.840s] Player AUTO: (2,3) -> (3,3)
+[8.880s] Auto-solve: WAITING at (3,3) for a safer move.
+[8.920s] Player AUTO: (3,3) -> (3,2)
+[8.920s] Monster 1: Director radio, switching ROAMING -> SEARCHING.
+[8.920s] Monster 2: Director radio, switching ROAMING -> SEARCHING.
+[8.920s] Monster 4: Director radio, switching ROAMING -> SEARCHING.
+[8.920s] Monster 5: Director radio, switching ROAMING -> SEARCHING.
+[8.920s] Director: REPORT 2 | RELIEF | Estimated player area: rows 0-20, cols 0-24 | Remote receivers: 4 | Using local evidence: 1 | Lead investigators: 1
+[8.960s] Auto-solve: WAITING at (3,2) for a safer move.
+[8.962s] Monster 5 | SEARCHING area target (1,9) | From (13,23)
+[8.962s] Monster 2 | SEARCHING area target (19,19) | From (13,10)
+[9.021s] Monster 4 | SEARCHING area target (15,24) | From (3,15)
+[9.024s] Monster 1 | SEARCHING area target (2,7) | From (15,10)
+[9.040s] Auto-solve: EVADING toward (3,3); replanning full exit path.
+[9.040s] Player AUTO: (3,2) -> (3,3)
+[9.080s] Player AUTO: (3,3) -> (3,2)
+[9.120s] Player AUTO: (3,2) -> (3,1)
+[9.160s] Auto-solve: WAITING at (3,1) for a safer move.
+[9.200s] Auto-solve: BACKTRACK committed toward (1,3) | 4 steps | Rechecking safety every action.
+[9.200s] Auto-solve: EVADING toward (3,2); replanning full exit path.
+[9.200s] Player AUTO: (3,1) -> (3,2)
+[9.200s] Movement hint #30 | Local footstep area: rows 0-12, cols 0-12 | Heard by 1 of 5
+[9.240s] Auto-solve: EVADING toward (3,3); replanning full exit path.
+[9.240s] Player AUTO: (3,2) -> (3,3)
+[9.280s] Auto-solve: EVADING toward (2,3); replanning full exit path.
+[9.280s] Player AUTO: (3,3) -> (2,3)
+[9.320s] Auto-solve: EVADING toward (1,3); replanning full exit path.
+[9.320s] Player AUTO: (2,3) -> (1,3)
+[9.360s] Auto-solve: Detour reached at (1,3) | Previous waypoint (1,3)
+[9.360s] Auto-solve: All exit routes blocked; standing still so monsters lose the movement hint. Bounded wait; then try a detour or backtrack.
+[9.360s] Auto-solve: WAITING at (1,3) for a safer move.
+[9.874s] Monster 1: Movement blocked at (13,13)
+[9.880s] Player stopped moving for 560 ms | Scent fading.
+[9.880s] Monster 3: Lost the scent, switching HUNTING -> SEARCHING the last clue area.
+[9.946s] Monster 3 | SEARCHING area target (5,5) | From (6,5)
+[9.982s] Monster 2: Movement blocked at (12,13)
+[10.000s] Director: RELIEF increased; confinement persists | Radio area: 21x31 | Retasked: 5 | Interceptors released: 0
+[10.041s] Monster 4 | SEARCHING area target (9,29) | From (1,19)
+[10.044s] Monster 1 | SEARCHING area target (1,12) | From (13,13)
+[10.044s] Monster 1: Movement blocked at (13,13)
+[10.080s] Auto-solve: DETOUR committed toward (5,1) | 6 steps | Rechecking safety every action.
+[10.080s] Player AUTO: (1,3) -> (2,3)
+[10.080s] Movement hint #31 | Local footstep area: rows 0-20, cols 0-20 | Heard by 1 of 5
+[10.080s] Monster 3: Heard the player, switching SEARCHING -> HUNTING.
+[10.116s] Monster 3 | HUNTING area target (11,5) | From (5,5)
+[10.120s] Player AUTO: (2,3) -> (3,3)
+[10.152s] Monster 2 | SEARCHING area target (19,5) | From (12,13)
+[10.152s] Monster 2: Movement blocked at (12,13)
+[10.152s] Monster 5 | SEARCHING area target (2,15) | From (10,19)
+[10.160s] Player AUTO: (3,3) -> (3,2)
+[10.200s] Player AUTO: (3,2) -> (3,1)
+[10.240s] Player AUTO: (3,1) -> (4,1)
+[10.280s] Player AUTO: (4,1) -> (5,1)
+[10.320s] Auto-solve: Detour reached at (5,1) | Previous waypoint (5,1)
+[10.320s] Auto-solve: All exit routes blocked; standing still so monsters lose the movement hint. Bounded wait; then try a detour or backtrack.
+[10.320s] Auto-solve: WAITING at (5,1) for a safer move.
+[10.384s] Monster 1: Movement blocked at (14,13)
+[10.492s] Monster 2: Movement blocked at (13,13)
+[10.724s] Monster 1: Movement blocked at (15,13)
+[10.832s] Monster 2: Movement blocked at (14,13)
+[10.840s] Player stopped moving for 560 ms | Scent fading.
+[10.840s] Monster 3: Lost the scent, switching HUNTING -> SEARCHING the last clue area.
+[10.856s] Monster 3 | SEARCHING area target (9,1) | From (9,4)
+[11.040s] Auto-solve: DETOUR committed toward (8,5) | 7 steps | Rechecking safety every action.
+[11.040s] Player AUTO: (5,1) -> (5,2)
+[11.040s] Movement hint #32 | Local footstep area: rows 0-20, cols 0-20 | Heard by 1 of 5
+[11.040s] Monster 3: Heard the player, switching SEARCHING -> HUNTING.
+[11.064s] Monster 1: Movement blocked at (15,14)
+[11.080s] Player AUTO: (5,2) -> (5,3)
+[11.120s] Player AUTO: (5,3) -> (5,4)
+[11.160s] Player AUTO: (5,4) -> (5,5)
+[11.196s] Monster 3 | HUNTING area target (13,1) | From (9,2)
+[11.200s] Player AUTO: (5,5) -> (6,5)
+[11.240s] Player AUTO: (6,5) -> (7,5)
+[11.280s] Player AUTO: (7,5) -> (8,5)
+[11.320s] Auto-solve: Detour reached at (8,5) | Previous waypoint (8,5)
+[11.320s] Auto-solve: All exit routes blocked; standing still so monsters lose the movement hint. Bounded wait; then try a detour or backtrack.
+[11.320s] Auto-solve: WAITING at (8,5) for a safer move.
+[11.420s] Monster 1: Search found nothing, switching SEARCHING -> ROAMING.
+[11.420s] Monster 2: Search found nothing, switching SEARCHING -> ROAMING.
+[11.420s] Monster 4: Search found nothing, switching SEARCHING -> ROAMING.
+[11.420s] Monster 5: Search found nothing, switching SEARCHING -> ROAMING.
+[11.512s] Monster 5 | ROAMING waypoint (19,24) | From (7,24)
+[11.512s] Monster 2 | ROAMING waypoint (11,29) | From (16,12)
+[11.571s] Monster 4 | ROAMING waypoint (17,29) | From (5,24)
+[11.574s] Monster 1 | ROAMING waypoint (17,19) | From (14,13)
+[11.840s] Player stopped moving for 560 ms | Scent fading.
+[11.840s] Monster 3: Lost the scent, switching HUNTING -> SEARCHING the last clue area.
+[11.936s] Monster 3 | SEARCHING area target (9,1) | From (13,1)
+[12.040s] Auto-solve: DETOUR committed toward (9,1) | 5 steps | Rechecking safety every action.
+[12.040s] Player AUTO: (8,5) -> (9,5)
+[12.040s] Movement hint #33 | Local footstep area: rows 0-20, cols 0-20 | Heard by 1 of 5
+[12.040s] Monster 3: Heard the player, switching SEARCHING -> HUNTING.
+[12.080s] Player AUTO: (9,5) -> (9,4)
+[12.106s] Monster 3 | HUNTING area target (6,5) | From (12,1)
+[12.120s] Player AUTO: (9,4) -> (9,3)
+[12.160s] Player AUTO: (9,3) -> (9,2)
+[12.200s] Player AUTO: (9,2) -> (9,1)
+[12.240s] Auto-solve: Detour reached at (9,1) | Previous waypoint (9,1)
+[12.240s] Auto-solve: EVADING toward (9,2); replanning full exit path.
+[12.240s] Player AUTO: (9,1) -> (9,2)
+[12.280s] Auto-solve: All exit routes blocked; standing still so monsters lose the movement hint. Bounded wait; then try a detour or backtrack.
+[12.280s] Auto-solve: WAITING at (9,2) for a safer move.
+[12.400s] Auto-solve: EVADING toward (9,3); replanning full exit path.
+[12.400s] Player AUTO: (9,2) -> (9,3)
+[12.440s] Auto-solve: All exit routes blocked; standing still so monsters lose the movement hint. Bounded wait; then try a detour or backtrack.
+[12.440s] Auto-solve: WAITING at (9,3) for a safer move.
+[12.520s] Auto-solve: EVADING toward (9,4); replanning full exit path.
+[12.520s] Player AUTO: (9,3) -> (9,4)
+[12.520s] Movement hint #34 | Local footstep area: rows 0-20, cols 0-20 | Heard by 1 of 5
+[12.560s] Auto-solve: All exit routes blocked; standing still so monsters lose the movement hint. Bounded wait; then try a detour or backtrack.
+[12.560s] Auto-solve: WAITING at (9,4) for a safer move.
+[12.680s] Auto-solve: EVADING toward (9,5); replanning full exit path.
+[12.680s] Player AUTO: (9,4) -> (9,5)
+[12.720s] Auto-solve: All exit routes blocked; standing still so monsters lose the movement hint. Bounded wait; then try a detour or backtrack.
+[12.720s] Auto-solve: WAITING at (9,5) for a safer move.
+[12.840s] Auto-solve: EVADING toward (8,5); replanning full exit path.
+[12.840s] Player AUTO: (9,5) -> (8,5)
+[12.880s] Auto-solve: All exit routes blocked; standing still so monsters lose the movement hint. Bounded wait; then try a detour or backtrack.
+[12.880s] Auto-solve: WAITING at (8,5) for a safer move.
+[12.960s] Auto-solve: BACKTRACK committed toward (5,4) | 4 steps | Rechecking safety every action.
+[12.960s] Auto-solve: EVADING toward (7,5); replanning full exit path.
+[12.960s] Player AUTO: (8,5) -> (7,5)
+[12.960s] Movement hint #35 | Local footstep area: rows 0-20, cols 0-20 | Heard by 1 of 5
+[13.000s] Auto-solve: EVADING toward (6,5); replanning full exit path.
+[13.000s] Player AUTO: (7,5) -> (6,5)
+[13.040s] Auto-solve: EVADING toward (5,5); replanning full exit path.
+[13.040s] Player AUTO: (6,5) -> (5,5)
+[13.080s] Auto-solve: EVADING toward (5,4); replanning full exit path.
+[13.080s] Player AUTO: (5,5) -> (5,4)
+[13.120s] Auto-solve: Detour reached at (5,4) | Previous waypoint (5,4)
+[13.120s] Auto-solve: All exit routes blocked; standing still so monsters lose the movement hint. Bounded wait; then try a detour or backtrack.
+[13.120s] Auto-solve: WAITING at (5,4) for a safer move.
+[13.560s] Auto-solve: EVADING toward (5,3); replanning full exit path.
+[13.560s] Player AUTO: (5,4) -> (5,3)
+[13.560s] Movement hint #36 | Local footstep area: rows 0-20, cols 0-20 | Heard by 1 of 5
+[13.586s] Monster 3 | HUNTING area target (7,1) | From (6,5)
+[13.600s] Auto-solve: All exit routes blocked; standing still so monsters lose the movement hint. Bounded wait; then try a detour or backtrack.
+[13.600s] Auto-solve: WAITING at (5,3) for a safer move.
+[13.840s] Auto-solve: BACKTRACK committed toward (2,3) | 7 steps | Rechecking safety every action.
+[13.840s] Auto-solve: EVADING toward (5,2); replanning full exit path.
+[13.840s] Player AUTO: (5,3) -> (5,2)
+[13.880s] Auto-solve: EVADING toward (5,1); replanning full exit path.
+[13.880s] Player AUTO: (5,2) -> (5,1)
+[13.920s] Auto-solve: EVADING toward (4,1); replanning full exit path.
+[13.920s] Player AUTO: (5,1) -> (4,1)
+[13.960s] Auto-solve: EVADING toward (3,1); replanning full exit path.
+[13.960s] Player AUTO: (4,1) -> (3,1)
+[13.960s] Movement hint #37 | Local footstep area: rows 0-20, cols 0-20 | Heard by 1 of 5
+[14.000s] Auto-solve: EVADING toward (3,2); replanning full exit path.
+[14.000s] Player AUTO: (3,1) -> (3,2)
+[14.040s] Auto-solve: EVADING toward (3,3); replanning full exit path.
+[14.040s] Player AUTO: (3,2) -> (3,3)
+[14.080s] Auto-solve: EVADING toward (2,3); replanning full exit path.
+[14.080s] Player AUTO: (3,3) -> (2,3)
+[14.120s] Auto-solve: Detour reached at (2,3) | Previous waypoint (2,3)
+[14.120s] Auto-solve: All exit routes blocked; standing still so monsters lose the movement hint. Bounded wait; then try a detour or backtrack.
+[14.120s] Auto-solve: WAITING at (2,3) for a safer move.
+[14.200s] Player AUTO: (2,3) -> (3,3)
+[14.240s] Auto-solve: All exit routes blocked; standing still so monsters lose the movement hint. Bounded wait; then try a detour or backtrack.
+[14.240s] Auto-solve: WAITING at (3,3) for a safer move.
+[14.360s] Player AUTO: (3,3) -> (3,2)
+[14.360s] Movement hint #38 | Local footstep area: rows 0-20, cols 0-20 | Heard by 1 of 5
+[14.400s] Auto-solve: All exit routes blocked; standing still so monsters lose the movement hint. Bounded wait; then try a detour or backtrack.
+[14.400s] Auto-solve: WAITING at (3,2) for a safer move.
+[14.480s] Player AUTO: (3,2) -> (3,1)
+[14.520s] Auto-solve: All exit routes blocked; standing still so monsters lose the movement hint. Bounded wait; then try a detour or backtrack.
+[14.520s] Auto-solve: WAITING at (3,1) for a safer move.
+[14.640s] Player AUTO: (3,1) -> (4,1)
+[14.680s] Player AUTO: (4,1) -> (5,1)
+[14.720s] Player AUTO: (5,1) -> (5,2)
+[14.760s] Player AUTO: (5,2) -> (5,3)
+[14.760s] Movement hint #39 | Local footstep area: rows 0-20, cols 0-20 | Heard by 1 of 5
+[14.800s] Player AUTO: (5,3) -> (5,4)
+[14.840s] Auto-solve: DETOUR committed toward (12,11) | 32 steps | Rechecking safety every action.
+[14.840s] Player AUTO: (5,4) -> (5,5)
+[14.880s] Auto-solve: Detour cancelled; exit route reopened at (5,5) | Previous waypoint (12,11)
+[14.880s] Player AUTO: (5,5) -> (6,5)
+[14.918s] Monster 3 | HUNTING area target (9,13) | From (7,1)
+[14.920s] Player AUTO: (6,5) -> (7,5)
+[14.960s] Player AUTO: (7,5) -> (8,5)
+[15.000s] Player AUTO: (8,5) -> (9,5)
+[15.040s] Player AUTO: (9,5) -> (9,4)
+[15.080s] Player AUTO: (9,4) -> (9,3)
+[15.120s] Auto-solve: EVADING toward (9,4); replanning full exit path.
+[15.120s] Player AUTO: (9,3) -> (9,4)
+[15.160s] Auto-solve: EVADING toward (9,5); replanning full exit path.
+[15.160s] Player AUTO: (9,4) -> (9,5)
+[15.160s] Movement hint #40 | Local footstep area: rows 0-20, cols 0-20 | Heard by 1 of 5
+[15.200s] Auto-solve: EVADING toward (8,5); replanning full exit path.
+[15.200s] Player AUTO: (9,5) -> (8,5)
+[15.240s] Auto-solve: EVADING toward (7,5); replanning full exit path.
+[15.240s] Player AUTO: (8,5) -> (7,5)
+[15.280s] Auto-solve: DETOUR committed toward (7,3) | 10 steps | Rechecking safety every action.
+[15.280s] Player AUTO: (7,5) -> (8,5)
+[15.320s] Player AUTO: (8,5) -> (9,5)
+[15.360s] Player AUTO: (9,5) -> (9,4)
+[15.360s] Monster 1: Director radio, switching ROAMING -> SEARCHING.
+[15.360s] Monster 2: Director radio, switching ROAMING -> SEARCHING.
+[15.360s] Monster 4: Director radio, switching ROAMING -> SEARCHING.
+[15.360s] Monster 5: Director radio, switching ROAMING -> SEARCHING.
+[15.360s] Director: REPORT 3 | RELIEF | Estimated player area: rows 0-20, cols 0-30 | Remote receivers: 4 | Using local evidence: 1 | Lead investigators: 1
+[15.400s] Player AUTO: (9,4) -> (9,3)
+[15.411s] Monster 4 | SEARCHING area target (19,30) | From (8,21)
+[15.414s] Monster 1 | SEARCHING area target (1,10) | From (9,16)
+[15.440s] Player AUTO: (9,3) -> (9,2)
+[15.480s] Player AUTO: (9,2) -> (9,1)
+[15.520s] Auto-solve: EVADING toward (8,1); replanning full exit path.
+[15.520s] Player AUTO: (9,1) -> (8,1)
+[15.544s] Monster 5 | SEARCHING area target (1,28) | From (13,25)
+[15.544s] Monster 2 | SEARCHING area target (19,7) | From (18,29)
+[15.560s] Auto-solve: EVADING toward (7,1); replanning full exit path.
+[15.560s] Player AUTO: (8,1) -> (7,1)
+[15.560s] Movement hint #42 | Local footstep area: rows 0-20, cols 0-20 | Heard by 1 of 5
+[15.600s] Auto-solve: EVADING toward (7,2); replanning full exit path.
+[15.600s] Player AUTO: (7,1) -> (7,2)
+[15.640s] Auto-solve: EVADING toward (7,3); replanning full exit path.
+[15.640s] Player AUTO: (7,2) -> (7,3)
+[15.680s] Auto-solve: Detour reached at (7,3) | Previous waypoint (7,3)
+[15.680s] Auto-solve: All exit routes blocked; standing still so monsters lose the movement hint. Bounded wait; then try a detour or backtrack.
+[15.680s] Auto-solve: WAITING at (7,3) for a safer move.
+[16.000s] Director: RELIEF increased; confinement persists | Radio area: 21x31 | Retasked: 5 | Interceptors released: 0
+[16.054s] Monster 2 | SEARCHING area target (19,7) | From (19,27)
+[16.054s] Monster 5 | SEARCHING area target (1,1) | From (15,24)
+[16.091s] Monster 4 | SEARCHING area target (9,29) | From (10,19)
+[16.094s] Monster 1 | SEARCHING area target (2,7) | From (11,16)
+[16.102s] Monster 3 | HUNTING area target (15,6) | From (13,3)
+[16.200s] Player stopped moving for 560 ms | Scent fading.
+[16.200s] Monster 3: Lost the scent, switching HUNTING -> SEARCHING the last clue area.
+[16.250s] Monster 3 | SEARCHING area target (11,3) | From (12,3)
+[16.400s] Auto-solve: DETOUR committed toward (12,1) | 7 steps | Rechecking safety every action.
+[16.400s] Player AUTO: (7,3) -> (7,2)
+[16.400s] Movement hint #43 | Local footstep area: rows 0-20, cols 0-28 | Heard by 1 of 5
+[16.400s] Monster 3: Heard the player, switching SEARCHING -> HUNTING.
+[16.420s] Monster 3 | HUNTING area target (13,9) | From (11,3)
+[16.440s] Player AUTO: (7,2) -> (7,1)
+[16.480s] Player AUTO: (7,1) -> (8,1)
+[16.520s] Player AUTO: (8,1) -> (9,1)
+[16.560s] Player AUTO: (9,1) -> (10,1)
+[16.600s] Player AUTO: (10,1) -> (11,1)
+[16.640s] Player AUTO: (11,1) -> (12,1)
+[16.680s] Auto-solve: Detour reached at (12,1) | Previous waypoint (12,1)
+[16.680s] Auto-solve: All exit routes blocked; standing still so monsters lose the movement hint. Bounded wait; then try a detour or backtrack.
+[16.680s] Auto-solve: WAITING at (12,1) for a safer move.
+[17.200s] Player stopped moving for 560 ms | Scent fading.
+[17.200s] Monster 3: Lost the scent, switching HUNTING -> SEARCHING the last clue area.
+[17.308s] Monster 3 | SEARCHING area target (14,5) | From (15,5)
+[17.400s] Auto-solve: DETOUR committed toward (11,4) | 6 steps | Rechecking safety every action.
+[17.400s] Player AUTO: (12,1) -> (13,1)
+[17.400s] Movement hint #44 | Local footstep area: rows 0-20, cols 0-28 | Heard by 1 of 5
+[17.400s] Monster 3: Heard the player, switching SEARCHING -> HUNTING.
+[17.440s] Player AUTO: (13,1) -> (13,2)
+[17.478s] Monster 3 | HUNTING area target (18,1) | From (14,5)
+[17.480s] Player AUTO: (13,2) -> (13,3)
+[17.520s] Player AUTO: (13,3) -> (12,3)
+[17.560s] Player AUTO: (12,3) -> (11,3)
+[17.600s] Player AUTO: (11,3) -> (11,4)
+[17.640s] Auto-solve: Detour reached at (11,4) | Previous waypoint (11,4)
+[17.640s] Auto-solve: All exit routes blocked; standing still so monsters lose the movement hint. Bounded wait; then try a detour or backtrack.
+[17.640s] Auto-solve: WAITING at (11,4) for a safer move.
+[17.860s] Monster 1: Search found nothing, switching SEARCHING -> ROAMING.
+[17.860s] Monster 2: Search found nothing, switching SEARCHING -> ROAMING.
+[17.860s] Monster 4: Search found nothing, switching SEARCHING -> ROAMING.
+[17.860s] Monster 5: Search found nothing, switching SEARCHING -> ROAMING.
+[17.924s] Monster 5 | ROAMING waypoint (5,9) | From (17,29)
+[17.924s] Monster 2 | ROAMING waypoint (1,29) | From (19,16)
+[17.961s] Monster 4 | ROAMING waypoint (17,4) | From (11,27)
+[17.964s] Monster 1 | ROAMING waypoint (1,14) | From (17,15)
+[18.160s] Player stopped moving for 560 ms | Scent fading.
+[18.160s] Monster 3: Lost the scent, switching HUNTING -> SEARCHING the last clue area.
+[18.218s] Monster 3 | SEARCHING area target (13,8) | From (13,7)
+[18.360s] Auto-solve: DETOUR committed toward (15,6) | 6 steps | Rechecking safety every action.
+[18.360s] Player AUTO: (11,4) -> (11,5)
+[18.360s] Movement hint #45 | Local footstep area: rows 0-20, cols 0-28 | Heard by 2 of 5
+[18.360s] Monster 1: Heard the player, switching ROAMING -> HUNTING.
+[18.360s] Monster 3: Heard the player, switching SEARCHING -> HUNTING.
+[18.388s] Monster 3 | HUNTING area target (18,1) | From (13,8)
+[18.400s] Player AUTO: (11,5) -> (12,5)
+[18.440s] Player AUTO: (12,5) -> (13,5)
+[18.480s] Player AUTO: (13,5) -> (14,5)
+[18.520s] Player AUTO: (14,5) -> (15,5)
+[18.520s] Monster 2: Heard the player, switching ROAMING -> HUNTING.
+[18.540s] Monster 1 | HUNTING area target (2,5) | From (15,14)
+[18.560s] Player AUTO: (15,5) -> (15,6)
+[18.600s] Auto-solve: Detour reached at (15,6) | Previous waypoint (15,6)
+[18.600s] Auto-solve: All exit routes blocked; standing still so monsters lose the movement hint. Bounded wait; then try a detour or backtrack.
+[18.600s] Auto-solve: WAITING at (15,6) for a safer move.
+[18.692s] Monster 2 | HUNTING area target (19,1) | From (18,13)
+[19.120s] Player stopped moving for 560 ms | Scent fading.
+[19.120s] Monster 1: Lost the scent, switching HUNTING -> SEARCHING the last clue area.
+[19.120s] Monster 2: Lost the scent, switching HUNTING -> SEARCHING the last clue area.
+[19.120s] Monster 3: Lost the scent, switching HUNTING -> SEARCHING the last clue area.
+[19.132s] Monster 1 | SEARCHING area target (1,11) | From (12,13)
+[19.136s] Monster 2 | SEARCHING area target (18,1) | From (17,11)
+[19.298s] Monster 3 | SEARCHING area target (11,9) | From (11,11)
+[19.320s] Player AUTO: (15,6) -> (15,7)
+[19.320s] Movement hint #46 | Local footstep area: rows 0-20, cols 0-28 | Heard by 3 of 5
+[19.320s] Monster 1: Heard the player, switching SEARCHING -> HUNTING.
+[19.320s] Monster 2: Heard the player, switching SEARCHING -> HUNTING.
+[19.320s] Monster 3: Heard the player, switching SEARCHING -> HUNTING.
+[19.320s] Monster 4: Director radio, switching ROAMING -> SEARCHING.
+[19.320s] Monster 5: Director radio, switching ROAMING -> SEARCHING.
+[19.320s] Director: REPORT 4 | RELIEF | Estimated player area: rows 0-20, cols 0-30 | Remote receivers: 2 | Using local evidence: 3 | Lead investigators: 1
+[19.360s] Player AUTO: (15,7) -> (14,7)
+[19.400s] Player AUTO: (14,7) -> (13,7)
+[19.440s] Player AUTO: (13,7) -> (13,8)
+[19.460s] Monster 5 | SEARCHING area target (1,11) | From (19,23)
+[19.468s] Monster 3 | HUNTING area target (5,2) | From (11,10)
+[19.472s] Monster 1 | HUNTING area target (1,0) | From (11,12)
+[19.472s] Monster 1: Movement blocked at (11,12)
+[19.476s] Monster 2 | HUNTING area target (19,25) | From (19,11)
+[19.480s] Auto-solve: BACKTRACK committed toward (15,6) | 4 steps | Rechecking safety every action.
+[19.480s] Auto-solve: EVADING toward (13,7); replanning full exit path.
+[19.480s] Player AUTO: (13,8) -> (13,7)
+[19.497s] Monster 4 | SEARCHING area target (15,29) | From (15,23)
+[19.520s] Auto-solve: EVADING toward (14,7); replanning full exit path.
+[19.520s] Player AUTO: (13,7) -> (14,7)
+[19.560s] Auto-solve: EVADING toward (15,7); replanning full exit path.
+[19.560s] Player AUTO: (14,7) -> (15,7)
+[19.600s] Auto-solve: EVADING toward (15,6); replanning full exit path.
+[19.600s] Player AUTO: (15,7) -> (15,6)
+[19.640s] Auto-solve: Detour reached at (15,6) | Previous waypoint (15,6)
+[19.640s] Auto-solve: All exit routes blocked; standing still so monsters lose the movement hint. Bounded wait; then try a detour or backtrack.
+[19.640s] Auto-solve: WAITING at (15,6) for a safer move.
+[20.160s] Player stopped moving for 560 ms | Scent fading.
+[20.160s] Monster 1: Lost the scent, switching HUNTING -> SEARCHING the last clue area.
+[20.160s] Monster 2: Lost the scent, switching HUNTING -> SEARCHING the last clue area.
+[20.160s] Monster 3: Lost the scent, switching HUNTING -> SEARCHING the last clue area.
+[20.208s] Monster 3 | SEARCHING area target (13,8) | From (13,9)
+[20.212s] Monster 1 | SEARCHING area target (1,26) | From (13,10)
+[20.216s] Monster 2 | SEARCHING area target (19,27) | From (18,13)
+[20.360s] Auto-solve: BACKTRACK committed toward (12,5) | 4 steps | Rechecking safety every action.
+[20.360s] Auto-solve: EVADING toward (15,5); replanning full exit path.
+[20.360s] Player AUTO: (15,6) -> (15,5)
+[20.360s] Movement hint #47 | Local footstep area: rows 0-20, cols 0-28 | Heard by 3 of 5
+[20.360s] Monster 1: Heard the player, switching SEARCHING -> HUNTING.
+[20.360s] Monster 2: Heard the player, switching SEARCHING -> HUNTING.
+[20.360s] Monster 3: Heard the player, switching SEARCHING -> HUNTING.
+[20.378s] Monster 3 | HUNTING area target (13,5) | From (13,8)
+[20.382s] Monster 1 | HUNTING area target (1,14) | From (13,11)
+[20.386s] Monster 2 | HUNTING area target (18,8) | From (19,13)
+[20.400s] Auto-solve: EVADING toward (14,5); replanning full exit path.
+[20.400s] Player AUTO: (15,5) -> (14,5)
+[20.440s] Auto-solve: EVADING toward (13,5); replanning full exit path.
+[20.440s] Player AUTO: (14,5) -> (13,5)
+[20.480s] Auto-solve: EVADING toward (12,5); replanning full exit path.
+[20.480s] Player AUTO: (13,5) -> (12,5)
+[20.520s] Auto-solve: Detour reached at (12,5) | Previous waypoint (12,5)
+[20.520s] Auto-solve: All exit routes blocked; standing still so monsters lose the movement hint. Bounded wait; then try a detour or backtrack.
+[20.520s] Auto-solve: WAITING at (12,5) for a safer move.
+[20.960s] Monster 2: Lost the scent, switching HUNTING -> SEARCHING the last clue area.
+[20.978s] Monster 2 | SEARCHING area target (18,1) | From (17,11)
+[21.040s] Player stopped moving for 560 ms | Scent fading.
+[21.040s] Monster 1: Lost the scent, switching HUNTING -> SEARCHING the last clue area.
+[21.040s] Monster 3: Lost the scent, switching HUNTING -> SEARCHING the last clue area.
+[21.118s] Monster 3 | SEARCHING area target (14,5) | From (15,5)
+[21.122s] Monster 1 | SEARCHING area target (1,22) | From (9,12)
+[21.197s] Monster 4 | SEARCHING area target (1,29) | From (15,29)
+[21.240s] Auto-solve: BACKTRACK committed toward (13,2) | 6 steps | Rechecking safety every action.
+[21.240s] Auto-solve: EVADING toward (11,5); replanning full exit path.
+[21.240s] Player AUTO: (12,5) -> (11,5)
+[21.240s] Movement hint #48 | Local footstep area: rows 0-20, cols 0-28 | Heard by 2 of 5
+[21.240s] Monster 1: Heard the player, switching SEARCHING -> HUNTING.
+[21.240s] Monster 3: Heard the player, switching SEARCHING -> HUNTING.
+[21.280s] Auto-solve: EVADING toward (11,4); replanning full exit path.
+[21.280s] Player AUTO: (11,5) -> (11,4)
+[21.288s] Monster 3 | HUNTING area target (3,23) | From (14,5)
+[21.292s] Monster 1 | HUNTING area target (1,12) | From (9,13)
+[21.320s] Auto-solve: EVADING toward (11,3); replanning full exit path.
+[21.320s] Player AUTO: (11,4) -> (11,3)
+[21.360s] Auto-solve: EVADING toward (12,3); replanning full exit path.
+[21.360s] Player AUTO: (11,3) -> (12,3)
+[21.400s] Auto-solve: EVADING toward (13,3); replanning full exit path.
+[21.400s] Player AUTO: (12,3) -> (13,3)
+[21.440s] Auto-solve: EVADING toward (13,2); replanning full exit path.
+[21.440s] Player AUTO: (13,3) -> (13,2)
+[21.480s] Auto-solve: Detour reached at (13,2) | Previous waypoint (13,2)
+[21.480s] Auto-solve: All exit routes blocked; standing still so monsters lose the movement hint. Bounded wait; then try a detour or backtrack.
+[21.480s] Auto-solve: WAITING at (13,2) for a safer move.
+[21.800s] Director: BACKSTAGE starts | Menace 78
+[21.800s] Monster 3: WITHDRAWING to (12,3)
+[21.820s] Monster 4: Search found nothing, switching SEARCHING -> ROAMING.
+[21.820s] Monster 5: Search found nothing, switching SEARCHING -> ROAMING.
+[21.840s] Monster 5 | ROAMING waypoint (1,0) | From (16,12)
+[21.877s] Monster 4 | ROAMING waypoint (3,29) | From (13,27)
+[21.920s] Monster 1: Lost the scent, switching HUNTING -> SEARCHING the last clue area.
+[22.000s] Player stopped moving for 560 ms | Scent fading.
+[22.000s] Monster 3: Lost the scent, switching HUNTING -> SEARCHING the last clue area.
+[22.000s] Director: RELIEF increased; confinement persists | Radio area: 21x31 | Retasked: 2 | Interceptors released: 0
+[22.028s] Monster 3 | SEARCHING area target (12,3) | From (15,7)
+[22.032s] Monster 1 | SEARCHING area target (2,5) | From (4,13)
+[22.168s] Monster 2 | SEARCHING area target (18,8) | From (19,6)
+[22.200s] Auto-solve: DETOUR committed toward (12,5) | 6 steps | Rechecking safety every action.
+[22.200s] Player AUTO: (13,2) -> (13,3)
+[22.200s] Movement hint #49 | Local footstep area: rows 0-20, cols 0-30 | Heard by 1 of 5
+[22.200s] Monster 3: Heard the player, switching SEARCHING -> HUNTING.
+[22.240s] Player AUTO: (13,3) -> (12,3)
+[22.240s] Monster 5: Heard the player, switching ROAMING -> HUNTING.
+[22.280s] Player AUTO: (12,3) -> (11,3)
+[22.320s] Player AUTO: (11,3) -> (11,4)
+[22.360s] Player AUTO: (11,4) -> (11,5)
+[22.400s] Player AUTO: (11,5) -> (12,5)
+[22.416s] Monster 5 | HUNTING area target (1,3) | From (14,13)
+[22.440s] Auto-solve: Detour reached at (12,5) | Previous waypoint (12,5)
+[22.440s] Auto-solve: All exit routes blocked; standing still so monsters lose the movement hint. Bounded wait; then try a detour or backtrack.
+[22.440s] Auto-solve: WAITING at (12,5) for a safer move.
+[22.480s] Auto-solve: EVADING toward (11,5); replanning full exit path.
+[22.480s] Player AUTO: (12,5) -> (11,5)
+[22.520s] Auto-solve: All exit routes blocked; standing still so monsters lose the movement hint. Bounded wait; then try a detour or backtrack.
+[22.520s] Auto-solve: WAITING at (11,5) for a safer move.
+[22.640s] Auto-solve: EVADING toward (11,4); replanning full exit path.
+[22.640s] Player AUTO: (11,5) -> (11,4)
+[22.640s] Movement hint #50 | Local footstep area: rows 0-20, cols 0-30 | Heard by 2 of 5
+[22.678s] Monster 2 | SEARCHING area target (19,22) | From (18,8)
+[22.680s] Auto-solve: All exit routes blocked; standing still so monsters lose the movement hint. Bounded wait; then try a detour or backtrack.
+[22.680s] Auto-solve: WAITING at (11,4) for a safer move.
+[22.800s] Auto-solve: EVADING toward (11,3); replanning full exit path.
+[22.800s] Player AUTO: (11,4) -> (11,3)
+[22.840s] Auto-solve: All exit routes blocked; standing still so monsters lose the movement hint. Bounded wait; then try a detour or backtrack.
+[22.840s] Auto-solve: WAITING at (11,3) for a safer move.
+[22.920s] Auto-solve: EVADING toward (12,3); replanning full exit path.
+[22.920s] Player AUTO: (11,3) -> (12,3)
+[22.960s] Auto-solve: All exit routes blocked; standing still so monsters lose the movement hint. Bounded wait; then try a detour or backtrack.
+[22.960s] Auto-solve: WAITING at (12,3) for a safer move.
+[23.080s] Auto-solve: EVADING toward (13,3); replanning full exit path.
+[23.080s] Player AUTO: (12,3) -> (13,3)
+[23.080s] Movement hint #51 | Local footstep area: rows 0-20, cols 0-30 | Heard by 2 of 5
+[23.120s] Auto-solve: All exit routes blocked; standing still so monsters lose the movement hint. Bounded wait; then try a detour or backtrack.
+[23.120s] Auto-solve: WAITING at (13,3) for a safer move.
+[23.160s] Auto-solve: BACKTRACK committed toward (4,1) | 19 steps | Rechecking safety every action.
+[23.160s] Auto-solve: EVADING toward (13,2); replanning full exit path.
+[23.160s] Player AUTO: (13,3) -> (13,2)
+[23.200s] Director: BACKSTAGE ends | Menace 0
+[23.200s] Auto-solve: EVADING toward (13,1); replanning full exit path.
+[23.200s] Player AUTO: (13,2) -> (13,1)
+[23.200s] Monster 4: Director radio, switching ROAMING -> SEARCHING.
+[23.200s] Director: REPORT 5 | RELIEF | Estimated player area: rows 0-20, cols 0-30 | Remote receivers: 3 | Using local evidence: 2 | Lead investigators: 1
+[23.221s] Monster 4 | SEARCHING area target (19,30) | From (14,23)
+[23.240s] Auto-solve: EVADING toward (12,1); replanning full exit path.
+[23.240s] Player AUTO: (13,1) -> (12,1)
+[23.256s] Monster 3 | HUNTING area target (13,1) | From (11,3)
+[23.280s] Auto-solve: EVADING toward (11,1); replanning full exit path.
+[23.280s] Player AUTO: (12,1) -> (11,1)
+[23.304s] Monster 5 | HUNTING area target (7,20) | From (12,11)
+[23.320s] Auto-solve: EVADING toward (10,1); replanning full exit path.
+[23.320s] Player AUTO: (11,1) -> (10,1)
+[23.360s] Auto-solve: EVADING toward (9,1); replanning full exit path.
+[23.360s] Player AUTO: (10,1) -> (9,1)
+[23.400s] Auto-solve: EVADING toward (9,2); replanning full exit path.
+[23.400s] Player AUTO: (9,1) -> (9,2)
+[23.440s] Auto-solve: EVADING toward (9,3); replanning full exit path.
+[23.440s] Player AUTO: (9,2) -> (9,3)
+[23.480s] Auto-solve: EVADING toward (9,4); replanning full exit path.
+[23.480s] Player AUTO: (9,3) -> (9,4)
+[23.480s] Movement hint #53 | Local footstep area: rows 0-20, cols 0-30 | Heard by 1 of 5
+[23.520s] Auto-solve: EVADING toward (9,5); replanning full exit path.
+[23.520s] Player AUTO: (9,4) -> (9,5)
+[23.560s] Auto-solve: EVADING toward (8,5); replanning full exit path.
+[23.560s] Player AUTO: (9,5) -> (8,5)
+[23.600s] Auto-solve: EVADING toward (7,5); replanning full exit path.
+[23.600s] Player AUTO: (8,5) -> (7,5)
+[23.640s] Auto-solve: EVADING toward (6,5); replanning full exit path.
+[23.640s] Player AUTO: (7,5) -> (6,5)
+[23.680s] Auto-solve: EVADING toward (5,5); replanning full exit path.
+[23.680s] Player AUTO: (6,5) -> (5,5)
+[23.720s] Auto-solve: EVADING toward (5,4); replanning full exit path.
+[23.720s] Player AUTO: (5,5) -> (5,4)
+[23.760s] Auto-solve: EVADING toward (5,3); replanning full exit path.
+[23.760s] Player AUTO: (5,4) -> (5,3)
+[23.800s] Auto-solve: EVADING toward (5,2); replanning full exit path.
+[23.800s] Player AUTO: (5,3) -> (5,2)
+[23.840s] Monster 5: Lost the scent, switching HUNTING -> SEARCHING the last clue area.
+[23.840s] Auto-solve: EVADING toward (5,1); replanning full exit path.
+[23.840s] Player AUTO: (5,2) -> (5,1)
+[23.848s] Monster 3 | HUNTING area target (7,17) | From (13,1)
+[23.880s] Auto-solve: EVADING toward (4,1); replanning full exit path.
+[23.880s] Player AUTO: (5,1) -> (4,1)
+[23.880s] Movement hint #54 | Local footstep area: rows 0-20, cols 0-30 | Heard by 1 of 5
+[23.896s] Monster 5 | SEARCHING area target (1,8) | From (12,13)
+[23.920s] Auto-solve: Detour reached at (4,1) | Previous waypoint (4,1)
+[23.920s] Auto-solve: EVADING toward (3,1); replanning full exit path.
+[23.920s] Player AUTO: (4,1) -> (3,1)
+[23.960s] Auto-solve: EVADING toward (3,2); replanning full exit path.
+[23.960s] Player AUTO: (3,1) -> (3,2)
+[24.000s] Player AUTO: (3,2) -> (3,1)
+[24.040s] Player AUTO: (3,1) -> (4,1)
+[24.080s] Player AUTO: (4,1) -> (5,1)
+[24.120s] Player AUTO: (5,1) -> (5,2)
+[24.160s] Player AUTO: (5,2) -> (5,3)
+[24.200s] Player AUTO: (5,3) -> (5,4)
+[24.240s] Player AUTO: (5,4) -> (5,5)
+[24.280s] Player AUTO: (5,5) -> (6,5)
+[24.280s] Movement hint #55 | Local footstep area: rows 0-20, cols 0-30 | Heard by 1 of 5
+[24.320s] Player AUTO: (6,5) -> (7,5)
+[24.360s] Auto-solve: All exit routes blocked; standing still so monsters lose the movement hint. Bounded wait; then try a detour or backtrack.
+[24.360s] Auto-solve: WAITING at (7,5) for a safer move.
+[24.412s] Monster 1 | SEARCHING area target (2,7) | From (2,5)
+[24.440s] Player AUTO: (7,5) -> (8,5)
+[24.480s] Auto-solve: All exit routes blocked; standing still so monsters lose the movement hint. Bounded wait; then try a detour or backtrack.
+[24.480s] Auto-solve: WAITING at (8,5) for a safer move.
+[24.600s] Player AUTO: (8,5) -> (9,5)
+[24.640s] Auto-solve: DETOUR committed toward (10,1) | 5 steps | Rechecking safety every action.
+[24.640s] Player AUTO: (9,5) -> (9,4)
+[24.680s] Player AUTO: (9,4) -> (9,3)
+[24.680s] Movement hint #56 | Local footstep area: rows 0-20, cols 0-30 | Heard by 1 of 5
+[24.720s] Player AUTO: (9,3) -> (9,2)
+[24.760s] Player AUTO: (9,2) -> (9,1)
+[24.800s] Player AUTO: (9,1) -> (10,1)
+[24.840s] Auto-solve: Detour reached at (10,1) | Previous waypoint (10,1)
+[24.840s] Auto-solve: All exit routes blocked; standing still so monsters lose the movement hint. Bounded wait; then try a detour or backtrack.
+[24.840s] Auto-solve: WAITING at (10,1) for a safer move.
+[25.092s] Monster 1 | SEARCHING area target (1,28) | From (2,7)
+[25.360s] Player stopped moving for 560 ms | Scent fading.
+[25.360s] Monster 3: Lost the scent, switching HUNTING -> SEARCHING the last clue area.
+[25.476s] Monster 3 | SEARCHING area target (15,5) | From (15,6)
+[25.560s] Auto-solve: DETOUR committed toward (11,5) | 9 steps | Rechecking safety every action.
+[25.560s] Player AUTO: (10,1) -> (11,1)
+[25.560s] Movement hint #57 | Local footstep area: rows 0-20, cols 0-30 | Heard by 1 of 5
+[25.560s] Monster 3: Heard the player, switching SEARCHING -> HUNTING.
+[25.600s] Player AUTO: (11,1) -> (12,1)
+[25.640s] Player AUTO: (12,1) -> (13,1)
+[25.646s] Monster 3 | HUNTING area target (18,11) | From (15,5)
+[25.680s] Player AUTO: (13,1) -> (13,2)
+[25.700s] Monster 1: Search found nothing, switching SEARCHING -> ROAMING.
+[25.700s] Monster 2: Search found nothing, switching SEARCHING -> ROAMING.
+[25.700s] Monster 4: Search found nothing, switching SEARCHING -> ROAMING.
+[25.720s] Player AUTO: (13,2) -> (13,3)
+[25.738s] Monster 2 | ROAMING waypoint (7,27) | From (19,21)
+[25.760s] Player AUTO: (13,3) -> (12,3)
+[25.771s] Monster 4 | ROAMING waypoint (1,28) | From (19,29)
+[25.772s] Monster 1 | ROAMING waypoint (1,25) | From (1,10)
+[25.800s] Player AUTO: (12,3) -> (11,3)
+[25.840s] Player AUTO: (11,3) -> (11,4)
+[25.880s] Player AUTO: (11,4) -> (11,5)
+[25.920s] Auto-solve: Detour reached at (11,5) | Previous waypoint (11,5)
+[25.920s] Auto-solve: All exit routes blocked; standing still so monsters lose the movement hint. Bounded wait; then try a detour or backtrack.
+[25.920s] Auto-solve: WAITING at (11,5) for a safer move.
+[26.340s] Monster 5: Search found nothing, switching SEARCHING -> ROAMING.
+[26.440s] Player stopped moving for 560 ms | Scent fading.
+[26.440s] Monster 3: Lost the scent, switching HUNTING -> SEARCHING the last clue area.
+[26.446s] Monster 5 | ROAMING waypoint (3,19) | From (3,11)
+[26.534s] Monster 3 | SEARCHING area target (11,11) | From (13,9)
+[26.640s] Auto-solve: DETOUR committed toward (14,7) | 7 steps | Rechecking safety every action.
+[26.640s] Player AUTO: (11,5) -> (12,5)
+[26.640s] Movement hint #58 | Local footstep area: rows 0-20, cols 0-30 | Heard by 1 of 5
+[26.640s] Monster 3: Heard the player, switching SEARCHING -> HUNTING.
+[26.680s] Player AUTO: (12,5) -> (13,5)
+[26.704s] Monster 3 | HUNTING area target (3,13) | From (13,10)
+[26.720s] Player AUTO: (13,5) -> (14,5)
+[26.760s] Player AUTO: (14,5) -> (15,5)
+[26.800s] Player AUTO: (15,5) -> (15,6)
+[26.800s] Monster 1: Director radio, switching ROAMING -> SEARCHING.
+[26.800s] Monster 2: Director radio, switching ROAMING -> SEARCHING.
+[26.800s] Monster 4: Director radio, switching ROAMING -> SEARCHING.
+[26.800s] Monster 5: Director radio, switching ROAMING -> SEARCHING.
+[26.800s] Director: REPORT 6 | RELIEF | Estimated player area: rows 0-20, cols 0-30 | Remote receivers: 4 | Using local evidence: 1 | Lead investigators: 1
+[26.830s] Monster 5 | SEARCHING area target (1,18) | From (1,11)
+[26.840s] Player AUTO: (15,6) -> (15,7)
+[26.880s] Player AUTO: (15,7) -> (14,7)
+[26.880s] Monster 5: Heard the player, switching SEARCHING -> HUNTING.
+[26.890s] Monster 2 | SEARCHING area target (19,2) | From (19,27)
+[26.920s] Auto-solve: Detour reached at (14,7) | Previous waypoint (14,7)
+[26.920s] Auto-solve: All exit routes blocked; standing still so monsters lose the movement hint. Bounded wait; then try a detour or backtrack.
+[26.920s] Auto-solve: WAITING at (14,7) for a safer move.
+[26.923s] Monster 4 | SEARCHING area target (12,29) | From (15,27)
+[26.924s] Monster 1 | SEARCHING area target (2,11) | From (2,15)
+[27.000s] Monster 5 | HUNTING area target (2,7) | From (1,12)
+[27.160s] Player AUTO: (14,7) -> (13,7)
+[27.160s] Movement hint #60 | Local footstep area: rows 0-20, cols 0-30 | Heard by 2 of 5
+[27.200s] Player AUTO: (13,7) -> (13,8)
+[27.200s] Monster 1: Heard the player, switching SEARCHING -> HUNTING.
+[27.240s] Player AUTO: (13,8) -> (13,9)
+[27.264s] Monster 1 | HUNTING area target (1,28) | From (1,14)
+[27.280s] Player AUTO: (13,9) -> (13,10)
+[27.320s] Player AUTO: (13,10) -> (13,11)
+[27.360s] Player AUTO: (13,11) -> (12,11)
+[27.400s] Player AUTO: (12,11) -> (11,11)
+[27.400s] Monster 2: Heard the player, switching SEARCHING -> HUNTING.
+[27.440s] Player AUTO: (11,11) -> (11,12)
+[27.480s] Player AUTO: (11,12) -> (11,13)
+[27.520s] Player AUTO: (11,13) -> (12,13)
+[27.560s] Player AUTO: (12,13) -> (13,13)
+[27.560s] Movement hint #61 | Local footstep area: rows 0-20, cols 0-30 | Heard by 3 of 5
+[27.570s] Monster 2 | HUNTING area target (19,18) | From (19,23)
+[27.600s] Player AUTO: (13,13) -> (14,13)
+[27.640s] Player AUTO: (14,13) -> (15,13)
+[27.680s] Player AUTO: (15,13) -> (15,12)
+[27.720s] Player AUTO: (15,12) -> (15,13)
+[27.760s] Player AUTO: (15,13) -> (15,14)
+[27.800s] Player AUTO: (15,14) -> (15,13)
+[27.840s] Player AUTO: (15,13) -> (15,14)
+[27.880s] Auto-solve: EVADING toward (15,15); replanning full exit path.
+[27.880s] Player AUTO: (15,14) -> (15,15)
+[27.888s] Monster 5 | HUNTING area target (1,19) | From (2,7)
+[27.920s] Player AUTO: (15,15) -> (15,14)
+[27.960s] Player AUTO: (15,14) -> (15,15)
+[27.960s] Movement hint #62 | Local footstep area: rows 0-20, cols 0-30 | Heard by 2 of 5
+[28.000s] Player AUTO: (15,15) -> (15,14)
+[28.040s] Player AUTO: (15,14) -> (15,15)
+[28.080s] Monster 1: Lost the scent, switching HUNTING -> SEARCHING the last clue area.
+[28.080s] Player AUTO: (15,15) -> (16,15)
+[28.120s] Monster 5: Lost the scent, switching HUNTING -> SEARCHING the last clue area.
+[28.120s] Player AUTO: (16,15) -> (15,15)
+[28.152s] Monster 1 | SEARCHING area target (2,29) | From (2,17)
+[28.160s] Player AUTO: (15,15) -> (16,15)
+[28.184s] Monster 5 | SEARCHING area target (2,5) | From (1,8)
+[28.200s] Auto-solve: EVADING toward (17,15); replanning full exit path.
+[28.200s] Player AUTO: (16,15) -> (17,15)
+[28.240s] Player AUTO: (17,15) -> (16,15)
+[28.280s] Player AUTO: (16,15) -> (17,15)
+[28.310s] Monster 2 | HUNTING area target (19,19) | From (19,18)
+[28.320s] Player AUTO: (17,15) -> (16,15)
+[28.360s] Player AUTO: (16,15) -> (15,15)
+[28.360s] Movement hint #63 | Local footstep area: rows 0-20, cols 0-30 | Heard by 2 of 5
+[28.400s] Player AUTO: (15,15) -> (16,15)
+[28.440s] Player AUTO: (16,15) -> (15,15)
+[28.458s] Monster 2 | HUNTING area target (19,17) | From (19,19)
+[28.480s] Player AUTO: (15,15) -> (16,15)
+[28.520s] Player AUTO: (16,15) -> (17,15)
+[28.560s] Auto-solve: EVADING toward (17,16); replanning full exit path.
+[28.560s] Player AUTO: (17,15) -> (17,16)
+[28.600s] Auto-solve: EVADING toward (17,17); replanning full exit path.
+[28.600s] Player AUTO: (17,16) -> (17,17)
+[28.628s] Monster 3 | HUNTING area target (15,3) | From (3,13)
+[28.640s] Auto-solve: EVADING toward (16,17); replanning full exit path.
+[28.640s] Player AUTO: (17,17) -> (16,17)
+[28.680s] Auto-solve: EVADING toward (15,17); replanning full exit path.
+[28.680s] Player AUTO: (16,17) -> (15,17)
+[28.680s] Auto-solve: Full path to exit updated | 53 steps | Current monster cells avoided.
+[28.720s] Player AUTO: (15,17) -> (14,17)
+[28.754s] Monster 2 | HUNTING area target (19,2) | From (19,17)
+[28.760s] Player AUTO: (14,17) -> (13,17)
+[28.760s] Movement hint #64 | Local footstep area: rows 0-20, cols 0-30 | Heard by 1 of 5
+[28.800s] Player AUTO: (13,17) -> (13,16)
+[28.840s] Player AUTO: (13,16) -> (13,15)
+[28.880s] Player AUTO: (13,15) -> (12,15)
+[28.920s] Player AUTO: (12,15) -> (11,15)
+[28.960s] Player AUTO: (11,15) -> (11,16)
+[29.000s] Player AUTO: (11,16) -> (11,17)
+[29.040s] Player AUTO: (11,17) -> (10,17)
+[29.080s] Player AUTO: (10,17) -> (9,17)
+[29.120s] Player AUTO: (9,17) -> (9,16)
+[29.160s] Player AUTO: (9,16) -> (9,15)
+[29.160s] Movement hint #65 | Local footstep area: rows 0-20, cols 0-30 | Heard by 0 of 5
+[29.200s] Monster 3: Lost the scent, switching HUNTING -> SEARCHING the last clue area.
+[29.200s] Player AUTO: (9,15) -> (8,15)
+[29.204s] Monster 5 | SEARCHING area target (1,23) | From (2,5)
+[29.220s] Monster 3 | SEARCHING area target (11,1) | From (7,13)
+[29.240s] Player AUTO: (8,15) -> (7,15)
+[29.240s] Monster 4: Heard the player, switching SEARCHING -> HUNTING.
+[29.280s] Player AUTO: (7,15) -> (7,16)
+[29.303s] Monster 4 | HUNTING area target (11,29) | From (11,25)
+[29.320s] Player AUTO: (7,16) -> (7,17)
+[29.346s] Monster 2 | HUNTING area target (16,29) | From (19,13)
+[29.360s] Player AUTO: (7,17) -> (6,17)
+[29.400s] Director: NORMAL precision restored after sustained escape from confinement | Radio area: 17x17 | Retasked: 0 | Interceptors released: 0
+[29.400s] Player AUTO: (6,17) -> (5,17)
+[29.400s] Movement hint #66 | Local footstep area: rows 5-9, cols 15-19 | Heard by 1 of 5
+[29.400s] Director: REPORT 7 | NORMAL | Estimated player area: rows 0-16, cols 14-30 | Remote receivers: 3 | Using local evidence: 2 | Lead investigators: 1
+[29.440s] Player AUTO: (5,17) -> (5,18)
+[29.440s] Movement hint #67 | Local footstep area: rows 5-9, cols 15-19 | Heard by 1 of 5
+[29.451s] Monster 4 | HUNTING area target (9,19) | From (11,26)
+[29.480s] Monster 2: Lost the scent, switching HUNTING -> SEARCHING the last radio sector.
+[29.480s] Player AUTO: (5,18) -> (5,19)
+[29.480s] Movement hint #68 | Local footstep area: rows 5-9, cols 15-19 | Heard by 1 of 5
+[29.494s] Monster 2 | SEARCHING area target (15,17) | From (19,14)
+[29.520s] Player AUTO: (5,19) -> (6,19)
+[29.520s] Movement hint #69 | Local footstep area: rows 5-9, cols 15-19 | Heard by 1 of 5
+[29.560s] Monster 3 | SEARCHING area target (1,15) | From (9,13)
+[29.560s] Player AUTO: (6,19) -> (7,19)
+[29.560s] Movement hint #70 | Local footstep area: rows 5-9, cols 15-19 | Heard by 1 of 5
+[29.599s] Monster 4 | HUNTING area target (6,15) | From (11,27)
+[29.600s] Player AUTO: (7,19) -> (7,20)
+[29.600s] Movement hint #71 | Local footstep area: rows 5-9, cols 20-24 | Heard by 1 of 5
+[29.640s] Player AUTO: (7,20) -> (7,21)
+[29.640s] Movement hint #72 | Local footstep area: rows 5-9, cols 20-24 | Heard by 2 of 5
+[29.640s] Monster 1: Heard the player, switching SEARCHING -> HUNTING.
+[29.680s] Player AUTO: (7,21) -> (8,21)
+[29.680s] Movement hint #73 | Local footstep area: rows 5-9, cols 20-24 | Heard by 1 of 5
+[29.682s] Monster 1 | HUNTING area target (5,23) | From (3,23)
+[29.720s] Player AUTO: (8,21) -> (9,21)
+[29.720s] Movement hint #74 | Local footstep area: rows 5-9, cols 20-24 | Heard by 1 of 5
+[29.747s] Monster 4 | HUNTING area target (5,24) | From (10,27)
+[29.760s] Player AUTO: (9,21) -> (9,20)
+[29.760s] Movement hint #75 | Local footstep area: rows 5-9, cols 20-24 | Heard by 1 of 5
+[29.800s] Player AUTO: (9,20) -> (9,19)
+[29.800s] Movement hint #76 | Local footstep area: rows 5-9, cols 15-19 | Heard by 1 of 5
+[29.840s] Player AUTO: (9,19) -> (10,19)
+[29.840s] Movement hint #77 | Local footstep area: rows 10-14, cols 15-19 | Heard by 1 of 5
+[29.880s] Player AUTO: (10,19) -> (11,19)
+[29.880s] Movement hint #78 | Local footstep area: rows 10-14, cols 15-19 | Heard by 1 of 5
+[29.895s] Monster 4 | HUNTING area target (13,15) | From (9,27)
+[29.920s] Player AUTO: (11,19) -> (12,19)
+[29.920s] Movement hint #79 | Local footstep area: rows 10-14, cols 15-19 | Heard by 1 of 5
+[29.960s] Player AUTO: (12,19) -> (13,19)
+[29.960s] Movement hint #80 | Local footstep area: rows 10-14, cols 15-19 | Heard by 1 of 5
+[29.978s] Monster 1 | HUNTING area target (5,24) | From (5,23)
+[30.000s] Player AUTO: (13,19) -> (13,20)
+[30.000s] Movement hint #81 | Local footstep area: rows 10-14, cols 20-24 | Heard by 1 of 5
+[30.040s] Player AUTO: (13,20) -> (13,21)
+[30.040s] Movement hint #82 | Local footstep area: rows 10-14, cols 20-24 | Heard by 1 of 5
+[30.043s] Monster 4 | HUNTING area target (11,22) | From (9,26)
+[30.080s] Player AUTO: (13,21) -> (13,22)
+[30.080s] Movement hint #83 | Local footstep area: rows 10-14, cols 20-24 | Heard by 1 of 5
+[30.120s] Player AUTO: (13,22) -> (13,23)
+[30.120s] Movement hint #84 | Local footstep area: rows 10-14, cols 20-24 | Heard by 1 of 5
+[30.126s] Monster 1 | HUNTING area target (5,21) | From (5,24)
+[30.160s] Player AUTO: (13,23) -> (14,23)
+[30.160s] Movement hint #85 | Local footstep area: rows 10-14, cols 20-24 | Heard by 1 of 5
+[30.200s] Monster 1: Lost the scent, switching HUNTING -> SEARCHING the last clue area.
+[30.200s] Player AUTO: (14,23) -> (15,23)
+[30.200s] Movement hint #86 | Local footstep area: rows 15-19, cols 20-24 | Heard by 1 of 5
+[30.240s] Player AUTO: (15,23) -> (15,24)
+[30.240s] Movement hint #87 | Local footstep area: rows 15-19, cols 20-24 | Heard by 1 of 5
+[30.274s] Monster 1 | SEARCHING area target (5,21) | From (5,25)
+[30.280s] Player AUTO: (15,24) -> (15,25)
+[30.280s] Movement hint #88 | Local footstep area: rows 15-19, cols 25-29 | Heard by 1 of 5
+[30.320s] Player AUTO: (15,25) -> (14,25)
+[30.320s] Movement hint #89 | Local footstep area: rows 10-14, cols 25-29 | Heard by 1 of 5
+[30.339s] Monster 4 | HUNTING area target (11,28) | From (10,27)
+[30.360s] Player AUTO: (14,25) -> (13,25)
+[30.360s] Movement hint #90 | Local footstep area: rows 10-14, cols 25-29 | Heard by 1 of 5
+[30.400s] Player AUTO: (13,25) -> (13,26)
+[30.400s] Movement hint #91 | Local footstep area: rows 10-14, cols 25-29 | Heard by 1 of 5
+[30.440s] Player AUTO: (13,26) -> (13,27)
+[30.440s] Movement hint #92 | Local footstep area: rows 10-14, cols 25-29 | Heard by 1 of 5
+[30.480s] Player AUTO: (13,27) -> (14,27)
+[30.480s] Movement hint #93 | Local footstep area: rows 10-14, cols 25-29 | Heard by 1 of 5
+[30.520s] Player AUTO: (14,27) -> (15,27)
+[30.520s] Movement hint #94 | Local footstep area: rows 15-19, cols 25-29 | Heard by 1 of 5
+[30.560s] Player AUTO: (15,27) -> (15,28)
+[30.560s] Movement hint #95 | Local footstep area: rows 15-19, cols 25-29 | Heard by 1 of 5
+[30.600s] Player AUTO: (15,28) -> (15,29)
+[30.600s] Movement hint #96 | Local footstep area: rows 15-19, cols 25-29 | Heard by 1 of 5
+[30.635s] Monster 4 | HUNTING area target (19,27) | From (11,28)
+[30.640s] Player AUTO: (15,29) -> (16,29)
+[30.640s] Movement hint #97 | Local footstep area: rows 15-19, cols 25-29 | Heard by 1 of 5
+[30.680s] Player AUTO: (16,29) -> (17,29)
+[30.680s] Movement hint #98 | Local footstep area: rows 15-19, cols 25-29 | Heard by 1 of 5
+[30.720s] Player AUTO: (17,29) -> (18,29)
+[30.720s] Movement hint #99 | Local footstep area: rows 15-19, cols 25-29 | Heard by 1 of 5
+[30.760s] Player AUTO: (18,29) -> (19,29)
+[30.760s] Movement hint #100 | Local footstep area: rows 15-19, cols 25-29 | Heard by 1 of 5
+[30.800s] Player AUTO: (19,29) -> (19,30)
+[30.800s] Movement hint #101 | Local footstep area: rows 15-19, cols 26-30 | Heard by 1 of 5
+[30.800s] Player REACHED THE EXIT at (19,30)
+[30.800s] Player (19,30) | Manual steps: 0 | Auto steps: 330 | Time: 30.80 s | Auto-solve: OFF | Difficulty: Medium | Director: NORMAL | Menace: 7 | Radio reports: 7 | Radio area: 17x17 | Hint width: 5 | Hunting: 1 | Searching: 4
+Maze Runner V5.4.3c | difficulty=Medium | seed=26 | 21x31 | monsters=5 | ESCAPED | simulation_ms=30800 | auto_steps=330 | withdrawals=1 | withdrawal_steps=9 | junction_scans=4 | compute_ms=29.97

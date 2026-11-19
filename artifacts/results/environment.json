@@ -1,10 +1,10 @@
 {
-  "recorded_utc": "2026-11-19T05:06:15.561916+00:00",
+  "recorded_utc": "2026-11-19T21:44:32.778822+00:00",
   "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
   "machine": "x86_64",
   "python": "3.12.14 (main, Aug 25 2026, 14:00:49) [Clang 22.1.3 ]",
   "compiler": "g++ (Debian 14.2.0-19) 14.2.0",
-  "source_sha256": "0ee75560b422a7a9e25aed15e26a5fad81852a3848727593358a7d42e2f4986f",
+  "source_sha256": "6a9004190c02f6bcb7880a01d2cb2a68743bedec0588916beb8b6c1327679a62",
   "scope": "Linux host execution; no native macOS or Windows execution; desktop GLFW startup not executed",
   "sanitizer_leak_detection": false
 }

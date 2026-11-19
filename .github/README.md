@@ -1,4 +1,4 @@
-# MazeRunner V5.4.3b
+# MazeRunner V5.4.3c
 
 MazeRunner is a C++17 maze game with an in-game setup screen, pixel-art characters, raised gray walls on a black background, and a headless simulator for repeatable AI experiments. Play manually or enable the automatic solver while roaming monsters and an adaptive director respond to movement.
 
@@ -8,17 +8,15 @@ The setup screen offers Low, Medium, and High difficulty, a configurable monster
 
 ![MazeRunner game view](../artifacts/screenshots/game.png)
 
-## What's new in V5.4.3b
+## What's new in V5.4.3c
 
-One investigator follows the best clue available to it. Other informed monsters cover different sides of the reported sector. Eligible Cutters can intercept at a chokepoint. A searcher checks junctions and alcoves, briefly turns toward an unchecked arm, and remembers where it has looked.
+The Director sends its first coarse report on eligible movement, then shortens the radio interval as the player improves their best route to the exit. A remote search can lapse during the opening. The lead still searches its clue, other informed monsters cover the perimeter, and sustained menace can send an investigator away.
 
-The Director samples menace every 200 ms. Sustained pressure can send the investigator walking away. During this quiet period the pack still hears real steps and can make contact. The HUD shows *BACKSTAGE* and the menace value (`M`). Individual monsters can learn from repeated audible scent losses, sector returns, sustained headings and reversals. A new run clears this memory.
+On High, a sound-hunter can notice the player down a clear corridor, spend a beat facing them and accelerate into a charge. A hunter at its last-seen corner checks for fresh line of sight before continuing. Patrols, searchers and hunters move at different speeds. The solver budgets for the fastest legal gait when deciding whether a monster can cut off an escape.
 
-On seed 8 the lead withdraws at 8.600 seconds. It takes nine steps away before the solver reaches the exit at 13.040 seconds. [Encounter trace](../artifacts/results/director-relief.log)
+Pack lessons use distinct observations. A dead-end check requires an unsuccessful local sweep, and a junction ambush requires a continuous heard return compatible with a real terrain cycle. One lesson can unlock every 12 seconds. Each replay begins with a fresh pack.
 
-![Backstage and menace on the HUD](../artifacts/screenshots/hud.png)
-
-The [player and developer Wiki](https://github.com/LeEz1219/MazeRunner/wiki) includes a first-maze walkthrough, a guide to the Director HUD, and the five-monster calibration and holdout results.
+On the default Medium maze, seed 26 shows relief at 4.000 s, a retreat at 21.800 s, and escape at 30.800 s. [Encounter trace](../artifacts/results/director-relief.log) · [Dedicated wiki](https://github.com/LeEz1219/MazeRunner/wiki)
 
 ## Build and play
 
@@ -30,7 +28,7 @@ sudo apt install build-essential cmake ninja-build libglfw3-dev libglew-dev libg
 cmake -S . -B build/cmake -G Ninja -DCMAKE_BUILD_TYPE=Release
 cmake --build build/cmake --parallel
 ctest --test-dir build/cmake --output-on-failure
-./build/cmake/bin/mazerunnerV5.4.3b
+./build/cmake/bin/mazerunnerV5.4.3c
 ```
 
 Use CMake 3.20 or newer. The [build and reproduction guide](../03-Build-Test-and-Reproduce.md) includes direct compiler commands, Apple Silicon macOS instructions, Windows CMD instructions, dependency troubleshooting, and the full validation procedure.
@@ -58,22 +56,22 @@ Here `42` is the random seed, which makes the run reproducible with the same bui
 
 ## Development kit
 
-[Download the complete V5.4.3b developer kit](https://github.com/LeEz1219/MazeRunner/raw/refs/heads/main/dist/MazeRunner-V5.4.3b-Documentation-and-Validation.zip). The archive includes the three guides, production source, CMake project, tests, raw results, 18 screenshots, reproduction scripts and integrity checks.
+[Download the complete V5.4.3c developer kit](https://github.com/LeEz1219/MazeRunner/raw/refs/heads/main/dist/MazeRunner-V5.4.3c-Documentation-and-Validation.zip). The archive includes the three guides, production source, CMake project, tests, raw results, 18 screenshots, reproduction scripts and integrity checks.
 
 | File or directory | Contents |
 |---|---|
-| [src/mazerunnerV5.4.3b.cpp](../src/mazerunnerV5.4.3b.cpp) | Complete game source with embedded sprites and font |
+| [src/mazerunnerV5.4.3c.cpp](../src/mazerunnerV5.4.3c.cpp) | Complete game source with embedded sprites and font |
 | [CMakeLists.txt](../CMakeLists.txt) | Graphical, headless, portable regression, and EGL render/app test targets |
-| [01-Source-Line-by-Line.md](../01-Source-Line-by-Line.md) | Line-by-line reference for all 3,631 physical source lines |
+| [01-Source-Line-by-Line.md](../01-Source-Line-by-Line.md) | 193 functions and methods with source links, behavior and design rationale |
 | [02-AI-Graphics-and-Redesign.md](../02-AI-Graphics-and-Redesign.md) | AI mechanics, measured escape rates, graphics, UI design, and redesign guidance |
 | [03-Build-Test-and-Reproduce.md](../03-Build-Test-and-Reproduce.md) | Platform-specific compilation and reproduction instructions |
-| [tests/](../tests/) | Gameplay, director, difficulty, V5.4.2 compatibility and V5.4.3b stalker behavior, UI, rendering, and application tests |
+| [tests/](../tests/) | Gameplay, director, difficulty, V5.4.2 compatibility and V5.4.3c stalker behavior, UI, rendering, and application tests |
 | [scripts/](../scripts/) | Validation, CMake, and calibration runners; documentation audit; package integrity verifier |
 | [artifacts/results/](../artifacts/results/) | Recorded commands, environment, test logs, CMake record, and calibration results |
 | [artifacts/screenshots/](../artifacts/screenshots/) | Eighteen PNG captures |
 | [manifest.json](../manifest.json), [SHA256SUMS](../SHA256SUMS) | Package metadata and payload checksums |
 
-The three numbered guides, `manifest.json`, `SHA256SUMS`, and everything under `artifacts/` were regenerated for V5.4.3b. The README lives under `.github/` so the verifier's exactly-three-guides check passes. `.gitattributes` keeps packaged file bytes identical across platforms, so the checksums hold on any checkout.
+The three numbered guides, `manifest.json`, `SHA256SUMS`, and everything under `artifacts/` were regenerated for V5.4.3c. The README lives under `.github/` so the verifier's exactly-three-guides check passes. `.gitattributes` keeps packaged file bytes identical across platforms, so the checksums hold on any checkout.
 
 Verify the package before editing files or regenerating results, using Python 3.9 or newer:
 
@@ -91,6 +89,6 @@ This command regenerates files under `artifacts/`, so use a separate working cop
 
 ## Recorded validation
 
-The Linux validation covers the headless CLI, deterministic gameplay and UI regressions, ASan/UBSan and offscreen OpenGL. Ubuntu CI builds both the desktop and headless targets. [Ubuntu CMake run](https://github.com/LeEz1219/MazeRunner/actions/runs/44462877518) · [Direct validation](../artifacts/results/validation-summary.json)
+The Linux validation covers the headless CLI, deterministic gameplay and UI regressions, ASan/UBSan and offscreen OpenGL. Ubuntu CI builds both the desktop and headless targets. [Ubuntu CMake run](https://github.com/LeEz1219/MazeRunner/actions/runs/44621893162) · [Direct validation](../artifacts/results/validation-summary.json)
 
-Across 2,400 five-monster calibration games on 21×21 and 31×31, escapes were Low 739/800 (92.38%), Medium 526/800 (65.75%), High 290/800 (36.25%). The full 4,740-game data includes the ten-monster presets, rectangular setup default and fresh-seed holdouts. [All outcomes](../artifacts/results/calibration-runs.csv) · [Cohort results](../artifacts/results/calibration.json)
+Across 2,400 five-monster calibration games, escape counts were Low 740/800 (92.50%), Medium 529/800 (66.12%), High 271/800 (33.88%). The 4,740-game dataset also includes the ten-monster presets, rectangular setup default and independent holdout seeds. [All outcomes](../artifacts/results/calibration-runs.csv) · [Cohort results](../artifacts/results/calibration.json)

@@ -1,19 +1,9 @@
 {
-  "source": "src/mazerunnerV5.4.3b.cpp",
-  "source_sha256": "0ee75560b422a7a9e25aed15e26a5fad81852a3848727593358a7d42e2f4986f",
-  "physical_lines": 3631,
-  "annotated_lines": 3631,
-  "missing_lines": [],
-  "function_index_entries": 183,
-  "annotation_categories": {
-    "access": 9,
-    "blank": 137,
-    "comment": 354,
-    "glyph": 42,
-    "include": 24,
-    "preprocessor": 25,
-    "semantic": 2503,
-    "sprite-row": 120,
-    "structure": 417
-  }
+  "source": "src/mazerunnerV5.4.3c.cpp",
+  "source_sha256": "6a9004190c02f6bcb7880a01d2cb2a68743bedec0588916beb8b6c1327679a62",
+  "physical_lines": 3834,
+  "defined_functions": 193,
+  "documented_functions": 193,
+  "missing": [],
+  "exact_match": true
 }

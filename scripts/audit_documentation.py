@@ -5,12 +5,12 @@ Run after an intended change to the source, guides, tests, or regenerated artifa
 It reads what is on disk; it does not build or run anything. Afterwards,
 scripts/verify_package.py checks the tree against the records written here.
 """
-import csv, datetime, hashlib, html, json, os, pathlib, re, struct, sys
+import csv, datetime, hashlib, json, os, pathlib, re, struct, sys
 
-from verify_package import release_paths
+from verify_package import function_coverage, release_paths
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
-RELEASE = '5.4.3b'
+RELEASE = '5.4.3c'
 SOURCE = f'src/mazerunnerV{RELEASE}.cpp'
 DOCUMENTS = ['01-Source-Line-by-Line.md', '02-AI-Graphics-and-Redesign.md', '03-Build-Test-and-Reproduce.md']
 RESULTS = ROOT / 'artifacts/results'
@@ -65,18 +65,6 @@ def calibration_matches():
     return not groups and total == report['total_games']
 
 
-def category(line):
-    s = line.strip()
-    if not s: return 'blank'
-    if s.startswith('//'): return 'comment'
-    if s.startswith('#include'): return 'include'
-    if s.startswith('#'): return 'preprocessor'
-    if s in ('public:', 'private:', 'protected:'): return 'access'
-    if re.fullmatch(r'[{}();,\]]+', s): return 'structure'
-    if re.fullmatch(r'("[^"]{20}",?\s*)+(\}\};)?', s): return 'sprite-row'
-    if s.startswith("case '") and 'return {' in s: return 'glyph'
-    return 'semantic'
-
 def main():
     files = release_paths()
     report_unlisted_files(set(files))
@@ -84,26 +72,12 @@ def main():
     source = (ROOT / SOURCE).read_bytes()
     lines = source.decode('utf-8').splitlines()
     guide = (ROOT / DOCUMENTS[0]).read_text(encoding='utf-8')
-    entries = re.findall(r'^\*\*L(\d{4})\*\* — <code>(.*?)</code>$', guide, re.M)
-    annotated, missing = set(), []
-    for number, code in entries:
-        n = int(number)
-        decoded = html.unescape(code)
-        if decoded == '[blank line]': decoded = ''
-        if 1 <= n <= len(lines) and decoded == lines[n - 1]:
-            annotated.add(n)
-    missing = [n for n in range(1, len(lines) + 1) if n not in annotated]
-    function_rows = re.findall(r'^\| \[L\d{4}\]\(#l\d{4}\) \| `[^`]+` \|', guide, re.M)
-    categories = {}
-    for line in lines:
-        k = category(line); categories[k] = categories.get(k, 0) + 1
     coverage = dict(source=SOURCE, source_sha256=hashlib.sha256(source).hexdigest(), physical_lines=len(lines),
-                    annotated_lines=len(annotated), missing_lines=missing,
-                    function_index_entries=len(function_rows), annotation_categories=dict(sorted(categories.items())))
+                    **function_coverage(source.decode('utf-8'), guide, SOURCE))
     (RESULTS / 'documentation-coverage.json').write_text(json.dumps(coverage, indent=2) + '\n')
 
     checks = {
-        'source_matches_line_guide': not missing and len(entries) == len(lines),
+        'source_matches_function_guide': coverage['exact_match'],
         'exactly_three_markdown_files': sorted(name for name in files if '/' not in name and name.endswith('.md')) == DOCUMENTS,
         'eighteen_png_screenshots': sum(pathlib.Path(name).parent.as_posix() == 'artifacts/screenshots' and name.endswith('.png') for name in files) == 18,
         'cmake_file_included': (ROOT / 'CMakeLists.txt').is_file(),
@@ -145,7 +119,7 @@ def main():
     render = (RESULTS / 'render.log').read_text().splitlines()[0] if (RESULTS / 'render.log').is_file() else None
     calibration = json.loads((RESULTS / 'calibration.json').read_text()) if (RESULTS / 'calibration.json').is_file() else {}
     manifest = dict(
-        package=f'MazeRunner V{RELEASE} Documentation and Validation', release=RELEASE, previous_release='5.4.3a',
+        package=f'MazeRunner V{RELEASE} Documentation and Validation', release=RELEASE, previous_release='5.4.3b',
         prepared_date=now[:10],
         source=dict(path=SOURCE, bytes=len(source), physical_lines=len(lines), sha256=coverage['source_sha256']),
         validation=dict(platform=env.get('platform'), compiler=env.get('compiler'), renderer=render,
@@ -168,7 +142,7 @@ def main():
     (ROOT / 'manifest.json').write_text(json.dumps(manifest, indent=2) + '\n')
     sums = [f'{sha256(ROOT / f)}  {f}' for f in files + ['manifest.json']]
     (ROOT / 'SHA256SUMS').write_text('\n'.join(sums) + '\n')
-    print(f"audit {audit['status']}: {len(lines)} lines, {len(annotated)} annotated, {len(function_rows)} index entries; "
+    print(f"audit {audit['status']}: {len(lines)} lines, {coverage['documented_functions']} documented functions; "
           f"manifest lists {len(files)} files")
     for key, ok in checks.items():
         if not ok: print('FAILED CHECK:', key, file=sys.stderr)

@@ -1,4 +1,4 @@
-Maze Runner V5.4.3b
+Maze Runner V5.4.3c
   [--seed N] [--difficulty low|medium|high] [--verbose] [--quiet]
   --simulate ROWS COLS MONSTERS SEED [LIMIT_MS] [--difficulty low|medium|high] [--verbose] [--quiet]
 Interactive play opens graphical setup; --difficulty preselects a card. No terminal input is required.

@@ -1,8 +1,8 @@
-PASS: 1760039 assertions across director, recovery, path, generation, and gameplay regressions.
-PASS: 5115710 assertions including all difficulty profiles, input, timing, hints, diversity, and determinism.
+PASS: 1651310 assertions across director, recovery, path, generation, and gameplay regressions.
+PASS: 4659906 assertions including all difficulty profiles, input, timing, hints, diversity, and determinism.
 PASS: visual geometry and camera invariants plus all gameplay/difficulty regressions.
 PASS: V5.4.2 start grace, hearing, searching, interceptors, sight, timing-aware blocking, fallback, and guards.
 PASS: menace hysteresis, physical withdrawal, pack jobs, suspicion scans, observed habits and deterministic replay.
 PASS: director radio delivery, privacy, expiry, retasking, interceptor release and complete relief cycle.
-PASS: V5.4.3b weighted detours, bounded corridor hearing and global interceptor reservations.
+PASS: V5.4.3c charge arrival bound, local alcove inspections, continuous terrain circuits and pack evidence.
 PASS: setup validation, all controls, text input, bounds, DPI hit testing, keyboard navigation, and screen transitions.
