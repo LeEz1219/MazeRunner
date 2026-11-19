@@ -58,8 +58,36 @@ std::vector<unsigned char> capture(int width,int height,const std::string&path){
         for(int y=height-1;y>=0;--y)file.write(reinterpret_cast<const char*>(image.data()+y*width*3),width*3);}
     return image;
 }
+// The scan diamond sits inside the selected corridor arm for one move interval.
+void test_scan_marker() {
+    auto maze = monster_gallery();
+    auto& monster = maze.monsters.front();
+    monster.state = MonsterState::Searching;
+    monster.scan_until = maze.now + 1;
+    Renderer renderer(maze);
+    auto marker_x = [&]() {
+        renderer.draw(1200,900,maze);
+        auto pixels = capture(1200,900,"");
+        int count = 0, sum = 0;
+        for (std::size_t i = 0; i < pixels.size(); i += 3) {
+            if (pixels[i] == 255 && std::abs(int(pixels[i+1])-173) <= 1 &&
+                std::abs(int(pixels[i+2])-48) <= 1) {
+                sum += int((i / 3) % 1200);
+                ++count;
+            }
+        }
+        return count ? sum / count : -1;
+    };
+    monster.gaze = 2;
+    int left = marker_x();
+    monster.gaze = 3;
+    require(left >= 0 && marker_x() > left, "scan marker follows the selected corridor arm");
+    maze.now = monster.scan_until;
+    require(marker_x() == -1, "scan marker disappears at the end of the pause");
+}
 int main(){try{
     Offscreen egl(1600,1200);
+    test_scan_marker();
     std::cout<<"OpenGL "<<glGetString(GL_VERSION)<<" | "<<glGetString(GL_RENDERER)<<'\n';
     {
         UiState ui;UiRenderer menu;

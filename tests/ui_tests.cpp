@@ -1,6 +1,9 @@
 #include "stalker_tests.cpp"
 
 void test_setup_inputs(){
+    for (char c : std::string(MAZERUNNER_VERSION)) {
+        require(ui_glyph(c) != ui_glyph('?'), "every character in the setup version has a bitmap glyph");
+    }
     UiState ui;int r=0,c=0,n=0;
     require(ui.form.values(r,c,n)&&r==21&&c==31&&n==5,"initial form valid");
     for(auto d:{Control::Low,Control::Medium,Control::High})ui.activate(d);

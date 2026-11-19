@@ -2971,7 +2971,7 @@ struct UiState {
 /// Resolve a small embedded 5x7 font. UI text uses uppercase, digits, and punctuation.
 std::array<unsigned char,7> ui_glyph(char c) {
     switch(c) {
-        case 'a':return {0,0,14,1,15,17,15};
+        case 'a':return {0,0,14,1,15,17,15};case 'b':return {16,16,22,25,17,17,30};
         case 'A':return {14,17,17,31,17,17,17};case 'B':return {30,17,17,30,17,17,30};
         case 'C':return {14,17,16,16,16,17,14};case 'D':return {30,17,17,17,17,17,30};
         case 'E':return {31,16,16,30,16,16,31};case 'F':return {31,16,16,30,16,16,16};
