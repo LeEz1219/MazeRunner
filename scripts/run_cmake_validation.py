@@ -20,8 +20,11 @@ build = pathlib.Path(args.build_dir)
 records = []
 env = dict(os.environ, LC_ALL='C')
 HOME = os.path.expanduser('~')
-# Longest first: the checkout usually lives inside the home directory.
-PRIVATE_PREFIXES = sorted({(str(ROOT), '.'), (HOME, '~'), (os.path.realpath(HOME), '~')},
+# Longest first: the checkout usually lives inside the home directory. CMake prints
+# forward slashes on Windows, so each path is also matched in that spelling.
+PRIVATE_PREFIXES = sorted({(spelling, label)
+                           for path, label in ((str(ROOT), '.'), (HOME, '~'), (os.path.realpath(HOME), '~'))
+                           for spelling in (path, path.replace('\\', '/'))},
                           key=lambda item: -len(item[0]))
 
 def scrub(text):

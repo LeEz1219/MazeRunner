@@ -175,7 +175,7 @@
     {
       "path": "artifacts/results/documentation-audit.json",
       "bytes": 1279,
-      "sha256": "9f3f30778cab5d25e7b56623018e915026ddce7219b9709288d5cd4ab7169545"
+      "sha256": "463bcbe4e3e500f684890e5872943c05a22ed93babba6633fd3a70aec66332c5"
     },
     {
       "path": "artifacts/results/documentation-coverage.json",
@@ -429,13 +429,13 @@
     },
     {
       "path": "scripts/run_cmake_validation.py",
-      "bytes": 4187,
-      "sha256": "1e52f8f39c5994ac948d2d0c5c4d517a662061052e0dc20ac127445d33b9f153"
+      "bytes": 4418,
+      "sha256": "7ed2b7754a18f6288d30d4aa8d2e562b471da4a4dafbb5ed09895cc340cf8247"
     },
     {
       "path": "scripts/run_validation.py",
-      "bytes": 7065,
-      "sha256": "8aa97270e93363a45a92177910ae360c8526f391bd3dd1db319f4f82e59cb9e1"
+      "bytes": 7296,
+      "sha256": "acfb9c1968af4145ce2dadea58ce02e9705f9e04bf25c0c2bc86ddfebdaae309"
     },
     {
       "path": "scripts/verify_package.py",
@@ -509,8 +509,8 @@
     },
     {
       "path": "tests/test_release_tools.py",
-      "bytes": 3599,
-      "sha256": "4338db69368206301613ff7250da70303502d1f3f9524669915c3c24c64aabe1"
+      "bytes": 5359,
+      "sha256": "70e0fabb2c22da6258cedb86f3560831bf9d98350ece3d4f029a818148cccbdd"
     },
     {
       "path": "tests/ui_tests.cpp",

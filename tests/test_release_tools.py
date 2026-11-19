@@ -1,5 +1,6 @@
-"""Regression tests for developer kit membership and CTest validation."""
+"""Regression tests for developer kit membership, CTest validation and log path scrubbing."""
 import json
+import os
 from pathlib import Path
 import shutil
 import subprocess
@@ -68,6 +69,33 @@ class ReleaseToolsTests(unittest.TestCase):
             self.assertEqual(result['cmake_configure_build_ctest_status'], 'failed')
             ctest = next(item for item in result['checks'] if item['name'] == 'ctest')
             self.assertNotEqual(ctest['exit_code'], 0)
+
+    @unittest.skipUnless(shutil.which('cmake') and shutil.which('ctest'), 'requires CMake and CTest')
+    def test_recorded_logs_hide_checkout_and_home_paths(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            home = Path(tmp).resolve() / 'home' / 'someone'
+            root = home / 'projects' / 'MazeRunner'
+            (root / 'scripts').mkdir(parents=True)
+            shutil.copyfile(ROOT / 'scripts/run_cmake_validation.py', root / 'scripts/run_cmake_validation.py')
+            (root / 'CMakeLists.txt').write_text(
+                'cmake_minimum_required(VERSION 3.20)\n'
+                'project(PathFixture NONE)\n'
+                'include(CTest)\n'
+                'file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/bin")\n'
+                'add_test(NAME example COMMAND "${CMAKE_COMMAND}" -E true)\n'
+            )
+            env = dict(os.environ, HOME=str(home), USERPROFILE=str(home))
+            for build_dir, label in (('build/inside', './build/inside'),
+                                     (str(home / 'builds' / 'outside'), '~/builds/outside')):
+                subprocess.run([sys.executable, 'scripts/run_cmake_validation.py', '--headless',
+                                '--build-dir', build_dir], cwd=root, env=env, check=True,
+                               text=True, capture_output=True)
+                results = root / 'artifacts/results/cmake'
+                for name in ('configure.log', 'ctest.log', 'validation.json'):
+                    text = (results / name).read_text()
+                    self.assertNotIn(tmp, text, name)
+                    self.assertNotIn(str(home), text, name)
+                self.assertIn('Test project ' + label, (results / 'ctest.log').read_text())
 
 
 if __name__ == '__main__':
