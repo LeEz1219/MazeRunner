@@ -1,1 +1,1 @@
-Maze Runner V5.4.3a | difficulty=Medium | seed=42 | 33x33 | monsters=10 | RUNNING | simulation_ms=1000 | auto_steps=24 | compute_ms=3.59
+Maze Runner V5.4.3b | difficulty=Medium | seed=42 | 33x33 | monsters=10 | RUNNING | simulation_ms=1000 | auto_steps=25 | withdrawals=0 | withdrawal_steps=0 | junction_scans=1 | compute_ms=3.75

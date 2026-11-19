@@ -5,7 +5,7 @@
     "monsters": 10,
     "seed": 42,
     "limit_ms": 1000,
-    "state": "Maze Runner V5.4.3a | difficulty=Low | seed=42 | 33x33 | monsters=10 | RUNNING | simulation_ms=1000 | auto_steps=9",
+    "state": "Maze Runner V5.4.3b | difficulty=Low | seed=42 | 33x33 | monsters=10 | RUNNING | simulation_ms=1000 | auto_steps=23 | withdrawals=0 | withdrawal_steps=0 | junction_scans=0",
     "repeat_equal": true
   },
   {
@@ -14,7 +14,7 @@
     "monsters": 10,
     "seed": 42,
     "limit_ms": 1000,
-    "state": "Maze Runner V5.4.3a | difficulty=Medium | seed=42 | 33x33 | monsters=10 | RUNNING | simulation_ms=1000 | auto_steps=24",
+    "state": "Maze Runner V5.4.3b | difficulty=Medium | seed=42 | 33x33 | monsters=10 | RUNNING | simulation_ms=1000 | auto_steps=25 | withdrawals=0 | withdrawal_steps=0 | junction_scans=1",
     "repeat_equal": true
   },
   {
@@ -23,7 +23,7 @@
     "monsters": 10,
     "seed": 42,
     "limit_ms": 1000,
-    "state": "Maze Runner V5.4.3a | difficulty=High | seed=42 | 33x33 | monsters=10 | RUNNING | simulation_ms=1000 | auto_steps=4",
+    "state": "Maze Runner V5.4.3b | difficulty=High | seed=42 | 33x33 | monsters=10 | RUNNING | simulation_ms=1000 | auto_steps=5 | withdrawals=0 | withdrawal_steps=0 | junction_scans=0",
     "repeat_equal": true
   },
   {
@@ -32,7 +32,7 @@
     "monsters": 10,
     "seed": 42,
     "limit_ms": 1000,
-    "state": "Maze Runner V5.4.3a | difficulty=Low | seed=42 | 63x63 | monsters=10 | RUNNING | simulation_ms=1000 | auto_steps=25",
+    "state": "Maze Runner V5.4.3b | difficulty=Low | seed=42 | 63x63 | monsters=10 | RUNNING | simulation_ms=1000 | auto_steps=25 | withdrawals=0 | withdrawal_steps=0 | junction_scans=1",
     "repeat_equal": true
   },
   {
@@ -41,7 +41,7 @@
     "monsters": 10,
     "seed": 42,
     "limit_ms": 1000,
-    "state": "Maze Runner V5.4.3a | difficulty=Medium | seed=42 | 63x63 | monsters=10 | RUNNING | simulation_ms=1000 | auto_steps=25",
+    "state": "Maze Runner V5.4.3b | difficulty=Medium | seed=42 | 63x63 | monsters=10 | RUNNING | simulation_ms=1000 | auto_steps=25 | withdrawals=0 | withdrawal_steps=0 | junction_scans=0",
     "repeat_equal": true
   },
   {
@@ -50,7 +50,7 @@
     "monsters": 10,
     "seed": 42,
     "limit_ms": 1000,
-    "state": "Maze Runner V5.4.3a | difficulty=High | seed=42 | 63x63 | monsters=10 | RUNNING | simulation_ms=1000 | auto_steps=25",
+    "state": "Maze Runner V5.4.3b | difficulty=High | seed=42 | 63x63 | monsters=10 | RUNNING | simulation_ms=1000 | auto_steps=25 | withdrawals=0 | withdrawal_steps=0 | junction_scans=1",
     "repeat_equal": true
   },
   {
@@ -59,7 +59,7 @@
     "monsters": 10,
     "seed": 42,
     "limit_ms": 1000,
-    "state": "Maze Runner V5.4.3a | difficulty=Low | seed=42 | 101x101 | monsters=10 | RUNNING | simulation_ms=1000 | auto_steps=25",
+    "state": "Maze Runner V5.4.3b | difficulty=Low | seed=42 | 101x101 | monsters=10 | RUNNING | simulation_ms=1000 | auto_steps=25 | withdrawals=0 | withdrawal_steps=0 | junction_scans=0",
     "repeat_equal": true
   },
   {
@@ -68,7 +68,7 @@
     "monsters": 10,
     "seed": 42,
     "limit_ms": 1000,
-    "state": "Maze Runner V5.4.3a | difficulty=Medium | seed=42 | 101x101 | monsters=10 | RUNNING | simulation_ms=1000 | auto_steps=25",
+    "state": "Maze Runner V5.4.3b | difficulty=Medium | seed=42 | 101x101 | monsters=10 | RUNNING | simulation_ms=1000 | auto_steps=25 | withdrawals=0 | withdrawal_steps=0 | junction_scans=0",
     "repeat_equal": true
   },
   {
@@ -77,7 +77,7 @@
     "monsters": 10,
     "seed": 42,
     "limit_ms": 1000,
-    "state": "Maze Runner V5.4.3a | difficulty=High | seed=42 | 101x101 | monsters=10 | RUNNING | simulation_ms=1000 | auto_steps=25",
+    "state": "Maze Runner V5.4.3b | difficulty=High | seed=42 | 101x101 | monsters=10 | RUNNING | simulation_ms=1000 | auto_steps=25 | withdrawals=0 | withdrawal_steps=0 | junction_scans=0",
     "repeat_equal": true
   }
 ]

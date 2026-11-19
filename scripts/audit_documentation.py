@@ -108,14 +108,18 @@ def main():
         'eighteen_png_screenshots': sum(pathlib.Path(name).parent.as_posix() == 'artifacts/screenshots' and name.endswith('.png') for name in files) == 18,
         'cmake_file_included': (ROOT / 'CMakeLists.txt').is_file(),
     }
-    def status(path, key='status'):
-        try: return json.loads((RESULTS / path).read_text()).get(key)
-        except (OSError, ValueError): return None
     validation = json.loads((RESULTS / 'validation-summary.json').read_text())
+    cmake_path = RESULTS / 'cmake/validation.json'
+    cmake = json.loads(cmake_path.read_text()) if cmake_path.is_file() else {}
+    cmake_summary = cmake.get('summary', {})
     names = {check['name'] for check in validation['checks'] if check['status'] == 'passed'}
     checks['raw_validation_passed'] = (validation['status'] == 'passed' and
         {'gameplay-and-ui', 'app', 'render', 'sanitizers', 'director-radio', 'director-relief'} <= names)
-    checks['cmake_configure_build_ctest_passed'] = status('cmake/validation.json', 'cmake_configure_build_ctest_status') == 'passed'
+    checks['cmake_configure_build_ctest_passed'] = cmake.get('cmake_configure_build_ctest_status') == 'passed'
+    binaries = {name.removesuffix('.exe') for name in cmake_summary.get('executables', [])}
+    checks['cmake_built_release_target'] = (
+        'maze-headless' in binaries and
+        (cmake_summary.get('graphical_target') is False or f'mazerunnerV{RELEASE}' in binaries))
     checks['raw_calibration_matches_all_groups_and_seeds'] = calibration_matches()
     checks['director_evidence'] = (
         'Remote receivers: 5 | Using local evidence: 0 | Lead investigators: 1' in (RESULTS / 'director-radio.log').read_text()
@@ -139,7 +143,6 @@ def main():
 
     env = json.loads((RESULTS / 'environment.json').read_text()) if (RESULTS / 'environment.json').is_file() else {}
     render = (RESULTS / 'render.log').read_text().splitlines()[0] if (RESULTS / 'render.log').is_file() else None
-    cmake = json.loads((RESULTS / 'cmake/validation.json').read_text()) if (RESULTS / 'cmake/validation.json').is_file() else {}
     calibration = json.loads((RESULTS / 'calibration.json').read_text()) if (RESULTS / 'calibration.json').is_file() else {}
     manifest = dict(
         package=f'MazeRunner V{RELEASE} Documentation and Validation', release=RELEASE, previous_release='5.4.3a',

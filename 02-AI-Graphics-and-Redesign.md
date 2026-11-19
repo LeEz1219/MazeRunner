@@ -1,21 +1,16 @@
-# MazeRunner V5.4.3a — AI, graphics, UI, and redesign guide
+# MazeRunner V5.4.3b — AI, graphics, UI, and redesign guide
 
-This guide describes the playtested director hotfix. The source has 3,261 physical lines and SHA-256 `62fa1254b9c509ae3002f812bfa6b26823cd5b97eae71921fa2d153ad249a403`. The visual redesign proposals in sections 9–11 are options a designer can implement. [Production source](src/mazerunnerV5.4.3a.cpp)
+This guide describes the V5.4.3b encounter system. The source has 3,631 physical lines and SHA-256 `b740d887484f1fe3bbfbb712b9caeadc284aa4fdf416ce514a84436326784e06`. The visual redesign proposals in sections 9–11 are options a designer can implement. [Production source](src/mazerunnerV5.4.3b.cpp)
 
 The companion [line-by-line reference](01-Source-Line-by-Line.md) explains every physical source line. The [build, test, and reproduction guide](03-Build-Test-and-Reproduce.md) contains commands, evidence, platform limitations, and a screenshot index. All images below were captured from this source by the included real-OpenGL test harness; the gallery is a deliberately arranged fixture.
 
-### Changes since V5.4.2
+### Changes since V5.4.3a
 
-| System | V5.4.3a behavior | Observable check |
-|---|---|---|
-| Local hearing | A bounded breadth-first search measures walkable steps around walls. Listeners hunt a quantized footstep sector. | Monsters across a thin wall can miss a physically close step. |
-| Strategic radio | A successful move can broadcast one coarse area across the entire maze. Remote patrols and searchers investigate it. | Seed 42, 63×63, five monsters, Medium. All five investigate the first report with zero local listeners. |
-| Intensity | Relief widens earlier evidence, spaces out subsequent reports and releases guards. Solver waits count as attempted escape. | Seed 7 enters relief, escalates, then recovers normal precision before escaping. |
-| Exit overlay | Weighted relaxation stores an optimal next step for each reachable cell. | A 48-step clear detour is drawn around a 46-step route with an occupied soft-cost cell. |
-| Manual input | Immediate keypress followed by chronological repeats on the simulation clock. | A step due at 220 ms beats a monster due at 230 ms across frame partitions. A tie goes to the monster. |
-| HUD and console | Phase, number of radio reports and current radio dimensions are visible. | The relief screenshot shows RELIEF, radio report 3 and a 21×25 area. |
+One investigator follows the center of an encounter. Other informed monsters cover different sides of the reported sector. Eligible Cutters can intercept at a chokepoint. A searcher checks junctions and alcoves, briefly turns toward an unchecked arm, and remembers where it has looked.
 
-V5.4.2 supplied the start grace, distributed patrols, search state, interceptors, High corridor sight, setup screens and time-aware solver. The ten visual variants share these behaviors.
+The Director samples menace every 200 ms. Sustained pressure can send the investigator walking away. During this quiet period the pack still hears real steps and can make contact. The HUD shows *BACKSTAGE* and the menace value (`M`). Individual monsters can learn from repeated audible scent losses, sector returns, sustained headings and reversals. A new run clears this memory.
+
+[Encounter regressions](tests/stalker_tests.cpp) · [Radio and pack trace](artifacts/results/director-radio.log)
 
 ## 1. Architecture and game rules
 
@@ -78,17 +73,30 @@ An actual displacement can create two clues. A blocked keypress, a solver wait a
 | Channel | Reach | Effect on a monster | Timing |
 |---|---|---|---|
 | Footstep | Shortest walkable corridor distance within the difficulty budget | The listener hunts its most recent local clue. Each genuine contact refreshes its own scent. | Test hearing on every successful step. Publishing a new local rectangle has its own throttle. |
-| Director radio | All monsters on the map | A patrol or searcher investigates the broadcast sector. A hunter continues following fresher evidence and can later use an eligible radio fallback. | First eligible step, then movement after the profile cooldown. Cooldown doubles in relief. |
+| Director radio | All monsters on the map | One lead investigates, and remaining informed monsters cover assigned sides. A hunter continues following fresher evidence and can later use an eligible radio fallback. | First eligible step, then movement after the profile cooldown. Confinement relief doubles the cooldown. Backstage suspends broadcasts. |
 | Corridor sight | High only, 3–6 cells on a clear row or column | An eligible monster may pursue a genuine last-seen cell. | Checked by the monster's own behavior. |
 
 Hearing uses `base + floor(per_100 × max(rows, cols) / 100)`. Manhattan distance is a cheap first rejection. A bounded BFS decides which remaining monsters really hear around walls. One acoustic field serves all possible listeners for that displacement. A Medium 63×63 map has a budget of 26 steps.
 
-The local sector side is 9/5/5 cells in Low/Medium/High. The nominal radio side is 19/17/11. Its normal side is limited to `min(profile_radio, max(local_side, floor((2 × max_dimension + 1) / 3)))`. Width and height are separately clipped at map edges. Relief adds padding on both sides. A radio recipient gets these bounds and a revision. It samples walkable targets inside the rectangle.
+The local sector side is 9/5/6 cells in Low/Medium/High. The nominal radio side is 19/17/11. Its normal side is limited to `min(profile_radio, max(local_side, floor((2 × max_dimension + 1) / 3)))`. Width and height are separately clipped at map edges. Relief adds padding on both sides. A radio recipient gets these bounds and a revision. The lead uses this as the seed of its sweep. Perimeter agents sample the outermost two usable bands on their assigned sides.
 
 Each audible step renews the listener's own scent even between clue publications. Normal continuing-motion publication intervals are 200/0/0 ms. During relief they are at least 400 ms. First motion after an idle spell immediately qualifies for a fresh local clue. The radio still observes its own cooldown after an idle spell. [First-step terminal trace](artifacts/results/director-radio.log)
 A hunting target is sampled inside the clue rectangle with weights favoring nearby cells and penalizing recent visits. A candidate already claimed by another hunter is strongly downweighted, encouraging a distributed search. A valid existing target may be retained after an updated clue.
 
 ### Searching after losing the scent
+
+The investigator seeds a bounded multi-source breadth-first search with every walkable cell in the best-known sector. A more recent firsthand sighting can supply a single exact seed. Uncertainty expands through one corridor edge per 180 simulated ms, up to five layers. Junctions and branch mouths have priority. An individual discounts its last 40 inspections for 1,800 ms. Low and Medium physically inspect traversed cells. A High junction scan can also inspect an unobstructed straight arm in its existing visual range. The amber direction marker lasts for one movement opportunity.
+
+### Tactics learned within a run
+
+| Observed evidence | Behavioral change |
+|---|---|
+| Two audible hunts end with that listener losing scent | A known dead end becomes a higher-priority sweep target. |
+| Two returns to previously heard sectors within the recent six-sector history | An eligible Cutter can hold a nearby junction inside its own clue. |
+| Two consecutive audible sector changes in the same cardinal direction | The lead weights candidates in the observed heading three times as strongly. |
+| Two observed reversals during audible trails | On search expiry a patrol may walk three steps away and revisit its last known junction. |
+
+Exact player headings and unobserved idle time do not feed these counters. Widened clues clear the directional history. A subsequent run starts with fresh monsters and fresh encounter state.
 
 At a hunter's scent deadline, it can adopt a broadcast issued strictly after its last physical contact if that report is still within the profile's search lifetime. That sweep ends at the broadcast time plus search duration. Otherwise the monster sweeps its last local area from scent loss. A new broadcast can renew a remote search. Once its search time expires without fresh evidence the monster returns to roaming. Searching uses the orange-eye state.
 
@@ -102,7 +110,7 @@ A cutter can hold a reachable chokepoint, then release it at its role deadline. 
 
 ### Corridor sight (High only)
 
-High gives monsters short sight. A monster that is **not already hunting** (roaming or searching), or one already mid-charge, can see the player along a shared row or column. The distance must be 3–6 cells, and every cell between them must be open. A sighting turns the monster into a hunter targeting the exact cell where it saw the player. It keeps re-sighting while the line holds, and when the line breaks it continues to the last seen cell. Reaching that cell ends the charge.
+High gives a patrolling, searching, withdrawing, or already sighted monster short corridor vision along a shared row or column. The distance must be 3–6 cells, and every cell between them must be open. A sighting turns the monster into a hunter targeting the exact cell where it saw the player. It keeps re-sighting while the line holds, and when the line breaks it continues to the last seen cell. Reaching that cell ends the charge.
 
 Sight is the only sensory path that can supply an exact last-seen player cell. Losing the line of sight leaves the last observed destination available. A broadcast carries rectangular bounds even if a hunter somewhere else can see the player.
 
@@ -125,9 +133,9 @@ Guidance is a weighted shortest-path field from the exit, computed with Dial's b
 
 For a step from v into u, the candidate cost is `1 + entry_penalty(u) + distance[u]`. Relaxation stores the successor u that achieved this value. Simply choosing the neighbor with the lowest remaining distance can hide the cost of entering that neighbor and draw a route through a monster. The overlay follows the stored chain all the way to the exit. An occupied route or the fallback for a disconnected weighted field is amber. With zero monsters a downhill terrain step is sufficient. Tactical decisions may wait, retreat or take another branch.
 
-![Medium HUD showing relief and a 21×25 radio footprint at 4.2 seconds](artifacts/screenshots/hud.png)
+![Medium HUD during an investigator withdrawal](artifacts/screenshots/hud.png)
 
-The HUD is a real 21-row × 31-column Medium game, seed 7, with five monsters. At the first relief tick the run shows 50 steps, three hunters and three radio reports. The map and counter use the same simulation state as the director trace. [Terminal record](artifacts/results/director-relief.log)
+The HUD capture shows the default five-monster setup on seed 8 at 8.800 seconds, during a physical withdrawal. [Terminal trace](artifacts/results/director-relief.log)
 
 ### Tactical forecast and beam search
 
@@ -151,7 +159,7 @@ If conservative planning fails, the planner tries a relaxed interpretation of un
 
 ## 5. Overwatch/director intensity control
 
-The director has two jobs. It decides when to broadcast coarse movement information and adjusts how precisely monsters can use it when play stalls. Monster movement speeds, collisions and physical hearing still use the selected profile.
+The Director manages radio, confinement relief and encounter pacing. Every 200 ms it measures corridor distance to a walkable representative of each hunter's own clue and checks for genuine visual contact. It uses peak pressure, a capped contribution from a second hunter, separation after a close encounter and current confinement. Menace stays between 0 and 100. At 76, the Director releases guards and requests one physical retreat. The chosen agent uses ordinary movement, occupancy, and collision rules. Current sight takes priority. Normal broadcast eligibility returns at pressure 26 or lower after at least 1,400 ms. Silence supplies no fresh radio clue.
 
 Every 200 ms of active play the director samples the player on the simulation clock. A full profile-sized window containing at most 12 unique cells and spanning at most eight cells per axis counts as confinement. In auto mode, prolonged absence of navigation progress is another trigger. Voluntary manual idling clears the history. An active solver accumulates samples while waiting or backtracking, even when the exit field contains a technically open route.
 
@@ -159,13 +167,13 @@ An escalation widens the last local clue, the last radio rectangle and each info
 
 Recovery requires that confinement end, the minimum hold elapse and the recovery condition remain true for 2,000 ms. The player must either gain at least six terrain steps toward the exit relative to relief entry or move at least six Manhattan cells from the relief anchor. An automatic player must also have a reachable weighted exit route. Returning to normal narrows subsequent reports. Existing broad memories keep their recorded extent until new evidence arrives.
 
-| Seed 7, Medium | Event | Effect |
-|---|---|---|
-| 4,200 ms | Relief starts | Radio area 21×25, five monsters retasked, one interceptor released |
-| 10,200 ms | Relief increases | Radio area clips to the full 21×31 board |
-| 17,600 ms | Normal precision restored | Future radio area 17×17 |
-| 26,600 ms | New confinement episode | Radio area returns to 21×25 |
-| 31,400 ms | Escape | 462 successful automatic moves |
+| Time | Event in the default Medium maze, seed 8 |
+|---|---|
+| 4.000 s | Confinement relief releases one Cutter and widens the radio footprint to 21×25. |
+| 8.600 s | Menace reaches 77. Monster 4 receives a withdrawal to row 5, column 9. |
+| 10.000 s | The minimum quiet interval ends with menace at zero. |
+| 11.600 s | Sustained progress restores normal clue precision. |
+| 13.040 s | The solver escapes after 190 moves. The run records nine physical withdrawal steps and two junction scans. |
 
 A wider clue can give the player time to get past a choke. The outcome depends on where monsters are and which walkable targets they choose. [Complete event trace](artifacts/results/director-relief.log)
 
@@ -177,9 +185,9 @@ All values below are read from `difficulty_settings`. Lower periods mean more fr
 |---|---:|---:|---:|
 | Minimum certified terrain solutions | 4 | 2 | 2 |
 | Loop budget percentage | 225 | 135 | 100 |
-| Monster movement interval, ms | 220 | 148 | 118 |
-| Approximate moves per simulated second | 4.55 | 6.76 | 8.47 |
-| Normal local sector side, cells | 9 | 5 | 5 |
+| Monster movement interval, ms | 210 | 148 | 126 |
+| Approximate moves per simulated second | 4.76 | 6.76 | 7.94 |
+| Normal local sector side, cells | 9 | 5 | 6 |
 | Local clue cooldown during continuous movement, ms | 200 | 0 | 0 |
 | Nominal normal radio sector side, cells | 19 | 17 | 11 |
 | Normal / relief radio cooldown, ms | 3,000 / 6,000 | 1,800 / 3,600 | 1,000 / 2,000 |
@@ -193,47 +201,40 @@ All values below are read from `difficulty_settings`. Lower periods mean more fr
 | Minimum relief hold, ms | 8,000 | 6,000 | 4,000 |
 | Added padding per relief escalation, cells per side | 4 | 4 | 2 |
 | Maximum padding, cells per side | 16 | 16 | 8 |
-| Maximum nominal expanded local sector side, cells | 41 | 37 | 21 |
+| Maximum nominal expanded local sector side, cells | 41 | 37 | 22 |
 | Maximum nominal expanded radio sector side before map limits, cells | 51 | 49 | 27 |
 | Auto-player action interval, ms | 40 | 40 | 40 |
 | Tactical horizon / beam width | 12–18 / 64 | 12–18 / 64 | 12–18 / 64 |
 
 ### Measured escape rates
 
-All 4,740 games used the bundled headless simulator. Calibration used five monsters on 21×21 and 31×31, seeds 1–400 per size and difficulty, at 60,000 simulated ms. Pooling the two sizes gives **751/800 Low (93.9%), 536/800 Medium (67.0%) and 273/800 High (34.1%)** against design targets of 92%, 65% and 35%. These rates apply to this seed protocol. The ten-monster presets are a separate, higher-pressure case.
+The shipped code ran 4,740 deterministic auto-solver games. Five-monster calibration used seeds 1–400 on both 21×21 and 31×31 with a 60-second limit. The pooled escape counts were Low 739/800 (92.38%), Medium 526/800 (65.75%), High 290/800 (36.25%). The design targets are 92%, 65% and 35%. The fresh square-map holdouts (seeds 1201–1400) yielded Low 373/400 (93.25%), Medium 251/400 (62.75%), High 158/400 (39.50%). The rectangular setup default and ten-monster presets are separate cohorts.
 
-| Sample | Rows × columns | Monsters | Difficulty | Escaped | Caught | At limit | Escape rate [95% CI] |
+| Cohort | Rows × columns | Monsters | Difficulty | Escaped | Caught | At limit | Escape rate [95% Wilson interval] |
 |---|---|---:|---|---:|---:|---:|---|
-| calibration | 21 × 21 | 5 | Low | 359/400 | 40 | 1 | 89.8% [86.4, 92.3] |
-| calibration | 21 × 21 | 5 | Medium | 254/400 | 143 | 3 | 63.5% [58.7, 68.1] |
-| calibration | 21 × 21 | 5 | High | 116/400 | 281 | 3 | 29.0% [24.8, 33.6] |
-| calibration | 31 × 31 | 5 | Low | 392/400 | 8 | 0 | 98.0% [96.1, 99.0] |
-| calibration | 31 × 31 | 5 | Medium | 282/400 | 114 | 4 | 70.5% [65.8, 74.8] |
-| calibration | 31 × 31 | 5 | High | 157/400 | 236 | 7 | 39.2% [34.6, 44.1] |
-| presets | 33 × 33 | 10 | Low | 53/60 | 7 | 0 | 88.3% [77.8, 94.2] |
-| presets | 33 × 33 | 10 | Medium | 30/60 | 30 | 0 | 50.0% [37.7, 62.3] |
-| presets | 33 × 33 | 10 | High | 9/60 | 51 | 0 | 15.0% [8.1, 26.1] |
-| presets | 63 × 63 | 10 | Low | 57/60 | 3 | 0 | 95.0% [86.3, 98.3] |
-| presets | 63 × 63 | 10 | Medium | 27/60 | 33 | 0 | 45.0% [33.1, 57.5] |
-| presets | 63 × 63 | 10 | High | 10/60 | 49 | 1 | 16.7% [9.3, 28.0] |
-| presets | 101 × 101 | 10 | Low | 60/60 | 0 | 0 | 100.0% [94.0, 100.0] |
-| presets | 101 × 101 | 10 | Medium | 43/60 | 17 | 0 | 71.7% [59.2, 81.5] |
-| presets | 101 × 101 | 10 | High | 13/60 | 47 | 0 | 21.7% [13.1, 33.6] |
-| setup | 21 × 31 | 5 | Medium | 260/400 | 136 | 4 | 65.0% [60.2, 69.5] |
-
-The default setup is width 31, height 21, five monsters, Medium. It escaped in 260/400 games on seeds 401–800. Presets used ten monsters, seeds 1–60 and a 120,000-ms ceiling. A game still running at its ceiling counts as a non-escape. Intervals are two-sided 95% Wilson intervals for the observed fraction within each cell.
-
-Fresh seeds 1201–1400 were run separately. The square maps pooled to 382/400 Low, 278/400 Medium and 144/400 High. The rectangular default held out at 146/200, giving 406/600 across its two disjoint cohorts. Seed sets overlap across profiles or map dimensions, so those rows should not be treated as independent replications of identical conditions.
-
-| Sample | Rows × columns | Monsters | Difficulty | Escaped | Caught | At limit | Escape rate [95% CI] |
-|---|---|---:|---|---:|---:|---:|---|
-| holdout | 21 × 21 | 5 | Low | 186/200 | 14 | 0 | 93.0% [88.6, 95.8] |
-| holdout | 21 × 21 | 5 | Medium | 135/200 | 62 | 3 | 67.5% [60.7, 73.6] |
-| holdout | 21 × 21 | 5 | High | 55/200 | 144 | 1 | 27.5% [21.8, 34.1] |
-| holdout | 31 × 31 | 5 | Low | 196/200 | 3 | 1 | 98.0% [95.0, 99.2] |
-| holdout | 31 × 31 | 5 | Medium | 143/200 | 56 | 1 | 71.5% [64.9, 77.3] |
-| holdout | 31 × 31 | 5 | High | 89/200 | 110 | 1 | 44.5% [37.8, 51.4] |
-| setup-holdout | 21 × 31 | 5 | Medium | 146/200 | 54 | 0 | 73.0% [66.5, 78.7] |
+| calibration | 21 × 21 | 5 | Low | 347/400 | 47 | 6 | 86.8% [83.1%, 89.7%] |
+| calibration | 21 × 21 | 5 | Medium | 226/400 | 169 | 5 | 56.5% [51.6%, 61.3%] |
+| calibration | 21 × 21 | 5 | High | 120/400 | 277 | 3 | 30.0% [25.7%, 34.7%] |
+| calibration | 31 × 31 | 5 | Low | 392/400 | 8 | 0 | 98.0% [96.1%, 99.0%] |
+| calibration | 31 × 31 | 5 | Medium | 300/400 | 93 | 7 | 75.0% [70.5%, 79.0%] |
+| calibration | 31 × 31 | 5 | High | 170/400 | 219 | 11 | 42.5% [37.8%, 47.4%] |
+| presets | 33 × 33 | 10 | Low | 53/60 | 7 | 0 | 88.3% [77.8%, 94.2%] |
+| presets | 33 × 33 | 10 | Medium | 21/60 | 38 | 1 | 35.0% [24.2%, 47.6%] |
+| presets | 33 × 33 | 10 | High | 5/60 | 55 | 0 | 8.3% [3.6%, 18.1%] |
+| presets | 63 × 63 | 10 | Low | 58/60 | 2 | 0 | 96.7% [88.6%, 99.1%] |
+| presets | 63 × 63 | 10 | Medium | 32/60 | 28 | 0 | 53.3% [40.9%, 65.4%] |
+| presets | 63 × 63 | 10 | High | 14/60 | 45 | 1 | 23.3% [14.4%, 35.4%] |
+| presets | 101 × 101 | 10 | Low | 60/60 | 0 | 0 | 100.0% [94.0%, 100.0%] |
+| presets | 101 × 101 | 10 | Medium | 44/60 | 16 | 0 | 73.3% [61.0%, 82.9%] |
+| presets | 101 × 101 | 10 | High | 17/60 | 41 | 2 | 28.3% [18.5%, 40.8%] |
+| setup | 21 × 31 | 5 | Medium | 239/400 | 154 | 7 | 59.8% [54.9%, 64.4%] |
+| holdout | 21 × 21 | 5 | Low | 184/200 | 12 | 4 | 92.0% [87.4%, 95.0%] |
+| holdout | 21 × 21 | 5 | Medium | 121/200 | 72 | 7 | 60.5% [53.6%, 67.0%] |
+| holdout | 21 × 21 | 5 | High | 66/200 | 131 | 3 | 33.0% [26.9%, 39.8%] |
+| holdout | 31 × 31 | 5 | Low | 189/200 | 10 | 1 | 94.5% [90.4%, 96.9%] |
+| holdout | 31 × 31 | 5 | Medium | 130/200 | 63 | 7 | 65.0% [58.2%, 71.3%] |
+| holdout | 31 × 31 | 5 | High | 92/200 | 101 | 7 | 46.0% [39.2%, 52.9%] |
+| setup-holdout | 21 × 31 | 5 | Medium | 139/200 | 58 | 3 | 69.5% [62.8%, 75.5%] |
 
 Every game has an outcome, seed, simulated duration and step count. [Per-game CSV](artifacts/results/calibration-runs.csv) · [Summary and intervals](artifacts/results/calibration.json)
 
@@ -326,7 +327,7 @@ stateDiagram-v2
 
 Generation runs on a worker that owns its captured configuration and creates only the CPU-side Maze. The loading screen is presented before that work starts. Once the future is ready, the main thread constructs the OpenGL renderer and installs both objects. Every GL object must be created and destroyed while its context remains current. A future designer change that loads GPU assets on the generation worker would violate the present threading model unless a deliberate shared-context strategy were added.
 
-The embedded bitmap font stores seven five-bit rows per glyph. Most labels uppercase their input. The version passes a case-preserving option and supplies the lowercase `a` glyph for V5.4.3a. An unsupported character renders as a question mark. Advance is six pixels times scale and text positions are manually chosen. Test new labels at narrow and high-DPI sizes and keep them clear of the HUD controls.
+The embedded bitmap font stores seven five-bit rows per glyph. Most labels uppercase their input. The version passes a case-preserving option and supplies the lowercase `a` glyph for V5.4.3b. An unsupported character renders as a question mark. Advance is six pixels times scale and text positions are manually chosen. Test new labels at narrow and high-DPI sizes and keep them clear of the HUD controls.
 
 ## 9. Redesign path A: keep the single-file art pipeline
 
@@ -357,7 +358,7 @@ For UI rearrangement, change rectangles in `UiState::widgets` and matching descr
 
 ## 10. Redesign path B: external texture sprites and richer animation
 
-An external sprite sheet would let a designer iterate in an image editor without rewriting C++ strings. This is a **proposed extension**, not a loader already present in V5.4.3a. A concrete initial asset contract could preserve 20×20 logical frames, transparent RGBA backgrounds, a documented foot pivot, and named clips for idle, walk, hunting, and searching. A separate manifest would map the ten stable appearance IDs to sheet regions and frame timings. Larger source art is also possible, but the logical world footprint must be chosen explicitly rather than inferred from image dimensions.
+An external sprite sheet would let a designer iterate in an image editor without rewriting C++ strings. This is a **proposed extension**, not a loader already present in V5.4.3b. A concrete initial asset contract could preserve 20×20 logical frames, transparent RGBA backgrounds, a documented foot pivot, and named clips for idle, walk, hunting, and searching. A separate manifest would map the ten stable appearance IDs to sheet regions and frame timings. Larger source art is also possible, but the logical world footprint must be chosen explicitly rather than inferred from image dimensions.
 
 Engineering work would include image decoding, texture lifetime ownership, UV coordinates in the vertex format, a texture sampler in the shader, atlas rectangles, and an asset-location policy. Nearest-neighbor sampling would preserve crisp pixel edges. Atlas gutters and careful UV boundaries would avoid neighboring-frame bleed. Transparent texels could be discarded for hard-edged pixel art while retaining depth writes; translucent effects would require an intentional blend/depth-order policy. Color-space handling should be consistent across images and vertex colors rather than relying on incidental driver defaults.
 

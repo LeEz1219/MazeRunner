@@ -1,6 +1,6 @@
 {
-  "recorded_utc": "2026-11-19T02:39:02.411435+00:00",
-  "release": "5.4.3a",
+  "recorded_utc": "2026-11-19T04:44:47.323637+00:00",
+  "release": "5.4.3b",
   "status": "passed",
   "checks": {
     "source_matches_line_guide": true,
@@ -9,6 +9,7 @@
     "cmake_file_included": true,
     "raw_validation_passed": true,
     "cmake_configure_build_ctest_passed": true,
+    "cmake_built_release_target": true,
     "raw_calibration_matches_all_groups_and_seeds": true,
     "director_evidence": true,
     "smoke_matrix_complete": true,
@@ -26,7 +27,7 @@
     "result.png"
   ],
   "review_notes": [
-    "Release captures show the V5.4.3a label, the seed-7 relief HUD with RADIO 3 and 21x25 area, the generated exit route and the zero-monster result.",
+    "The release HUD fixture uses seed 8 during withdrawal. The result fixture records a zero-monster escape.",
     "Native GLFW desktop startup and macOS/Windows builds were not executed.",
     "Portable/regression assertion counters are cumulative, not independent simulation totals."
   ]
