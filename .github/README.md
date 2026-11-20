@@ -14,6 +14,8 @@ When Backstage begins, the lead chooses a leg whose every step increases corrido
 
 A searching investigator ranks fresh junction arms by corridor direction toward its clue, straight-line reach and the learned alcove preference. A glance has its own short memory. On Low and Medium it changes what the monster checks next without revealing hidden cells. The solver now simulates those turns and retreat continuations on copies of the pack.
 
+The learned junction ambush now considers every eligible listener’s own clue. The nearest qualifying junction wins, with a deterministic cell-ID tie break, and a Cutter still has to reach it in time.
+
 On the default Medium maze, seed 26 shows relief at 4.000 s, withdrawal at 21.800 s and escape at 30.800 s. [Encounter trace](../artifacts/results/director-relief.log) · [Dedicated wiki](https://github.com/LeEz1219/MazeRunner/wiki)
 
 ## Build and play

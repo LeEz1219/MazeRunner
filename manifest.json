@@ -59,8 +59,8 @@
     },
     {
       "path": ".github/README.md",
-      "bytes": 6862,
-      "sha256": "5d6c2e48ef8a3a2bb4f76865966f172cb00e4e91f2bbbdb4b2fd47ae0d6c8cbd"
+      "bytes": 7065,
+      "sha256": "167e40aebbe8b1ff75c5fb221e9f0af23a0553424b78be2fe7bc030fa06e4b1a"
     },
     {
       "path": ".github/workflows/validate.yml",
@@ -74,13 +74,13 @@
     },
     {
       "path": "01-SourceCode-Deepdive-and- Explanation.md",
-      "bytes": 63368,
-      "sha256": "af2e4a3e81d7d6a8adc971908fc5331fc7693cfa9ad6ee861ac88fad46e77b73"
+      "bytes": 63637,
+      "sha256": "d5ad7f7c23a109a14023ed5dce1fd1ab38ad99d664e3fdc2d3498b8a0cc75241"
     },
     {
       "path": "02-AI-Design-Deepdive.md",
-      "bytes": 52083,
-      "sha256": "955bd5710564a5bcb69742bac84445cbe3e4c511cb5d057a5a782c325de95166"
+      "bytes": 53685,
+      "sha256": "259222b5501a93edd480d7c8b9a476d1c23f0044f9b4956657ed7c61541fb0b0"
     },
     {
       "path": "03-Graphics-Design.md",
@@ -180,7 +180,7 @@
     {
       "path": "artifacts/results/documentation-audit.json",
       "bytes": 1406,
-      "sha256": "3f4856c9d8b0e10acaaed11bcafd7f85b252fbfd256fde35753e1a55bb38ded5"
+      "sha256": "97b868ad7794014e5f514a30e17133fd5393644a896f4551fbb0f097868cad2a"
     },
     {
       "path": "artifacts/results/documentation-coverage.json",
