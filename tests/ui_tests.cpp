@@ -82,7 +82,7 @@ int main(){try{
     test_charge_reach_bound();test_sector_circuit_evidence();test_stalker_replay();
     std::cout<<"PASS: menace hysteresis, physical withdrawal, pack jobs, suspicion scans, observed habits and deterministic replay.\n";
     std::cout<<"PASS: director radio delivery, privacy, expiry, retasking, interceptor release and complete relief cycle.\n";
-    std::cout<<"PASS: V5.4.3c charge arrival bound, local alcove inspections, continuous terrain circuits and pack evidence.\n";
+    std::cout<<"PASS: V5.4.4 charge arrival bound, local alcove inspections, continuous terrain circuits and pack evidence.\n";
     test_setup_inputs();test_pointer_and_keyboard_focus();test_screen_transitions();
     std::cout<<"PASS: setup validation, all controls, text input, bounds, DPI hit testing, keyboard navigation, and screen transitions.\n";
 }catch(const std::exception& e){std::cerr<<e.what()<<'\n';return 1;}}

@@ -1,5 +1,5 @@
-// Build: g++ -std=c++17 -O2 -DNDEBUG mazerunnerV5.4.3c.cpp -o mazerunnerV5.4.3c -lglfw -lGLEW -lGL -pthread
-// Headless: g++ -std=c++17 -O2 -DNDEBUG -DMAZERUNNER_HEADLESS mazerunnerV5.4.3c.cpp -o mazerunnerV5.4.3c-headless -pthread
+// Build: g++ -std=c++17 -O2 -DNDEBUG mazerunnerV5.4.4.cpp -o mazerunnerV5.4.4 -lglfw -lGLEW -lGL -pthread
+// Headless: g++ -std=c++17 -O2 -DNDEBUG -DMAZERUNNER_HEADLESS mazerunnerV5.4.4.cpp -o mazerunnerV5.4.4-headless -pthread
 
 #ifndef MAZERUNNER_HEADLESS
 #include <GL/glew.h>
@@ -32,7 +32,7 @@
 // One version string for logs, the window title, the setup screen, and --help.
 // CMake supplies the release label. Standalone builds use the same default.
 #ifndef MAZERUNNER_VERSION
-#define MAZERUNNER_VERSION "5.4.3c"
+#define MAZERUNNER_VERSION "5.4.4"
 #endif
 #define MAZERUNNER_TITLE "Maze Runner V" MAZERUNNER_VERSION
 
@@ -194,11 +194,15 @@ struct Monster {
     std::deque<int> recent_cells;
     PackDuty duty = PackDuty::Roam;
     int withdrawal_goal = -1, last_junction = -1, return_junction = -1;
+    std::vector<int> retreat_route;  // Next step at the back; shared with forecasts by value.
+    int pressure_ticks = 0;  // Consecutive director ticks of close, nonvisual hunting.
     int departure_steps = 0, scanned_junction = -1, gaze = -1;
     Millis scan_until = 0, clue_at = 0, last_seen_at = -NEVER;
     int last_seen = -1;
     struct Inspection { int cell; Millis at; };
     std::vector<Inspection> inspected;
+    struct Look { int junction = -1, arm = -1; Millis at = -NEVER; };
+    std::array<Look, 4> recent_looks{};  // Turning toward an arm does not clear its cells.
     // Only delivered footstep sectors and this monster's own contact losses feed habits.
     // A failed local search can credit only the audible clue it actually inspected.
     std::uint64_t lost_clue_revision = 0;
@@ -224,7 +228,8 @@ struct DirectorState {
     std::uint64_t reports = 0;
     int hint_padding = 0, relief_anchor = -1, relief_exit_distance = INF_DISTANCE;
     int menace = 0;
-    bool backstage = false, withdrawal_pending = false;
+    bool backstage = false;
+    int withdrawal_orders = 0;  // One primary and, if pressure persists, one support hunter.
     Millis quiet_until = 0;
     int withdrawal_episodes = 0, withdrawal_steps = 0, junction_scans = 0;
     // Clue IDs deduplicate asynchronous searches even when they finish out of order.
@@ -717,6 +722,7 @@ private:
     std::vector<std::uint32_t> sweep_stamp;
     std::uint32_t sweep_epoch = 0;
     std::vector<int> sweep_cells;
+    std::vector<int> retreat_parent;  // Scratch for one bounded outward route at a time.
     std::deque<std::pair<int, std::shared_ptr<const std::vector<int>>>> fields;
     std::shared_ptr<const std::vector<int>> exit_distances;
     std::vector<int> beam_index;
@@ -1089,6 +1095,10 @@ private:
     /// Change jobs once. A first-hand sighting and an assigned cutter keep their target.
     void set_duty(Monster& m, PackDuty duty) {
         if (m.duty == duty) return;
+        if (m.duty == PackDuty::Withdraw) {
+            m.retreat_route.clear();
+            m.withdrawal_goal = -1;
+        }
         m.duty = duty;
         if (duty == PackDuty::Withdraw) m.lost_clue_revision = 0;
         m.return_junction = -1;
@@ -1232,27 +1242,28 @@ private:
             }
         if (from < 0) return;
         auto chokepoints = exit_chokepoints(from, latest_hint);
-        // A listener that repeatedly heard returns can also cover a junction in its clue.
-        for (std::size_t i : listeners) {
-            const auto& m = monsters[i];
-            if (!director.lessons[JunctionAmbush] || m.sighted) continue;
-            int junction = -1, nearest = INF_DISTANCE;
-            auto distances = local_field(m.cell);
-            for (int r = m.hint.min_row; r <= m.hint.max_row; ++r)
-                for (int c = m.hint.min_col; c <= m.hint.max_col; ++c) {
-                    int v = id({r,c});
-                    if (degrees[v] >= 3 && !dead_end_depth[v] && distances->at(v) < nearest) {
-                        nearest = distances->at(v); junction = v;
-                    }
+        // Every eligible listener can nominate a junction. A cell-ID tie break keeps
+        // the nomination independent of spawn order. The allocator still checks arrival time.
+        if (director.lessons[JunctionAmbush]) {
+            int junction = -1, nearest = 5;
+            for (std::size_t i : listeners) {
+                const auto& m = monsters[i];
+                if (m.sighted || m.duty == PackDuty::Withdraw || !m.hint.revision) continue;
+                auto distances = local_field(m.cell, 4);
+                for (int v : distances->queue) {
+                    const int d = distances->at(v);
+                    if (d > nearest) break;  // BFS visits cells by increasing distance.
+                    if (degrees[v] < 3 || dead_end_depth[v] || !m.hint.contains(point(v))) continue;
+                    if (d < nearest || v < junction) { nearest = d; junction = v; }
                 }
-            if (junction >= 0 && nearest <= 4) chokepoints.insert(chokepoints.begin(), {junction, 8});
-            break;
+            }
+            if (junction >= 0) chokepoints.insert(chokepoints.begin(), {junction, 8});
         }
         std::vector<std::size_t> pool;
         std::vector<int> reserved_chokes;
         for (std::size_t i = 0; i < monsters.size(); ++i) {
             const Monster& m = monsters[i];
-            if (m.sighted || m.state != MonsterState::Hunting) continue;
+            if (m.sighted || m.duty == PackDuty::Withdraw || m.state != MonsterState::Hunting) continue;
             if (std::find(listeners.begin(), listeners.end(), i) != listeners.end()) {
                 pool.push_back(i);
             } else if (m.role == MonsterRole::Cutter) {
@@ -1323,28 +1334,66 @@ private:
                   " | Interceptors released: " + std::to_string(released));
     }
 
-    /// Retreat along real corridors to a reachable region farther from the last evidence.
-    int withdrawal_target(const Monster& m) {
-        int anchor = clue_anchor(m.hint);
-        if (anchor < 0) anchor = m.cell;
-        auto from_clue = local_field(anchor, 48);
-        auto from_self = local_field(m.cell, WITHDRAW_DISTANCE);
-        int best = m.cell, score = -INF_DISTANCE;
-        for (int v : from_self->queue) {
-            if (v == m.cell || v == exit_cell) continue;
-            int rank = 4 * from_clue->at(v) + from_self->at(v) - (dead_end_depth[v] ? 2 : 0);
-            if (rank > score) { score = rank; best = v; }
+    /// Choose the threat location from the withdrawing monster's own evidence.
+    int retreat_anchor(const Monster& m) const {
+        if (walkable(m.last_seen) && (!m.hint.revision || m.last_seen_at >= m.clue_at)) return m.last_seen;
+        return clue_anchor(m.hint);
+    }
+
+    /// Only follow paths on which every step increases corridor separation from the
+    /// evidence. Keep the actual path so two withdrawals can take different passages.
+    void plan_retreat(Monster& m, int anchor, const std::vector<Monster>& pack,
+                      const std::vector<int>& reserved, bool primary_leg = false) {
+        m.retreat_route.clear();
+        m.target = m.withdrawal_goal = m.cell;
+        if (!walkable(anchor)) return;
+        auto from_clue = distance_field(anchor);
+        const int start = (*from_clue)[m.cell];
+        if (start == INF_DISTANCE) return;
+
+        std::vector<int> unavailable = reserved;
+        for (const auto& other : pack) if (other.id != m.id) {
+            unavailable.push_back(other.cell);
+            if (other.duty == PackDuty::Withdraw)
+                unavailable.insert(unavailable.end(), other.retreat_route.begin(), other.retreat_route.end());
         }
-        return best;
+        if (retreat_parent.size() != grid.size()) retreat_parent.assign(grid.size(), -1);
+        std::vector<int> reached{m.cell};
+        retreat_parent[m.cell] = m.cell;
+        int best = m.cell;
+        std::pair<int, int> best_rank{0, 0};
+        for (std::size_t i = 0; i < reached.size(); ++i) {
+            const int u = reached[i], depth = (*from_clue)[u] - start;
+            if (depth == WITHDRAW_DISTANCE) continue;
+            for (int v : adjacency[u]) {
+                if (v < 0 || v == exit_cell || retreat_parent[v] >= 0 ||
+                    (*from_clue)[v] != (*from_clue)[u] + 1 || is_reserved(unavailable, v)) continue;
+                retreat_parent[v] = u;
+                reached.push_back(v);
+                // Maximize separation first. On the lead's opening leg prefer open
+                // corridors. On following legs, break ties away from the escape route.
+                const int length = depth + 1;
+                const int detour = length + (*exit_distances)[v] - (*exit_distances)[m.cell];
+                const int lane = (primary_leg ? 0 : detour) - (dead_end_depth[v] ? 2 : 0);
+                const std::pair<int, int> rank{length, lane};
+                if (rank > best_rank) { best = v; best_rank = rank; }
+            }
+        }
+        for (int v = best; v != m.cell; v = retreat_parent[v]) m.retreat_route.push_back(v);
+        for (int v : reached) retreat_parent[v] = -1;
+        m.target = m.withdrawal_goal = best;  // With no safe outward edge, hold here.
     }
 
     /// Measure proximity to known clues. A close pass contributes only on separation.
     void pace_encounter() {
         int peak = 0, nearby = 0, separation = 0;
         bool visible_contact = false;
+        bool retreat_active = false;
+        const bool choosing_support = director.backstage && director.withdrawal_orders == 1;
         Monster* candidate = nullptr;
         int best = -1;
         for (auto& m : monsters) {
+            if (m.duty == PackDuty::Withdraw) retreat_active = true;
             bool visual = m.sighted && sees_player(m);
             int pressure = 0;
             if (visual) { pressure = 16; visible_contact = true; }
@@ -1358,14 +1407,19 @@ private:
             m.close_last_tick = close;
             peak = std::max(peak, pressure);
             nearby += pressure >= 8;
+            m.pressure_ticks = !visual && pressure >= 8 ? std::min(2, m.pressure_ticks + 1) : 0;
             if (visual || m.duty == PackDuty::Withdraw || m.state == MonsterState::Patrolling) continue;
+            if (choosing_support && m.pressure_ticks < 2) continue;
+            // Keep the lead as the first choice. On later ticks only a second
+            // hunter that has sustained pressure can qualify for a supporting retreat.
             int priority = pressure + (m.duty == PackDuty::Investigate ? 24 : 0);
             if (priority > best) { best = priority; candidate = &m; }
         }
         int gain = peak + (nearby > 1 ? 2 : 0) + separation + (director.hint_padding && peak ? 2 : 0);
         director.menace = std::clamp(director.menace + gain - (director.backstage ? 19 : 5), 0, 100);
         if (!director.backstage && director.menace >= MENACE_HIGH) {
-            director.backstage = director.withdrawal_pending = true;
+            director.backstage = true;
+            director.withdrawal_orders = 0;
             ++director.withdrawal_episodes;
             director.quiet_until = now + WITHDRAW_HOLD_MS;
             log_event("Director: BACKSTAGE starts | Menace " + std::to_string(director.menace));
@@ -1375,21 +1429,19 @@ private:
             }
         }
         if (!director.backstage) return;
-        if (director.withdrawal_pending && candidate) {
+        const bool quiet = now >= director.quiet_until && director.menace <= MENACE_LOW;
+        if (candidate && (director.withdrawal_orders == 0 || (choosing_support && retreat_active && !quiet))) {
             auto& m = *candidate;
-            m.sighted = false; m.withdrawal_goal = withdrawal_target(m);
+            m.sighted = false;
             set_duty(m, PackDuty::Withdraw);
-            m.target = m.withdrawal_goal;
-            director.withdrawal_pending = false;
+            plan_retreat(m, retreat_anchor(m), monsters, {}, director.withdrawal_orders == 0);
+            ++director.withdrawal_orders;
             log_event(monster_name(m) + ": WITHDRAWING to " + cell_label(m.target));
             coordinate_pack();
         }
-        if (now < director.quiet_until || director.menace > MENACE_LOW ||
-            (director.withdrawal_pending && visible_contact)) return;
-        director.backstage = director.withdrawal_pending = false;
-        for (auto& m : monsters) if (m.duty == PackDuty::Withdraw) {
-            m.withdrawal_goal = -1; set_duty(m, PackDuty::Roam);
-        }
+        if (!quiet || (director.withdrawal_orders == 0 && visible_contact)) return;
+        director.backstage = false;
+        for (auto& m : monsters) if (m.duty == PackDuty::Withdraw) set_duty(m, PackDuty::Roam);
         coordinate_pack();
         log_event("Director: BACKSTAGE ends | Menace " + std::to_string(director.menace));
     }
@@ -1523,6 +1575,7 @@ private:
                 }
                 m.last_seen = -1; m.last_seen_at = -NEVER;
                 m.inspected.clear();
+                m.recent_looks = {};
                 m.state = MonsterState::Patrolling; m.search_until = NEVER;
                 m.hint = {}; m.target = -1; m.blocked_turns = 0; m.planned_revision = 0; m.next_replan = now;
                 log_event(monster_name(m) + ": Search found nothing, switching SEARCHING -> ROAMING.");
@@ -1611,7 +1664,8 @@ public:
                     log_event(monster_name(m) + ": SPOTTED the player down a corridor; charging.");
                 if (m.state != MonsterState::Hunting) { m.state = MonsterState::Hunting; m.search_until = NEVER; }
                 m.sighted = true; m.role = MonsterRole::Chaser; m.role_until = NEVER;
-                m.duty = PackDuty::Roam; m.withdrawal_goal = m.return_junction = -1;
+                set_duty(m, PackDuty::Roam);
+                m.return_junction = -1;
                 m.last_seen = player; m.last_seen_at = now;
                 m.scan_until = 0;
                 m.scent_until = std::max(m.scent_until == NEVER ? Millis(0) : m.scent_until, now + settings.scent_ms);
@@ -1620,9 +1674,9 @@ public:
             m.next_move = now + move_period(m);
             if (scan_junction(m, now, true)) { ++director.junction_scans; continue; }
             // Movement hints survive across frames until this particular monster acts.
-            if (m.target < 0 || m.planned_revision != m.hint.revision ||
-                now >= m.next_replan || m.blocked_turns >= 2 ||
-                m.cell == m.target) {
+            const bool needs_target = m.target < 0 || m.planned_revision != m.hint.revision ||
+                                      now >= m.next_replan || m.blocked_turns >= 2 || m.cell == m.target;
+            if (m.duty != PackDuty::Withdraw && needs_target) {
                 int previous_target = m.target;
                 m.target = choose_target(m);
                 m.planned_revision = m.hint.revision;
@@ -1635,7 +1689,7 @@ public:
                                m.state == MonsterState::Searching ? "SEARCHING area target " : "ROAMING waypoint ") +
                               cell_label(m.target) + " | From " + cell_label(m.cell));
             }
-            int next = choose_monster_step(m, reserved);
+            int next = choose_monster_step(m, monsters, reserved);
             if (next != m.cell) {
                 if (verbose_logs)
                     log_event(monster_name(m) + ": " + cell_label(m.cell) + " -> " + cell_label(next));
@@ -1644,7 +1698,7 @@ public:
                 if (m.duty == PackDuty::Withdraw) ++director.withdrawal_steps;
                 m.scanned_junction = -1;
                 if (degrees[next] >= 3) m.last_junction = next;
-                if (m.state == MonsterState::Searching) inspect_cell(m, next);
+                if (m.state == MonsterState::Searching) inspect_cell(m, next, now);
                 if (m.return_junction >= 0) {
                     if (m.departure_steps > 0 && --m.departure_steps == 0) { m.target = -1; m.next_replan = now; }
                     else if (!m.departure_steps && next == m.return_junction) m.return_junction = -1;
@@ -1832,7 +1886,7 @@ private:
         return Sight::Charge;
     }
 
-    void inspect_cell(Monster& m, int cell) const {
+    void inspect_cell(Monster& m, int cell, Millis at) const {
         if (m.lost_clue_revision && m.lost_clue_revision == m.hint.revision &&
             m.duty == PackDuty::Investigate && degrees[cell] == 1 && dead_end_depth[cell] > 0 &&
             m.hint.contains(point(cell))) m.inspected_alcove = true;
@@ -1840,7 +1894,7 @@ private:
                                  [cell](const auto& step) { return step.cell == cell; });
         if (seen != m.inspected.end()) m.inspected.erase(seen);
         if (m.inspected.size() >= 40) m.inspected.erase(m.inspected.begin());
-        m.inspected.push_back({cell, now});
+        m.inspected.push_back({cell, at});
     }
 
     static bool recently_inspected(const Monster& m, int v, Millis at) {
@@ -1849,32 +1903,50 @@ private:
         return false;
     }
 
-    /// A lead searcher looks down an unchecked arm once per junction arrival.
-    /// Forecast copies take the same pause without inspecting cells in the real world.
-    bool scan_junction(Monster& m, Millis at, bool record) const {
+    /// Rank fresh arms by the corridor route to the clue and how far each arm
+    /// opens. A glance is remembered separately from a physical or visual inspection.
+    bool scan_junction(Monster& m, Millis at, bool live) {
         if (m.state != MonsterState::Searching || m.duty != PackDuty::Investigate ||
             m.role == MonsterRole::Cutter || degrees[m.cell] < 3 || m.scanned_junction == m.cell) return false;
         if (!m.hint.contains(point(m.cell)) &&
             (!walkable(m.last_seen) || manhattan(m.cell, m.last_seen) > SWEEP_SPREAD)) return false;
-        int direction = -1;
-        for (int d = 0; d < 4; ++d) {
-            int v = adjacency[m.cell][d];
-            if (v >= 0 && std::find(m.recent_cells.begin(), m.recent_cells.end(), v) == m.recent_cells.end() &&
-                !recently_inspected(m, v, at)) { direction = d; break; }
+        int focus = m.target;
+        if (walkable(m.last_seen) && m.last_seen_at >= m.clue_at) focus = m.last_seen;
+        else if (!walkable(focus) || focus == m.cell) focus = clue_anchor(m.hint);
+        constexpr int look_radius = 6, focus_radius = 2 * look_radius;
+        std::shared_ptr<const LocalField> toward;
+        if (walkable(focus) && manhattan(focus, m.cell) <= focus_radius)
+            toward = local_field(focus, focus_radius);
+        int direction = -1, best_score = -1;
+        for (int arm = 0; arm < 4; ++arm) {
+            const int d = (m.id + m.cell + arm) % 4;  // Distribute exact ties reproducibly.
+            const int v = adjacency[m.cell][d];
+            if (v < 0 || recently_inspected(m, v, at) ||
+                std::find(m.recent_cells.begin(), m.recent_cells.end(), v) != m.recent_cells.end()) continue;
+            bool already_looked = std::any_of(m.recent_looks.begin(), m.recent_looks.end(), [&](const auto& look) {
+                return look.junction == m.cell && look.arm == d && at - look.at < INSPECTION_MEMORY_MS;
+            });
+            if (already_looked) continue;
+            int reach = 1, tip = v;
+            while (reach < look_radius && adjacency[tip][d] >= 0) { tip = adjacency[tip][d]; ++reach; }
+            int score = 2 * reach;
+            if (toward && toward->at(v) < toward->at(m.cell)) score += 12;
+            if (director.lessons[AlcoveSweep] && dead_end_depth[v] > 0) score += 8;
+            if (score > best_score) { best_score = score; direction = d; }
         }
         m.scanned_junction = m.last_junction = m.cell;
         if (direction < 0) return false;
         m.gaze = direction; m.scan_until = at + move_period(m);
-        if (record) {
-            inspect_cell(m, m.cell);
-            int v = m.cell;
-            for (int steps = 1; steps <= settings.sight_cells; ++steps) {
-                v = adjacency[v][direction];
-                if (v < 0) break;
-                if (steps >= SIGHT_MIN_CELLS) inspect_cell(m, v);
-            }
-            if (verbose_logs) log_event(monster_name(m) + ": SCANNING at " + cell_label(m.cell));
+        std::rotate(m.recent_looks.begin(), m.recent_looks.begin() + 1, m.recent_looks.end());
+        m.recent_looks.back() = {m.cell, direction, at};
+        inspect_cell(m, m.cell, at);
+        int v = m.cell;
+        for (int steps = 1; steps <= settings.sight_cells; ++steps) {
+            v = adjacency[v][direction];
+            if (v < 0) break;
+            if (steps >= SIGHT_MIN_CELLS) inspect_cell(m, v, at);
         }
+        if (live && verbose_logs) log_event(monster_name(m) + ": SCANNING at " + cell_label(m.cell));
         return true;
     }
 
@@ -1921,13 +1993,12 @@ private:
         return best;
     }
 
-    /// Resolve firsthand sight, withdrawal, interception, sweep and patrol intentions.
+    /// Resolve firsthand sight, interception, sweep and patrol intentions.
     /// Only a firsthand sighting supplies an exact player cell. Keep a usable goal
     /// until arrival so a stream of similar movement reports does not cause jitter.
     /// Roaming prefers regions no monster has covered recently and avoids crowding.
     int choose_target(const Monster& m) {
         if (m.sighted && walkable(m.target) && m.target != m.cell) return m.target;
-        if (m.duty == PackDuty::Withdraw && walkable(m.withdrawal_goal)) return m.withdrawal_goal;
         if (m.role == MonsterRole::Cutter && walkable(m.target)) return m.target;
         if (m.return_junction >= 0 && !m.departure_steps) return m.return_junction;
         if (m.return_junction >= 0 && (!walkable(m.target) || m.cell == m.target)) {
@@ -2014,7 +2085,27 @@ private:
 
     /// Follow a shared reverse-distance field while respecting reserved cells.
     /// If blocked, allow a temporary side/back step to make room at bottlenecks.
-    int choose_monster_step(const Monster& m, const std::vector<int>& reserved) {
+    int choose_monster_step(Monster& m, const std::vector<Monster>& pack, const std::vector<int>& reserved) {
+        if (m.duty == PackDuty::Withdraw) {
+            const int anchor = retreat_anchor(m);
+            // A newly heard clue or a blocked first step can invalidate a committed
+            // path. Roll on at arrival only if there is a fresh legal outward step.
+            bool replan = m.retreat_route.empty();
+            if (!replan) {
+                const int next = m.retreat_route.back();
+                replan = is_reserved(reserved, next);
+                if (!replan && walkable(anchor)) {
+                    auto distances = distance_field(anchor);
+                    replan = (*distances)[next] <= (*distances)[m.cell];
+                }
+            }
+            if (replan) plan_retreat(m, anchor, pack, reserved);
+            m.target = m.withdrawal_goal;
+            if (m.retreat_route.empty()) return m.cell;
+            const int next = m.retreat_route.back();
+            m.retreat_route.pop_back();
+            return next;
+        }
         if (!walkable(m.target) || m.cell == m.target) return m.cell;
         auto distance = distance_field(m.target);
         int best = m.cell;
@@ -2071,14 +2162,18 @@ public:
                     const Sight sight = sight_check(m, event);
                     if (sight == Sight::Noticing) { m.next_move += move_period(m); continue; }
                     const bool visual = sight == Sight::Charge;
-                    if (visual) { m.target = player; m.state = MonsterState::Hunting; m.sighted = true; m.duty = PackDuty::Roam; }
+                    if (visual) {
+                        m.target = player; m.state = MonsterState::Hunting; m.sighted = true;
+                        set_duty(m, PackDuty::Roam);
+                    }
                     m.next_move += move_period(m);  // Live play commits this deadline before crossing a corner.
                     if (!visual && scan_junction(m, event, false)) continue;
-                    int next = choose_monster_step(m, reserved);
+                    int next = choose_monster_step(m, predicted, reserved);
                     if (next != m.cell) {
                         remember(m.recent_cells, m.cell, 12);
                         m.cell = next; reserved.push_back(next); m.blocked_turns = 0;
                         m.scanned_junction = -1;
+                        if (m.state == MonsterState::Searching) inspect_cell(m, next, event);
                         if (m.sighted && m.cell == m.target) { if (sees_player(m)) m.target = player; else m.sighted = false; }
                     } else if (m.cell != m.target) ++m.blocked_turns;
                 }
@@ -3799,7 +3894,7 @@ int main(int argc, char** argv) {
                       << "Interactive play opens graphical setup; --difficulty preselects a card. No terminal input is required.\n"
                       << "Simulation defaults to Medium. Low offers more routes and earlier relief; High increases pursuit pressure.\n"
                       << "State logs are enabled by default; --verbose also logs every monster step.\n"
-                      << "Stalker AI: one lead investigates, the pack covers the perimeter, and high menace triggers withdrawal.\n"
+                      << "Stalker AI: one lead investigates. During Backstage a second hunter can withdraw if close pressure persists.\n"
                       << "RELIEF widens searches, spaces out reports, and releases interceptors while the solver is confined.\n"
                       << "Mouse/Tab/Enter: setup. WASD/arrows (hold to keep walking): move. G: auto-solve. Esc: pause. Q: quit. Wheel/+/-: zoom. Home: fit.\n";
             return 0;
