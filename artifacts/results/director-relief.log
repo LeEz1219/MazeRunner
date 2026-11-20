@@ -5,7 +5,7 @@
 [0.000s] Monster 4 spawned at (11,23) | ROAMING
 [0.000s] Monster 5 spawned at (11,25) | ROAMING
 [0.000s] Player spawned at (1,0) | Exit (19,30)
-Maze Runner V5.4.3c | Difficulty: Medium | seed=26 | 21x31 | Monsters: 5
+Maze Runner V5.4.4 | Difficulty: Medium | seed=26 | 21x31 | Monsters: 5
 Monster interval: 148 ms | Player interval: 40 ms | Scent timeout: 560 ms | Search sweep: 2500 ms
 Normal hint: up to 5x5 | Moving updates: every successful move | Hearing radius: 22 corridor steps | Interceptors: 1 | Corridor sight: off
 Director radio: first successful step, then every 5000 ms near the entrance, 1800 ms from 50% of the route, on a successful step | Normal radio area: 17x17 | Remote monsters investigate without gaining scent.
@@ -642,7 +642,6 @@ Monsters wait for the first move or auto-solve | Director confinement: 4000 ms |
 [22.000s] Player stopped moving for 560 ms | Scent fading.
 [22.000s] Monster 3: Lost the scent, switching HUNTING -> SEARCHING the last clue area.
 [22.000s] Director: RELIEF increased; confinement persists | Radio area: 21x31 | Retasked: 2 | Interceptors released: 0
-[22.028s] Monster 3 | SEARCHING area target (12,3) | From (15,7)
 [22.032s] Monster 1 | SEARCHING area target (2,5) | From (4,13)
 [22.168s] Monster 2 | SEARCHING area target (18,8) | From (19,6)
 [22.200s] Auto-solve: DETOUR committed toward (12,5) | 6 steps | Rechecking safety every action.
@@ -1000,4 +999,4 @@ Monsters wait for the first move or auto-solve | Director confinement: 4000 ms |
 [30.800s] Movement hint #101 | Local footstep area: rows 15-19, cols 26-30 | Heard by 1 of 5
 [30.800s] Player REACHED THE EXIT at (19,30)
 [30.800s] Player (19,30) | Manual steps: 0 | Auto steps: 330 | Time: 30.80 s | Auto-solve: OFF | Difficulty: Medium | Director: NORMAL | Menace: 7 | Radio reports: 7 | Radio area: 17x17 | Hint width: 5 | Hunting: 1 | Searching: 4
-Maze Runner V5.4.3c | difficulty=Medium | seed=26 | 21x31 | monsters=5 | ESCAPED | simulation_ms=30800 | auto_steps=330 | withdrawals=1 | withdrawal_steps=9 | junction_scans=4 | compute_ms=29.97
+Maze Runner V5.4.4 | difficulty=Medium | seed=26 | 21x31 | monsters=5 | ESCAPED | simulation_ms=30800 | auto_steps=330 | withdrawals=1 | withdrawal_steps=9 | junction_scans=4 | compute_ms=26.12

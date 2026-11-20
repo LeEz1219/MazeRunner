@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 """Verify the committed package (release, payload hashes, function guide, links, screenshots) before rerunning tests or editing files."""
 from pathlib import Path
+from urllib.parse import unquote
 import hashlib, json, re, struct, sys
 ROOT = Path(__file__).resolve().parents[1]
-EXPECTED_RELEASE = '5.4.3c'
-DOCUMENTS = ['01-Source-Code-Explanation.md','02-AI-Graphics-and-Redesign.md','03-Build-Test-and-Reproduce.md']
+EXPECTED_RELEASE = '5.4.4'
+DOCUMENTS = ['01-SourceCode-Deepdive-and- Explanation.md', '02-AI-Design-Deepdive.md', '03-Graphics-Design.md', '04-Build-Test-and-Reproduce.md']
 
 def require(condition, message):
     if not condition: raise RuntimeError(message)
@@ -84,7 +85,7 @@ def main():
         require(path.is_file() and hashlib.sha256(path.read_bytes()).hexdigest()==digest,'Checksum mismatch: '+name)
     expected['manifest.json'] = hashlib.sha256((ROOT/'manifest.json').read_bytes()).hexdigest()
     require(ledger == expected, 'Checksum ledger and manifest do not cover the same payload')
-    require(sorted(name for name in approved if '/' not in name and name.endswith('.md'))==DOCUMENTS,'Expected exactly the three documented Markdown files')
+    require(sorted(name for name in approved if '/' not in name and name.endswith('.md'))==DOCUMENTS,'Expected exactly the four documented Markdown files')
     source_path=f'src/mazerunnerV{EXPECTED_RELEASE}.cpp'
     require(manifest['source']['path']==source_path,'Manifest names an unexpected source file')
     source=(ROOT/source_path).read_bytes()
@@ -100,6 +101,7 @@ def main():
         for target in re.findall(r'!?\[[^\]\n]*\]\(([^)\n]+)\)',data):
             if target.startswith(('https://','http://','mailto:')):continue
             path,_,anchor=target.partition('#')
+            path=unquote(path)
             resolved=(ROOT/document).parent.joinpath(path).resolve() if path else ROOT/document
             require(resolved.is_relative_to(ROOT),'Local link escapes the package: '+target)
             require(resolved.exists(),f'Broken local link in {document}: {target}')
@@ -113,7 +115,7 @@ def main():
         require(raw[:8]==b'\x89PNG\r\n\x1a\n','Invalid PNG signature: '+path.name)
         w,h=struct.unpack('>II',raw[16:24])
         require(w>0 and h>0,'Invalid PNG dimensions: '+path.name)
-    print(f'PASS: V{EXPECTED_RELEASE}; {len(manifest["files"])} payload hashes; source matches manifest; {coverage["documented_functions"]} documented functions; three Markdown guides; local links; eighteen PNGs.')
+    print(f'PASS: V{EXPECTED_RELEASE}; {len(manifest["files"])} payload hashes; source matches manifest; {coverage["documented_functions"]} documented functions; four Markdown guides; local links; eighteen PNGs.')
     print('This validates package integrity, not native-platform build or gameplay behavior.')
 
 if __name__=='__main__':

@@ -7,12 +7,11 @@ scripts/verify_package.py checks the tree against the records written here.
 """
 import csv, datetime, hashlib, json, os, pathlib, re, struct, sys
 
-from verify_package import function_coverage, release_paths
+from verify_package import DOCUMENTS, function_coverage, release_paths
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
-RELEASE = '5.4.3c'
+RELEASE = '5.4.4'
 SOURCE = f'src/mazerunnerV{RELEASE}.cpp'
-DOCUMENTS = ['01-Source-Code-Explanation.md', '02-AI-Graphics-and-Redesign.md', '03-Build-Test-and-Reproduce.md']
 RESULTS = ROOT / 'artifacts/results'
 # Files that describe the package rather than belong to it, and generated build output.
 EXCLUDED_DIRS = {'.git', 'build', 'dist'}
@@ -78,7 +77,7 @@ def main():
 
     checks = {
         'source_matches_function_guide': coverage['exact_match'],
-        'exactly_three_markdown_files': sorted(name for name in files if '/' not in name and name.endswith('.md')) == DOCUMENTS,
+        'exactly_four_markdown_files': sorted(name for name in files if '/' not in name and name.endswith('.md')) == DOCUMENTS,
         'eighteen_png_screenshots': sum(pathlib.Path(name).parent.as_posix() == 'artifacts/screenshots' and name.endswith('.png') for name in files) == 18,
         'cmake_file_included': (ROOT / 'CMakeLists.txt').is_file(),
     }
@@ -119,7 +118,7 @@ def main():
     render = (RESULTS / 'render.log').read_text().splitlines()[0] if (RESULTS / 'render.log').is_file() else None
     calibration = json.loads((RESULTS / 'calibration.json').read_text()) if (RESULTS / 'calibration.json').is_file() else {}
     manifest = dict(
-        package=f'MazeRunner V{RELEASE} Documentation and Validation', release=RELEASE, previous_release='5.4.3b',
+        package=f'MazeRunner V{RELEASE} Documentation and Validation', release=RELEASE, previous_release='5.4.3c',
         prepared_date=now[:10],
         source=dict(path=SOURCE, bytes=len(source), physical_lines=len(lines), sha256=coverage['source_sha256']),
         validation=dict(platform=env.get('platform'), compiler=env.get('compiler'), renderer=render,
@@ -131,7 +130,7 @@ def main():
                         ctest_tests=cmake.get('summary', {}).get('tests_total'),
                         calibration_benchmark_performed=bool(calibration),
                         calibration_pooled_escape_rates={k: v['escape_rate'] for k, v in calibration.get('pooled_calibration', {}).items()}),
-        entry_guide='03-Build-Test-and-Reproduce.md',
+        entry_guide=DOCUMENTS[-1],
         excluded_generated_files=['build/', 'dist/', 'artifacts/screenshots/*.ppm'],
         build_system=dict(file='CMakeLists.txt', minimum_cmake='3.20',
                           targets=['mazerunner', 'maze-headless', 'maze-regressions', 'maze-render-tests', 'maze-app-tests'],

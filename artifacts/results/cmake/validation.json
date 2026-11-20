@@ -1,5 +1,5 @@
 {
-  "recorded_utc": "2026-11-19T21:47:28.707657+00:00",
+  "recorded_utc": "2026-11-20T21:41:58.707783+00:00",
   "cmake_configure_build_ctest_status": "passed",
   "scope": "Real CMake configure, Release build with warnings as errors, and CTest run on this Linux host.",
   "summary": {
@@ -67,7 +67,7 @@
       "maze-headless",
       "maze-regressions",
       "maze-render-tests",
-      "mazerunnerV5.4.3c"
+      "mazerunnerV5.4.4"
     ]
   },
   "checks": [
@@ -78,7 +78,7 @@
         "--version"
       ],
       "exit_code": 0,
-      "seconds": 1.014,
+      "seconds": 0.034,
       "status": "passed"
     },
     {
@@ -97,7 +97,7 @@
         "-DMAZERUNNER_BUILD_GRAPHICS=ON"
       ],
       "exit_code": 0,
-      "seconds": 3.291,
+      "seconds": 2.193,
       "status": "passed"
     },
     {
@@ -110,7 +110,7 @@
         "2"
       ],
       "exit_code": 0,
-      "seconds": 20.975,
+      "seconds": 28.372,
       "status": "passed"
     },
     {
@@ -123,7 +123,7 @@
         "--no-tests=error"
       ],
       "exit_code": 0,
-      "seconds": 8.563,
+      "seconds": 4.614,
       "status": "passed"
     }
   ]

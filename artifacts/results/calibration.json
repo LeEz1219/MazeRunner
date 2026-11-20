@@ -1,7 +1,7 @@
 {
-  "recorded_utc": "2026-11-19T21:42:54.059825+00:00",
-  "source": "src/mazerunnerV5.4.3c.cpp",
-  "source_sha256": "6a9004190c02f6bcb7880a01d2cb2a68743bedec0588916beb8b6c1327679a62",
+  "recorded_utc": "2026-11-20T21:23:54.976899+00:00",
+  "source": "src/mazerunnerV5.4.4.cpp",
+  "source_sha256": "f41253d019d30d3080187b7ae6cf06829a9ffa48b4d082a3889a49b475d06a0d",
   "total_games": 4740,
   "raw_file": "calibration-runs.csv",
   "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
@@ -13,31 +13,31 @@
   },
   "pooled_calibration": {
     "low": {
-      "escape_rate": 0.925,
+      "escape_rate": 0.935,
       "escape_rate_95ci": [
-        0.9046,
-        0.9413
+        0.9158,
+        0.9501
       ],
       "games": 800
     },
     "medium": {
-      "escape_rate": 0.6613,
+      "escape_rate": 0.665,
       "escape_rate_95ci": [
-        0.6278,
-        0.6932
+        0.6316,
+        0.6969
       ],
       "games": 800
     },
     "high": {
-      "escape_rate": 0.3387,
+      "escape_rate": 0.3275,
       "escape_rate_95ci": [
-        0.3068,
-        0.3722
+        0.2959,
+        0.3608
       ],
       "games": 800
     }
   },
-  "wall_seconds": 20.8,
+  "wall_seconds": 34.4,
   "results": [
     {
       "cohort": "calibration",
@@ -47,15 +47,15 @@
       "difficulty": "low",
       "seeds": "1-400",
       "games": 400,
-      "escaped": 358,
-      "caught": 36,
-      "timed_out": 6,
-      "escape_rate": 0.895,
+      "escaped": 362,
+      "caught": 30,
+      "timed_out": 8,
+      "escape_rate": 0.905,
       "escape_rate_95ci": [
-        0.8611,
-        0.9214
+        0.8723,
+        0.93
       ],
-      "median_escape_ms": 5500.0
+      "median_escape_ms": 5640.0
     },
     {
       "cohort": "calibration",
@@ -65,15 +65,15 @@
       "difficulty": "medium",
       "seeds": "1-400",
       "games": 400,
-      "escaped": 244,
-      "caught": 146,
-      "timed_out": 10,
-      "escape_rate": 0.61,
+      "escaped": 242,
+      "caught": 144,
+      "timed_out": 14,
+      "escape_rate": 0.605,
       "escape_rate_95ci": [
-        0.5614,
-        0.6565
+        0.5563,
+        0.6517
       ],
-      "median_escape_ms": 12020.0
+      "median_escape_ms": 11660.0
     },
     {
       "cohort": "calibration",
@@ -83,15 +83,15 @@
       "difficulty": "high",
       "seeds": "1-400",
       "games": 400,
-      "escaped": 98,
-      "caught": 298,
-      "timed_out": 4,
-      "escape_rate": 0.245,
+      "escaped": 93,
+      "caught": 305,
+      "timed_out": 2,
+      "escape_rate": 0.2325,
       "escape_rate_95ci": [
-        0.2054,
-        0.2894
+        0.1938,
+        0.2763
       ],
-      "median_escape_ms": 5560.0
+      "median_escape_ms": 5360
     },
     {
       "cohort": "calibration",
@@ -101,15 +101,15 @@
       "difficulty": "low",
       "seeds": "1-400",
       "games": 400,
-      "escaped": 382,
-      "caught": 14,
-      "timed_out": 4,
-      "escape_rate": 0.955,
+      "escaped": 386,
+      "caught": 12,
+      "timed_out": 2,
+      "escape_rate": 0.965,
       "escape_rate_95ci": [
-        0.93,
-        0.9713
+        0.9421,
+        0.979
       ],
-      "median_escape_ms": 4720.0
+      "median_escape_ms": 4760.0
     },
     {
       "cohort": "calibration",
@@ -119,15 +119,15 @@
       "difficulty": "medium",
       "seeds": "1-400",
       "games": 400,
-      "escaped": 285,
-      "caught": 106,
-      "timed_out": 9,
-      "escape_rate": 0.7125,
+      "escaped": 290,
+      "caught": 99,
+      "timed_out": 11,
+      "escape_rate": 0.725,
       "escape_rate_95ci": [
-        0.6663,
-        0.7547
+        0.6793,
+        0.7665
       ],
-      "median_escape_ms": 9280
+      "median_escape_ms": 9740.0
     },
     {
       "cohort": "calibration",
@@ -137,15 +137,15 @@
       "difficulty": "high",
       "seeds": "1-400",
       "games": 400,
-      "escaped": 173,
-      "caught": 221,
-      "timed_out": 6,
-      "escape_rate": 0.4325,
+      "escaped": 169,
+      "caught": 226,
+      "timed_out": 5,
+      "escape_rate": 0.4225,
       "escape_rate_95ci": [
-        0.3848,
-        0.4815
+        0.3751,
+        0.4714
       ],
-      "median_escape_ms": 7360
+      "median_escape_ms": 6960
     },
     {
       "cohort": "presets",
@@ -155,15 +155,15 @@
       "difficulty": "low",
       "seeds": "1-60",
       "games": 60,
-      "escaped": 49,
-      "caught": 11,
+      "escaped": 52,
+      "caught": 8,
       "timed_out": 0,
-      "escape_rate": 0.8167,
+      "escape_rate": 0.8667,
       "escape_rate_95ci": [
-        0.7008,
-        0.8944
+        0.7583,
+        0.9309
       ],
-      "median_escape_ms": 9680
+      "median_escape_ms": 10360.0
     },
     {
       "cohort": "presets",
@@ -173,15 +173,15 @@
       "difficulty": "medium",
       "seeds": "1-60",
       "games": 60,
-      "escaped": 23,
-      "caught": 36,
+      "escaped": 26,
+      "caught": 33,
       "timed_out": 1,
-      "escape_rate": 0.3833,
+      "escape_rate": 0.4333,
       "escape_rate_95ci": [
-        0.2709,
-        0.5098
+        0.3157,
+        0.559
       ],
-      "median_escape_ms": 17960
+      "median_escape_ms": 17900.0
     },
     {
       "cohort": "presets",
@@ -191,15 +191,15 @@
       "difficulty": "high",
       "seeds": "1-60",
       "games": 60,
-      "escaped": 3,
-      "caught": 57,
+      "escaped": 8,
+      "caught": 52,
       "timed_out": 0,
-      "escape_rate": 0.05,
+      "escape_rate": 0.1333,
       "escape_rate_95ci": [
-        0.0171,
-        0.137
+        0.0691,
+        0.2417
       ],
-      "median_escape_ms": 9280
+      "median_escape_ms": 21120.0
     },
     {
       "cohort": "presets",
@@ -209,15 +209,15 @@
       "difficulty": "low",
       "seeds": "1-60",
       "games": 60,
-      "escaped": 59,
-      "caught": 1,
+      "escaped": 57,
+      "caught": 3,
       "timed_out": 0,
-      "escape_rate": 0.9833,
+      "escape_rate": 0.95,
       "escape_rate_95ci": [
-        0.9114,
-        0.9971
+        0.863,
+        0.9829
       ],
-      "median_escape_ms": 10880
+      "median_escape_ms": 10640
     },
     {
       "cohort": "presets",
@@ -227,15 +227,15 @@
       "difficulty": "medium",
       "seeds": "1-60",
       "games": 60,
-      "escaped": 39,
-      "caught": 21,
+      "escaped": 38,
+      "caught": 22,
       "timed_out": 0,
-      "escape_rate": 0.65,
+      "escape_rate": 0.6333,
       "escape_rate_95ci": [
-        0.5236,
-        0.7583
+        0.5068,
+        0.7438
       ],
-      "median_escape_ms": 21920
+      "median_escape_ms": 24880.0
     },
     {
       "cohort": "presets",
@@ -245,15 +245,15 @@
       "difficulty": "high",
       "seeds": "1-60",
       "games": 60,
-      "escaped": 14,
-      "caught": 46,
+      "escaped": 15,
+      "caught": 45,
       "timed_out": 0,
-      "escape_rate": 0.2333,
+      "escape_rate": 0.25,
       "escape_rate_95ci": [
-        0.1444,
-        0.3544
+        0.1578,
+        0.3723
       ],
-      "median_escape_ms": 15260.0
+      "median_escape_ms": 17160
     },
     {
       "cohort": "presets",
@@ -281,15 +281,15 @@
       "difficulty": "medium",
       "seeds": "1-60",
       "games": 60,
-      "escaped": 47,
-      "caught": 12,
-      "timed_out": 1,
-      "escape_rate": 0.7833,
+      "escaped": 46,
+      "caught": 14,
+      "timed_out": 0,
+      "escape_rate": 0.7667,
       "escape_rate_95ci": [
-        0.6638,
-        0.8688
+        0.6456,
+        0.8556
       ],
-      "median_escape_ms": 28960
+      "median_escape_ms": 28600.0
     },
     {
       "cohort": "presets",
@@ -299,15 +299,15 @@
       "difficulty": "high",
       "seeds": "1-60",
       "games": 60,
-      "escaped": 17,
-      "caught": 43,
-      "timed_out": 0,
-      "escape_rate": 0.2833,
+      "escaped": 14,
+      "caught": 44,
+      "timed_out": 2,
+      "escape_rate": 0.2333,
       "escape_rate_95ci": [
-        0.1851,
-        0.4077
+        0.1444,
+        0.3544
       ],
-      "median_escape_ms": 28040
+      "median_escape_ms": 23760.0
     },
     {
       "cohort": "setup",
@@ -325,7 +325,7 @@
         0.6123,
         0.7047
       ],
-      "median_escape_ms": 12460.0
+      "median_escape_ms": 11940.0
     },
     {
       "cohort": "holdout",
@@ -336,8 +336,8 @@
       "seeds": "1201-1400",
       "games": 200,
       "escaped": 185,
-      "caught": 9,
-      "timed_out": 6,
+      "caught": 11,
+      "timed_out": 4,
       "escape_rate": 0.925,
       "escape_rate_95ci": [
         0.88,
@@ -353,15 +353,15 @@
       "difficulty": "medium",
       "seeds": "1201-1400",
       "games": 200,
-      "escaped": 116,
-      "caught": 78,
-      "timed_out": 6,
-      "escape_rate": 0.58,
+      "escaped": 114,
+      "caught": 82,
+      "timed_out": 4,
+      "escape_rate": 0.57,
       "escape_rate_95ci": [
-        0.5107,
-        0.6463
+        0.5007,
+        0.6367
       ],
-      "median_escape_ms": 13400.0
+      "median_escape_ms": 13020.0
     },
     {
       "cohort": "holdout",
@@ -371,15 +371,15 @@
       "difficulty": "high",
       "seeds": "1201-1400",
       "games": 200,
-      "escaped": 58,
-      "caught": 142,
-      "timed_out": 0,
-      "escape_rate": 0.29,
+      "escaped": 51,
+      "caught": 148,
+      "timed_out": 1,
+      "escape_rate": 0.255,
       "escape_rate_95ci": [
-        0.2315,
-        0.3564
+        0.1996,
+        0.3196
       ],
-      "median_escape_ms": 9060.0
+      "median_escape_ms": 5400
     },
     {
       "cohort": "holdout",
@@ -390,8 +390,8 @@
       "seeds": "1201-1400",
       "games": 200,
       "escaped": 191,
-      "caught": 7,
-      "timed_out": 2,
+      "caught": 8,
+      "timed_out": 1,
       "escape_rate": 0.955,
       "escape_rate_95ci": [
         0.9167,
@@ -415,7 +415,7 @@
         0.6593,
         0.7822
       ],
-      "median_escape_ms": 9360
+      "median_escape_ms": 8760
     },
     {
       "cohort": "holdout",
@@ -425,15 +425,15 @@
       "difficulty": "high",
       "seeds": "1201-1400",
       "games": 200,
-      "escaped": 85,
+      "escaped": 84,
       "caught": 112,
-      "timed_out": 3,
-      "escape_rate": 0.425,
+      "timed_out": 4,
+      "escape_rate": 0.42,
       "escape_rate_95ci": [
-        0.3585,
-        0.4943
+        0.3537,
+        0.4893
       ],
-      "median_escape_ms": 8160
+      "median_escape_ms": 8240.0
     },
     {
       "cohort": "setup-holdout",
@@ -443,15 +443,15 @@
       "difficulty": "medium",
       "seeds": "1201-1400",
       "games": 200,
-      "escaped": 140,
-      "caught": 57,
+      "escaped": 144,
+      "caught": 53,
       "timed_out": 3,
-      "escape_rate": 0.7,
+      "escape_rate": 0.72,
       "escape_rate_95ci": [
-        0.6332,
-        0.7593
+        0.6541,
+        0.7776
       ],
-      "median_escape_ms": 10860.0
+      "median_escape_ms": 11060.0
     }
   ]
 }

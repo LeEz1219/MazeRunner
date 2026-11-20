@@ -1,9 +1,9 @@
-Maze Runner V5.4.3c
+Maze Runner V5.4.4
   [--seed N] [--difficulty low|medium|high] [--verbose] [--quiet]
   --simulate ROWS COLS MONSTERS SEED [LIMIT_MS] [--difficulty low|medium|high] [--verbose] [--quiet]
 Interactive play opens graphical setup; --difficulty preselects a card. No terminal input is required.
 Simulation defaults to Medium. Low offers more routes and earlier relief; High increases pursuit pressure.
 State logs are enabled by default; --verbose also logs every monster step.
-Stalker AI: one lead investigates, the pack covers the perimeter, and high menace triggers withdrawal.
+Stalker AI: one lead investigates. During Backstage a second hunter can withdraw if close pressure persists.
 RELIEF widens searches, spaces out reports, and releases interceptors while the solver is confined.
 Mouse/Tab/Enter: setup. WASD/arrows (hold to keep walking): move. G: auto-solve. Esc: pause. Q: quit. Wheel/+/-: zoom. Home: fit.

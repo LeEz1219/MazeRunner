@@ -1,10 +1,10 @@
 {
-  "recorded_utc": "2026-11-19T22:06:57.442795+00:00",
-  "release": "5.4.3c",
+  "recorded_utc": "2026-11-20T21:51:59.613102+00:00",
+  "release": "5.4.4",
   "status": "passed",
   "checks": {
     "source_matches_function_guide": true,
-    "exactly_three_markdown_files": true,
+    "exactly_four_markdown_files": true,
     "eighteen_png_screenshots": true,
     "cmake_file_included": true,
     "raw_validation_passed": true,
@@ -13,12 +13,14 @@
     "raw_calibration_matches_all_groups_and_seeds": true,
     "director_evidence": true,
     "smoke_matrix_complete": true,
-    "01-Source-Code-Explanation.md_fences_balanced": true,
-    "01-Source-Code-Explanation.md_no_internal_paths": true,
-    "02-AI-Graphics-and-Redesign.md_fences_balanced": true,
-    "02-AI-Graphics-and-Redesign.md_no_internal_paths": true,
-    "03-Build-Test-and-Reproduce.md_fences_balanced": true,
-    "03-Build-Test-and-Reproduce.md_no_internal_paths": true
+    "01-SourceCode-Deepdive-and- Explanation.md_fences_balanced": true,
+    "01-SourceCode-Deepdive-and- Explanation.md_no_internal_paths": true,
+    "02-AI-Design-Deepdive.md_fences_balanced": true,
+    "02-AI-Design-Deepdive.md_no_internal_paths": true,
+    "03-Graphics-Design.md_fences_balanced": true,
+    "03-Graphics-Design.md_no_internal_paths": true,
+    "04-Build-Test-and-Reproduce.md_fences_balanced": true,
+    "04-Build-Test-and-Reproduce.md_no_internal_paths": true
   },
   "visual_review": [
     "setup.png",

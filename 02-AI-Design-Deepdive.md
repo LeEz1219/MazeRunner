@@ -1,16 +1,8 @@
-# MazeRunner V5.4.3c — AI, graphics, UI, and redesign guide
+# MazeRunner v5.4.4 AI design deep dive
 
-This guide covers the shipped encounter rules, the automatic player’s threat model, and the OpenGL graphics and UI. Sections 9–11 describe optional redesigns. [Production source](src/mazerunnerV5.4.3c.cpp) · [Function guide](01-Source-Code-Explanation.md) · [Build and validation](03-Build-Test-and-Reproduce.md)
+The monster reasons from private evidence, the Director regulates the information and duties given to the pack, and the automatic player plans against observed monster positions and a conservative reach model. These are different information sets. A property proved for one does not transfer automatically to the others. Sections 1–5 follow their interactions. Section 6 gives the actual difficulty profiles and measured outcomes. Section 7 proves the terrain and motion guarantees, derives the tactical bounds, and accounts for time and memory.
 
-### Changes since V5.4.3b
-
-The Director sends its first coarse report on eligible movement, then shortens the radio interval as the player improves their best route to the exit. A remote search can lapse during the opening. The lead still searches its clue, other informed monsters cover the perimeter, and sustained menace can send an investigator away.
-
-On High, a sound-hunter can notice the player down a clear corridor, spend a beat facing them and accelerate into a charge. A hunter at its last-seen corner checks for fresh line of sight before continuing. Patrols, searchers and hunters move at different speeds. The solver budgets for the fastest legal gait when deciding whether a monster can cut off an escape.
-
-Pack lessons use distinct observations. A dead-end check requires an unsuccessful local sweep, and a junction ambush requires a continuous heard return compatible with a real terrain cycle. One lesson can unlock every 12 seconds. Each replay begins with a fresh pack.
-
-[Encounter regressions](tests/stalker_tests.cpp) · [Radio and pack trace](artifacts/results/director-radio.log)
+In v5.4.4 a retreat commits to a physically outward path, a sustained second hunter can support the lead, and junction scans rank fresh arms. The forecast advances copies of these same retreat paths. For a quick comparison, follow the seed-26 encounter in section 5 and the four-edge charge example in section 7. [Production source](src/mazerunnerV5.4.4.cpp) · [C++ function guide](01-SourceCode-Deepdive-and-%20Explanation.md) · [Validation procedure](04-Build-Test-and-Reproduce.md)
 
 ## 1. Architecture and game rules
 
@@ -52,7 +44,7 @@ Threat forecasts request a bounded field of 64 corridor steps. Its sentinel of 6
 
 Debug builds (without `NDEBUG`) hash the terrain at each `rebuild_graph` and check the hash at simulation entry points. Editing `grid` without rebuilding then fails with a clear error instead of running on stale adjacency. Release builds skip the check. The exact A* search that V5.4.1 kept in the game class is now only an independent oracle in the tests; the live game never used it.
 
-At the maximum 501×501 grid there are 251,001 cells, so repeated whole-grid work and mesh allocation matter. Iterative graph algorithms avoid deep recursive DFS stacks. The recovery search is separately bounded. With ten monsters on Medium or High, V5.4.2 spends about 4.7–5.8 ms of simulation per 16 ms frame on average, with a worst frame near 20 ms. V5.4.1 spent 12–15 ms on average with worst frames near 80 ms. The gains come from the LRU cache, bounded threat fields, short reservation lists instead of grid-sized arrays, and rebuilding the solver overlay once per frame rather than after every monster event. Rendering has a large-map detail reduction described below. These are measurements on one host, not a promise of identical frame rate across devices.
+At the maximum 501×501 grid there are 251,001 cells, so repeated whole-grid work and mesh allocation matter. Iterative graph algorithms avoid deep recursive DFS stacks. The recovery search is separately bounded. With ten monsters on Medium or High, V5.4.2 spends about 4.7–5.8 ms of simulation per 16 ms frame on average, with a worst frame near 20 ms. V5.4.1 spent 12–15 ms on average with worst frames near 80 ms. The gains come from the LRU cache, bounded threat fields, short reservation lists instead of grid-sized arrays, and rebuilding the solver overlay once per frame rather than after every monster event. The graphics guide describes the renderer’s large-map detail policy. These are measurements on one host, not a promise of identical frame rate across devices.
 
 ## 3. Monster AI: hearing, hunting, searching, and interception
 
@@ -66,7 +58,7 @@ The Director prefers an eligible hunter for the lead and uses the monster’s ow
 
 A patrolling monster ordinarily has no active clue. A member of a pack that learned to double back can revisit its last junction during patrol. It samples 32 random open cells and scores each one. A cell scores higher the longer it has been since any monster entered its 8×8 region, capped at 20 seconds. Travel distance (capped at 20 steps) adds a small amount. The score is penalized for cells this monster visited recently, for cells another monster already claimed, and for each other monster positioned or heading within six cells. Together the monsters therefore cover the map instead of clumping. Patrol is not a stationary guard waiting for an alarm.
 
-Following a target uses a reverse BFS distance gradient. Recent-cell penalties discourage immediate repetition. When blocked, a monster can accept limited non-improving movement to sidestep congestion, and repeated blockage causes a new target choice. Targets are reviewed on a 700-ms schedule, but review can preserve a still-valid waypoint. Each monster keeps a bounded recent-cell history rather than a permanent visited map.
+Ordinary pursuit follows a reverse BFS distance gradient. Withdrawal uses the committed outward route described in section 7. Recent-cell penalties discourage immediate repetition. When blocked, a monster can accept limited non-improving movement to sidestep congestion, and repeated blockage causes a new target choice. Targets are reviewed on a 700-ms schedule, but review can preserve a still-valid waypoint. Each monster keeps a bounded recent-cell history rather than a permanent visited map.
 
 ### Local footsteps and map-wide director reports
 
@@ -87,7 +79,7 @@ An ordinary hunter favors nearby, less recently visited candidates inside its cl
 
 ### Searching after losing the scent
 
-The investigator seeds a bounded multi-source breadth-first search with every walkable cell in the best-known sector. A more recent firsthand sighting can supply a single exact seed. Uncertainty expands through one corridor edge per 180 simulated ms, up to five layers. Junctions and branch mouths have priority. An individual discounts its last 40 inspections for 1,800 ms. Low and Medium physically inspect traversed cells. A High junction scan can also inspect an unobstructed straight arm in its existing visual range. At an eligible junction, the lead pauses for one monster period and inspects an unchecked arm. The marker points down that arm until the next movement opportunity.
+The investigator seeds a bounded multi-source breadth-first search with every walkable cell in the best-known sector. A more recent firsthand sighting can supply a single exact seed. Uncertainty expands through one corridor edge per 180 simulated ms, up to five layers. Junctions and branch mouths have priority. An individual discounts its last 40 inspections for 1,800 ms. Low and Medium physically inspect traversed cells. A High junction scan can also inspect an unobstructed straight arm in its existing visual range. At an eligible junction, the lead pauses for one monster period and looks down an eligible arm chosen by clue direction, straight reach and learned alcove value. Four recent arm choices are remembered independently of the cells actually inspected. The marker points down that arm until the next movement opportunity.
 
 ### Tactics learned within a run
 
@@ -163,7 +155,7 @@ If conservative planning fails, the planner tries a relaxed interpretation of un
 
 Best progress is the percentage of the entrance-to-exit corridor distance already gained at the closest point reached so far. The normal radio interval interpolates over the first half of that distance. Medium goes from 5,000 to 1,800 ms and High from 7,000 to 1,000 ms. Low uses 3,000 ms throughout. Backtracking retains the best progress. Relief doubles the current interval and Backstage suppresses broadcasts. Local footsteps still renew scent independently.
 
-The Director manages radio, confinement relief and encounter pacing. Every 200 ms it measures corridor distance to a walkable representative of each hunter's own clue and checks for genuine visual contact. It uses peak pressure, a capped contribution from a second hunter, separation after a close encounter and current confinement. Menace stays between 0 and 100. At 76, the Director releases guards and requests one physical retreat. The chosen agent uses ordinary movement, occupancy, and collision rules. A current sighting takes priority. Backstage can begin while the only eligible hunter still sees the player. Its withdrawal request stays pending until a candidate can disengage. After at least 1,400 ms, pressure at 26 or below permits backstage to end unless a pending withdrawal still has visual contact. A new broadcast then requires an eligible player step and the usual cooldown. Silence supplies no fresh radio clue.
+The Director manages radio, confinement relief and encounter pacing. Every 200 ms it measures corridor distance to a walkable representative of each hunter's own clue and checks for genuine visual contact. It uses peak pressure, a capped contribution from another hunter, separation after a close encounter and an extra contribution when relief padding is active. Menace stays between 0 and 100. At 76 the Director releases guards and requests a primary physical retreat. While the first retreater remains active, a second nonvisual hunter can qualify after two consecutive pressure samples of at least 8. The pair reserve distinct legs and each step has to increase corridor distance from the actor’s own evidence. A trapped actor holds position. The chosen agent uses ordinary movement, occupancy, and collision rules. A current sighting takes priority. Backstage can begin while the only eligible hunter still sees the player. Its withdrawal request stays pending until a candidate can disengage. After at least 1,400 ms, pressure at 26 or below permits backstage to end unless a pending withdrawal still has visual contact. A new broadcast then requires an eligible player step and the usual cooldown. Silence supplies no fresh radio clue.
 
 Every 200 ms of active play the director samples the player on the simulation clock. A full profile-sized window containing at most 12 unique cells and spanning at most eight cells per axis counts as confinement. In auto mode, prolonged absence of navigation progress is another trigger. Voluntary manual idling clears the history. An active solver accumulates samples while waiting or backtracking, even when the exit field contains a technically open route.
 
@@ -215,179 +207,98 @@ All values below are read from `difficulty_settings`. Lower periods mean more fr
 
 ### Measured escape rates
 
-The release benchmark covers 4,740 deterministic auto-solver games. Five-monster calibration uses seeds 1–400 on 21×21 and 31×31 with a 60-second limit. The pooled counts were Low 740/800 (92.50%), Medium 529/800 (66.12%), High 271/800 (33.88%). The design targets are 92%, 65% and 35%. The independent seed cohort on the same maps (1201–1400) produced Low 376/400 (94.00%), Medium 261/400 (65.25%), High 143/400 (35.75%). The rectangular setup and ten-monster presets are reported separately.
+The release benchmark covers 4,740 deterministic auto-solver games. Five-monster calibration uses seeds 1–400 on 21×21 and 31×31 with a 60-second limit. The pooled calibration counts were Low 748/800 (93.50%), Medium 532/800 (66.50%), High 262/800 (32.75%). The design targets are 92%, 65% and 35%. On the independent square-map holdout (seeds 1201–1400) the counts were Low 376/400 (94.00%), Medium 259/400 (64.75%), High 135/400 (33.75%). Rectangular setup and ten-monster presets are reported separately.
 
 | Cohort | Rows × columns | Monsters | Difficulty | Escaped | Caught | At limit | Escape rate [95% Wilson interval] |
 |---|---|---:|---|---:|---:|---:|---|
-| calibration | 21 × 21 | 5 | Low | 358/400 | 36 | 6 | 89.5% [86.1%, 92.1%] |
-| calibration | 21 × 21 | 5 | Medium | 244/400 | 146 | 10 | 61.0% [56.1%, 65.6%] |
-| calibration | 21 × 21 | 5 | High | 98/400 | 298 | 4 | 24.5% [20.5%, 28.9%] |
-| calibration | 31 × 31 | 5 | Low | 382/400 | 14 | 4 | 95.5% [93.0%, 97.1%] |
-| calibration | 31 × 31 | 5 | Medium | 285/400 | 106 | 9 | 71.2% [66.6%, 75.5%] |
-| calibration | 31 × 31 | 5 | High | 173/400 | 221 | 6 | 43.2% [38.5%, 48.1%] |
-| presets | 33 × 33 | 10 | Low | 49/60 | 11 | 0 | 81.7% [70.1%, 89.4%] |
-| presets | 33 × 33 | 10 | Medium | 23/60 | 36 | 1 | 38.3% [27.1%, 51.0%] |
-| presets | 33 × 33 | 10 | High | 3/60 | 57 | 0 | 5.0% [1.7%, 13.7%] |
-| presets | 63 × 63 | 10 | Low | 59/60 | 1 | 0 | 98.3% [91.1%, 99.7%] |
-| presets | 63 × 63 | 10 | Medium | 39/60 | 21 | 0 | 65.0% [52.4%, 75.8%] |
-| presets | 63 × 63 | 10 | High | 14/60 | 46 | 0 | 23.3% [14.4%, 35.4%] |
+| calibration | 21 × 21 | 5 | Low | 362/400 | 30 | 8 | 90.5% [87.2%, 93.0%] |
+| calibration | 21 × 21 | 5 | Medium | 242/400 | 144 | 14 | 60.5% [55.6%, 65.2%] |
+| calibration | 21 × 21 | 5 | High | 93/400 | 305 | 2 | 23.2% [19.4%, 27.6%] |
+| calibration | 31 × 31 | 5 | Low | 386/400 | 12 | 2 | 96.5% [94.2%, 97.9%] |
+| calibration | 31 × 31 | 5 | Medium | 290/400 | 99 | 11 | 72.5% [67.9%, 76.6%] |
+| calibration | 31 × 31 | 5 | High | 169/400 | 226 | 5 | 42.2% [37.5%, 47.1%] |
+| presets | 33 × 33 | 10 | Low | 52/60 | 8 | 0 | 86.7% [75.8%, 93.1%] |
+| presets | 33 × 33 | 10 | Medium | 26/60 | 33 | 1 | 43.3% [31.6%, 55.9%] |
+| presets | 33 × 33 | 10 | High | 8/60 | 52 | 0 | 13.3% [6.9%, 24.2%] |
+| presets | 63 × 63 | 10 | Low | 57/60 | 3 | 0 | 95.0% [86.3%, 98.3%] |
+| presets | 63 × 63 | 10 | Medium | 38/60 | 22 | 0 | 63.3% [50.7%, 74.4%] |
+| presets | 63 × 63 | 10 | High | 15/60 | 45 | 0 | 25.0% [15.8%, 37.2%] |
 | presets | 101 × 101 | 10 | Low | 59/60 | 1 | 0 | 98.3% [91.1%, 99.7%] |
-| presets | 101 × 101 | 10 | Medium | 47/60 | 12 | 1 | 78.3% [66.4%, 86.9%] |
-| presets | 101 × 101 | 10 | High | 17/60 | 43 | 0 | 28.3% [18.5%, 40.8%] |
+| presets | 101 × 101 | 10 | Medium | 46/60 | 14 | 0 | 76.7% [64.6%, 85.6%] |
+| presets | 101 × 101 | 10 | High | 14/60 | 44 | 2 | 23.3% [14.4%, 35.4%] |
 | setup | 21 × 31 | 5 | Medium | 264/400 | 124 | 12 | 66.0% [61.2%, 70.5%] |
-| holdout | 21 × 21 | 5 | Low | 185/200 | 9 | 6 | 92.5% [88.0%, 95.4%] |
-| holdout | 21 × 21 | 5 | Medium | 116/200 | 78 | 6 | 58.0% [51.1%, 64.6%] |
-| holdout | 21 × 21 | 5 | High | 58/200 | 142 | 0 | 29.0% [23.2%, 35.6%] |
-| holdout | 31 × 31 | 5 | Low | 191/200 | 7 | 2 | 95.5% [91.7%, 97.6%] |
+| holdout | 21 × 21 | 5 | Low | 185/200 | 11 | 4 | 92.5% [88.0%, 95.4%] |
+| holdout | 21 × 21 | 5 | Medium | 114/200 | 82 | 4 | 57.0% [50.1%, 63.7%] |
+| holdout | 21 × 21 | 5 | High | 51/200 | 148 | 1 | 25.5% [20.0%, 32.0%] |
+| holdout | 31 × 31 | 5 | Low | 191/200 | 8 | 1 | 95.5% [91.7%, 97.6%] |
 | holdout | 31 × 31 | 5 | Medium | 145/200 | 53 | 2 | 72.5% [65.9%, 78.2%] |
-| holdout | 31 × 31 | 5 | High | 85/200 | 112 | 3 | 42.5% [35.9%, 49.4%] |
-| setup-holdout | 21 × 31 | 5 | Medium | 140/200 | 57 | 3 | 70.0% [63.3%, 75.9%] |
+| holdout | 31 × 31 | 5 | High | 84/200 | 112 | 4 | 42.0% [35.4%, 48.9%] |
+| setup-holdout | 21 × 31 | 5 | Medium | 144/200 | 53 | 3 | 72.0% [65.4%, 77.8%] |
 
 Every game has an outcome, seed, simulated duration and step count. [Per-game CSV](artifacts/results/calibration-runs.csv) · [Summary and intervals](artifacts/results/calibration.json)
 
-## 7. Existing graphics implementation
+## 7. Why the navigation algorithms work
 
-### Actual 3D walls and a fixed orthographic camera
+Write $N=RC$ for rectangular storage, $V$ for the number of walkable cells, $E$ for undirected walkable adjacencies and $M$ for the number of monsters. The graph is undirected, unweighted for physical travel, and has maximum degree four, so $E\le 2V$. A graph theorem may cost $O(V+E)$ on an adjacency list while its implementation still initializes $N$ array entries. The following bounds distinguish those costs. [Carving and diversity](src/mazerunnerV5.4.4.cpp#L300) · [Bounded fields](src/mazerunnerV5.4.4.cpp#L677) · [Director](src/mazerunnerV5.4.4.cpp#L1388) · [Scan](src/mazerunnerV5.4.4.cpp#L1908) · [Tactical player](src/mazerunnerV5.4.4.cpp#L2419) A tactical claim about escape needs both this static model and an explicit model of actors and time.
 
-Wall cells generate real three-dimensional triangles with height **0.38 grid units**. Exposed vertical faces and top caps use different gray brightness factors. Detailed maps add 0.035-cell inset bevels with a 0.045-cell shoulder drop. Faces between adjacent solid wall cells are omitted. Base stone color varies deterministically by cell-index hashing, so this cosmetic variation cannot alter maze generation or AI randomness. `build_wall_mesh` first counts the exposed faces so its vertex reservation matches the mesh exactly. V5.4.1 reserved by cell count, which over-allocated by about a third at 501×501.
+### Carving, loop budgets and certification
 
-The view is a fixed **25-degree orthographic tilt**. It exposes height while preserving familiar row/column directional controls. This is not a freely rotating perspective camera. The projection fits the complete map at 1×, preserves scale under aspect changes, and follows/clamps around the knight while zoomed. Zoom ranges from 1× to 64×. The world clears to black; there is no separate textured floor covering every corridor.
+The two-cell carve operates on odd-coordinate rooms. Initially one room is marked. Each successful step opens an unvisited room and the intervening wall, so it preserves connectivity and adds exactly one edge to the room tree. When the DFS finishes, every room is reached: a first unvisited room along a room-grid path would have had a visited predecessor whose neighbor enumeration finished too soon. Opening extra connecting walls can only add routes. A loop budget therefore changes the distribution of layouts, but cannot by itself certify alternatives between the two endpoints.
 
-For grids above 15,000 total cells, the renderer omits small cap bevels while retaining top faces and exposed vertical walls. All three square presets are below that threshold; the maximum 501×501 case is not. This is a mesh-detail policy based on total area, not camera distance. There are no normal maps, shadow maps, physical lights, or physically based materials. The apparent illumination is authored RGB brightness on each face.
+**Two-route certificate.** Let $P$ be the DFS-tree path from the entrance to the exit. A tree edge $(u,v)$ to child $v$ is a bridge exactly when $low[v]>disc[u]$. In that case no vertex below it links to $u$ or an ancestor, so deleting it separates the subtree. Otherwise a back edge closes a cycle. If any edge on $P$ is not a bridge, remove it. The endpoints remain connected and a simple path in the surviving graph differs from $P$. Conversely, any distinct simple escape path must omit some edge of $P$ and keep the endpoints connected, so that edge cannot be a bridge. A loop in a room with one door can fail this test. Discovery, low links and a neighbor cursor per vertex take one visit per edge, with $O(N+E)$ time and space including initialization.
 
-### Pixel actors are billboards, not 3D character models
+**Four-route lower bound.** The vertex-biconnected blocks form a tree when joined through their articulation vertices. The entrance and exit specify one chain in that tree. A simple path cannot detour into an off-chain block and return without repeating the articulation. In a cyclic chain block with distinct entry and exit $x,y$, let $r=e-v+1$. There are at least $r+1$ simple $x$–$y$ paths. Start an open-ear decomposition with a cycle containing $x,y$. It gives two paths and rank one. Each added ear increases the rank by one. In the old 2-connected graph there are disjoint links from the pair $\{x,y\}$ to the two ear endpoints, in some pairing (the two-path form of Menger’s theorem; an overlapping endpoint can use a zero-length link). Joining those links through the new ear gives a simple $x$–$y$ path that uses a new edge. All old paths survive. The argument also covers a single new chord. A bridge contributes one choice. [Graph theory reference, sections on connectivity, Menger’s theorem and ears](https://www.math.kit.edu/iag6/lehre/graphtheory2019w/media/main.pdf)
 
-The knight, exit, and ten monsters are each **20×20** arrays of palette characters embedded in the `.cpp`. Every opaque pixel becomes one quad, or six triangle vertices. Dots emit no geometry. A camera-facing plane keeps the pixel image legible in the tilted world. This construction supports depth occlusion against walls without loading a texture or using alpha blending.
+Choices multiply along the chain because two blocks share only the articulation where their path segments join. Two qualifying cycle blocks in series already give $2\times2=4$ choices. The implementation saturates the product at four and, on Low, credits a block only at the size threshold $\min(12,\lfloor(R-1)/2\rfloor\lfloor(C-1)/2\rfloor)$. The result is a conservative certificate. It can undercount actual simple paths, especially in small loops. The edge stack emits each block once. Carving, shuffling, adjacency construction, leaf peeling and certification take linear work per attempt on this grid. After 64 attempts the fallback opens at least one additional interior wall per nonterminal pass or opens the remaining interior. With $W$ interior walls still closed, a coarse upper bound through certification is $O((64+W+1)(N+E))$ time and $O(N+E)$ working space. The cap limits random retries, not the number of fallback passes.
 
-One pixel is 0.044 cells wide, giving a sprite a nominal 0.88-cell width. Sprites are horizontally mirrored after left/right movement. The knight has a brief step bob and a blue octagonal ground ring. Wraith, Bat, and Evil eye receive a small sinusoidal hover. **Eye pixels show monster state: gold while roaming, red while hunting, orange while searching.** These animations are visual offsets based on simulation time; they do not interpolate actor collision positions or introduce animated sprite frames.
+### Distance fields, branch mouths and a blocked exit
 
-A searching investigator briefly draws an amber diamond 0.45 cells toward the inspected corridor arm. East and west scans also turn the sprite. The diamond disappears at the scan deadline. Its direction shows where the investigator looked. The amber route overlay separately indicates a potentially obstructed player route.
+FIFO BFS assigns an unvisited neighbor the current layer plus one. By induction every shorter route would already have reached that neighbor in an earlier layer. A full reverse field therefore gives exact shortest distances on the fixed terrain. The bounded version stops after radius $r$. An unstamped cell has true distance at least $r+1$, including infinite distance, so reporting $r+1$ is valid for an acoustic cut-off or conservative arrival-time bound. It is not an exact long-range route length. Cache keys include the radius. The full-field cache retains up to 24 destination entries; eviction drops a cache reference while a caller may still own the field. The bounded pool first tries to recycle an unpinned buffer once it has 14 entries. If callers pin them all it can allocate another.
 
-| Spawn ID | Appearance | Sprite constant | Cosmetic hover |
-|---:|---|---|---|
-| 0 | Goblin | `GOBLIN_SPRITE` | No |
-| 1 | Demon | `DEMON_SPRITE` | No |
-| 2 | Wraith | `WRAITH_SPRITE` | Yes |
-| 3 | Skeleton | `SKELETON_SPRITE` | No |
-| 4 | Slime | `SLIME_SPRITE` | No |
-| 5 | Bat | `BAT_SPRITE` | Yes |
-| 6 | Spider | `SPIDER_SPRITE` | No |
-| 7 | Stone golem | `GOLEM_SPRITE` | No |
-| 8 | Evil eye | `EVIL_EYE_SPRITE` | Yes |
-| 9 | Mushroom | `MUSHROOM_SPRITE` | No |
+Pruning unprotected degree-one vertices records a parent toward the surviving core. Removing leaves cannot destroy a simple entrance-to-exit path because its interior vertices need two path edges. Processing removals backwards makes a child inherit a known gate and a depth one greater than its parent. The exit-rooted DFS also supplies discovery intervals and low-link information for interception. A monster on one shortest path is not automatically at a chokepoint. The separating-articulation test is what qualifies an ancestor as a guard position. A guard still walks there, and occupancy may block it.
 
-![Arranged rendering fixture displaying all ten monsters, knight, and exit](artifacts/screenshots/monsters.png)
+The automatic player assigns a hard exclusion to selected near or parked threats and finite extra cost to farther occupied cells. Reverse relaxation from $u$ to predecessor $v$ uses $D(v)\gets\min(D(v),D(u)+w(u))$: $w(u)$ is the cost the forward traveler pays to *enter* $u$. With weights 1 and 25, tentative labels generated from distance $k$ lie in $[k+1,k+25]$. A ring of 26 buckets can represent that active window. Advancing the smallest current label finalizes it by the positive-edge Dijkstra argument; stale duplicates are skipped. A four-edge safe detour costs 4, whereas three steps with one soft entry cost 27. If hard exclusions disconnect the player, the overlay can fall back to the terrain field. The amber display communicates that risk.
 
-The arranged gallery places every appearance where it can be inspected; it is not a naturally generated gameplay encounter. The render test also removes each monster in turn and checks that its absence changes visible pixels, helping detect hidden or missing variants.
+### Quantized evidence, directed sweeps and learning
 
-### Palette and batching
+The sweep at time $t$ seeds walkable cells of a rectangle, or the last-seen cell if sufficiently recent. It grows $k=\min(5,\lfloor(t-t_{clue})/180\rfloor)$ graph layers. By the BFS layer invariant this yields exactly the corridor-distance dilation of the seed set through $k$ edges. The representation makes a branch behind a corner plausible while a nearby square behind a sealed wall stays unreachable. The sector can contain several disconnected seed components. For each reachable candidate the score combines $-2$ times bounded travel distance, a 45-point recent-inspection penalty, a 12-point claim penalty, a 7-point junction/mouth bonus and a 4- or 16-point tip bonus. These are ordinal priorities. The game has no observation likelihood from which to infer calibrated posterior probabilities.
 
-The exact shared palette is below. Values are normalized RGB, not hexadecimal byte values. `E` is state-dependent; `.` is transparent. The same symbols are used in world art and setup illustrations.
+At an eligible junction the investigator filters out blocked, recently visited, inspected and recently glanced arms. For each remaining arm let $l$ be its unobstructed straight reach, capped at six. The scan scores $2l+12I_{closer}+8I_{learned\ alcove}$. The middle indicator requires the first neighbor to descend the bounded corridor field toward the focus. Ties follow the actor-and-cell rotation. A four-cell arm descending toward a clue scores 20; a six-cell arm with neither bonus scores 12. The chosen direction is remembered among four looks for 1,800 ms. Physical travel and High’s real visual range maintain the separate inspection memory. The scan marker and horizontal sprite facing expose part of this computation to the player. Low and Medium can glance without remotely clearing an arm.
 
-| Symbol | RGB / behavior | Intended visual role |
+A heard sequence can support a loop lesson only if it admits an ordered return on actual terrain. The game tries legal boundary cells in the first observed sector, expands within the present sector or forward into the next, and requires re-entry at the *same starting cell*. The sequence uses distinct sectors, so a visited cell has a unique stage; cell-only deduplication is valid. A dead-end out-and-back cannot pass by reusing the same boundary in reverse order. This is a compatibility test on coarse observations. It cannot prove which exact loop the human traversed. Deduplication by clue revision and the pack lesson cooldown keep multiple listeners from counting one event repeatedly. The behavior table under “Tactics learned within a run” specifies each trigger and unlocked counter.
+
+### Menace, retreat geometry and reservations
+
+Per 200 ms sample, a confirmed current sighting contributes 16. Otherwise an eligible non-withdrawing hunter contributes 12, 8, 3 or 0 by distance to its own clue anchor ($d\le2$, $d\le6$, $d\le10$, farther). Let $p$ be the maximum individual contribution, $n$ the number at or above 8, and $s$ indicate any crossing from at least 12 to below 12. The tick adds $p+2[n>1]+7s+2[\mathrm{padding}\land p>0]$, subtracts 5 normally or 19 while Backstage, and clamps to $[0,100]$. Multiple separations in the same tick share one bonus. This defines the meaning of menace precisely enough to reproduce a log. It measures pressure from evidence and contact, not the distance to a hidden player.
+
+Entry at 76 opens an episode, releases Cutters and gives priority to the investigator for the first nonvisual retreat. While that retreat remains active, one additional eligible hunter can disengage after two consecutive nonvisual pressure samples of at least 8. A quiet episode cannot start new support work. Exit needs 1,400 ms of hold and menace at most 26, with pending live contact handled explicitly. The player can remain close, and new sight can interrupt an order. Hysteresis prevents a single near-threshold sample from flipping the mode back.
+
+**Outward-step invariant.** Fix a retreat anchor $a$ and let $D_a$ be its full BFS field. The planner admits $u\to v$ only when $D_a(v)=D_a(u)+1$, omitting the exit, teammates, reserved moves and other retreat routes when constructing the leg. Induction gives $D_a(v_k)=D_a(v_0)+k$ after $k$ steps, so the leg is simple and never turns toward that evidence. At most ten edges are retained. Length is ranked first. Later legs break ties with $k+D_{exit}(v_k)-D_{exit}(v_0)$ and a two-point dead-end penalty; the opening primary leg uses just the penalty for ties. The distance difference is bounded by $k$, so the detour term ranges from 0 on an exit geodesic to $2k$ going straight away. A new clue or blocked next step can force replanning. No legal outward edge means holding still. The proof is relative to a fixed clue, not to an independently moving player.
+
+Movement batches start with every occupied cell reserved. Each accepted new cell is added before processing the next actor. Induction shows no two actors end in the same cell, and the original reservation also forbids a head-on swap. The rotating order distributes first choice over time but cannot guarantee progress at every bottleneck. A retreat planner receives either the live pack or the forecast copy and reserves its teammates’ future legs in that same world. The tests verify two concurrent retreats and that a speculative rollout consumes neither live route. [Regression fixtures](tests/stalker_tests.cpp)
+
+### Tactical forecast and limits of optimality
+
+For the source cell the physical arrival bound is zero. Otherwise let $d$ be its capped corridor distance, $\delta$ the remaining delay to the next move and $\tau$ the fastest legal step period. A monster needs its first action and at least $d-1$ further moves. Therefore $T_{earliest}\ge\delta+(d-1)\tau$. Using $d=r+1$ outside the local ball preserves the lower bound. With $d=4$, $\delta=126$ and High’s $\tau=107$ the result is 447 ms. A reach bound that expires early is conservative for the solver. An exact arrival also depends on occupancy, notice, duties and new observations.
+
+The beam considers wait plus four cardinal edges in 40 ms layers. Width is 64 and depth is 12 or 18. First it rejects conservative conflicts, then it may try relaxed scoring. A goal candidate survives truncation, but two paths reaching the same cell at the same depth may incur different future reversal costs because they have different parents. Merging them loses optimal substructure for that reduced state. Width truncation can also discard the only eventual escape. With no monsters, the solver follows the exact terrain gradient and this objection disappears. With moving monsters, use replay tests and cohort outcomes to evaluate behavior.
+
+### Runtime and memory ledger
+
+Let $B_r$ be the number of cells in a radius-$r$ graph ball, $U$ the sweep union, $A$ the area of its seed rectangle, $P$ the size of the local buffer pool, $J$ the number of candidate circuit start cells, and $K$ the length of a reservation list. Costs below are per operation. Repeated calls on the same target can be cache hits.
+
+| Operation | Work | Principal storage and qualification |
 |---|---|---|
-| `.` | No geometry | Transparent background |
-| `K` | 0.045, 0.050, 0.065 | Outline / near black |
-| `S` | 0.290, 0.350, 0.430 | Dark steel |
-| `L` | 0.860, 0.920, 0.970 | Steel highlights |
-| `W` | 0.940, 0.870, 0.670 | Bone / cream |
-| `Y` | 1.000, 0.830, 0.430 | Light yellow |
-| `A` | 0.820, 0.580, 0.190 | Gold / ochre |
-| `B` | 0.190, 0.400, 0.870 | Blue |
-| `R` | 0.960, 0.190, 0.210 | Red |
-| `r` | 0.550, 0.060, 0.120 | Dark red |
-| `T` | 0.450, 0.230, 0.120 | Brown |
-| `G` | 0.400, 0.780, 0.270 | Green |
-| `g` | 0.170, 0.390, 0.130 | Dark green |
-| `P` | 0.710, 0.290, 0.770 | Purple |
-| `p` | 0.360, 0.110, 0.430 | Dark purple |
-| `C` | 0.320, 0.730, 0.840 | Cyan |
-| `D` | 0.140, 0.340, 0.510 | Dark cyan |
-| `E` | Roaming: 1.000, 0.830, 0.230; hunting: 1.000, 0.120, 0.080; searching: 1.000, 0.520, 0.100 | Monster eyes |
+| Build adjacency, prune branches, certify routes | $O(N+E)$ per graph or certificate pass | $O(N+E)$ arrays and explicit stacks |
+| Full reverse field | $O(N+E)$ cold, scan of at most 24 entries on hit | $O(N)$ per retained field, including externally held references |
+| Bounded field | $O(P+B_r)$ with reusable storage on this degree-four graph | $O(N)$ per buffer, $O(N)$ extra initialization on allocation or epoch wrap |
+| Hearing on one footstep | $O(M)$ broad checks plus at most one shared acoustic field for audibility | Local evidence processing, duties and lesson verification are additional work |
+| Suspicion selection | $O(A+\lvert U\rvert(1+M+I))$ plus one local field | $I\le40$ retained inspections, $O(N)$ reusable stamps, $O(\lvert U\rvert)$ active list |
+| Junction scan | Four arms, at most six straight steps each, plus one optional bounded focus field | Four remembered looks per actor and bounded visit/inspection history |
+| Sector circuit | Expected $O(A+J(V+E))$ with hash-set membership and bounded sector history | One start search at a time with $O(V)$ frontier and visited set |
+| Retreat plan | Full clue field if cold, then $O(K+B_{10}(1+K))$ | $K$ includes reservations, teammates and their short legs; linear membership, reusable $O(N)$ parent array |
+| Weighted guidance rebuild | $O(N+25V+E\log(M+2)+M\log(M+2))$ | 26 cyclic buckets, $O(N+E)$ worst-case arrays and pending relaxations |
+| Beam after forecast | $O(H\,5B(M+L+\log(B+1)))$ for one pass | $B=64$, $H\le18$, $L$ bounded history/heat work; $O(HB)$ retained nodes and $O(N)$ reusable indices |
+| Recovery search | Initialize $N$ entries, expand at most 4,096 cells through depth 32, plus scans of monsters and short histories per expansion | A later guidance build can still traverse the whole component |
 
-`Vertex` holds six floats: three position components and three color components. A static VAO/VBO contains maze walls. A second batch is regenerated for the route, exit, monsters, and knight. The UI has its own streaming batch. A normal gameplay frame therefore uses two world triangle draws plus one UI draw; setup needs only its UI batch. Buffer capacity can grow when a long full-map overlay requires more vertices than the initial reservation.
-
-The shared GLSL 3.30 shader multiplies a vertex by `viewProjection` and forwards RGB. The fragment shader writes opaque alpha. Depth testing is enabled for the world and disabled for UI. Blending, multisampling, and dithering are disabled for crisp opaque rendering. The route's “glow” consists of a broad dark strip and narrow bright strip at slightly different heights, not bloom or a lighting effect.
-
-## 8. UI structure and redesign boundaries
-
-The UI is custom immediate geometry over a **1000×760 logical canvas**. `UiTransform` uniformly fits and centers that canvas in the framebuffer. Cursor conversion first accounts for window-to-framebuffer DPI scaling, then reverses the same letterbox transform. This is why widget rectangles must remain shared between drawing and hit testing.
-
-`UiState::widgets` defines control IDs, rectangles, labels, selected flags, and enabled flags. Pointer presses store the hit control; release activates only the same enabled control. Tab/Shift+Tab traverse enabled widgets. Numeric fields hold strings while being edited, validate independently, and support replacement, deletion, and bounded stepping. Invalid input disables Start. Pressing Enter in a numeric field first focuses Start; confirming again starts the game. Control+A marks a numeric value for replacement; the current code does not map macOS Command+A.
-
-**Esc never quits.** It pauses and resumes play, and on the result screen it returns to setup. On the setup screen it leaves a numeric field (focusing Start) and otherwise does nothing; during loading it is ignored. Quitting is explicit, through Q or the QUIT button. V5.4.1 quit immediately on Esc from setup, even while a field was being edited.
-
-The HUD shows difficulty, elapsed time and steps, plus the Director phase, menace (`M0`–`M100`), cumulative radio count and radio footprint in rows × columns. During withdrawal, `BACKSTAGE` takes the place of the normal or relief label. A widened footprint can remain visible during backstage. Hunting counts appear in red, or searching counts in orange when no monster is hunting. Before the first input it shows “MOVE OR PRESS G TO START”. Keep the phase and radio labels legible at the smallest supported viewport.
-
-```mermaid
-stateDiagram-v2
-    [*] --> Setup
-    Setup --> Loading: Valid Start
-    Loading --> Playing: Ready and focused
-    Loading --> Paused: Ready without focus
-    Loading --> Setup: Generation failure
-    Playing --> Paused: Pause or focus loss
-    Paused --> Playing: Resume
-    Playing --> Result: Escape or capture
-    Paused --> Setup: Change setup
-    Result --> Setup: Change setup
-    Result --> Loading: Play again
-```
-
-Generation runs on a worker that owns its captured configuration and creates only the CPU-side Maze. The loading screen is presented before that work starts. Once the future is ready, the main thread constructs the OpenGL renderer and installs both objects. Every GL object must be created and destroyed while its context remains current. A future designer change that loads GPU assets on the generation worker would violate the present threading model unless a deliberate shared-context strategy were added.
-
-The embedded bitmap font stores seven five-bit rows per glyph. Most labels uppercase their input. The version passes a case-preserving option and supplies lowercase `a`, `b` and `c` glyphs, including the suffix in `V5.4.3c`. An unsupported character renders as a question mark. Advance is six pixels times scale and text positions are manually chosen. Test new labels at narrow and high-DPI sizes and keep them clear of the HUD controls.
-
-## 9. Redesign path A: keep the single-file art pipeline
-
-This is the smallest engineering change for a graphic designer's first pass. Keep all simulation code and the appearance registry order intact. Redraw each sprite on an exact 20×20 canvas using the existing palette, preserving a common foot position and the knight's approximate cell footprint. Replace the twenty corresponding string rows. Each row must contain exactly twenty symbols, and every symbol must be in `valid_sprite`'s whitelist. Compile-time assertions catch malformed dimensions and unknown symbols before the game runs.
-
-Use silhouette to distinguish creatures before relying on color: wings, horns, eye shape, body mass, leg count, and cap outline remain meaningful at small scale. Keep intentional transparency around limbs. Reserve `E` for visible state-sensitive eye details and inspect the roaming, hunting, and searching versions. Avoid changing a shared palette entry casually: modifying `W`, for example, changes every sprite using that symbol, including UI illustrations. For new colors, update both `sprite_color` and the whitelist, then consider whether tests expecting palette ranges need a deliberate update.
-
-Edit theme colors in `UiRenderer` and stone brightness in `build_wall_mesh`. Maintain contrast between black corridors, gray raised walls, the player's blue ring, exit art, and route overlay. At 101×101 fitted into one window, individual sprite pixels become very small; judge navigation readability at whole-map scale as well as at zoom. The existing ring is a useful player locator. A future exit beacon or an icon outline could improve readability, but neither is currently implemented.
-
-For UI rearrangement, change rectangles in `UiState::widgets` and matching descriptive panel/text positions in `UiRenderer::setup`, `hud`, and `draw`. Background labels and panels are not generated automatically from the widget list, so moving only a button rectangle can create overlaps even though clicks remain correctly aligned to that button. Keep focus outlines and disabled/pressed states distinct. Test the minimum 800×600 window, wide and tall windows, and a high-DPI transform. A portrait offscreen screenshot is a robustness check, not a promise the native minimum-size limits permit that exact window.
-
-| Desired edit | Primary source location | Related constraints |
-|---|---|---|
-| Knight or exit drawing | [Knight sprite](src/mazerunnerV5.4.3c.cpp#L2619), [Exit sprite](src/mazerunnerV5.4.3c.cpp#L2751) | 20 rows × 20 symbols; shared palette |
-| Ten monster drawings | [Monster sprites](src/mazerunnerV5.4.3c.cpp#L2631) onward | Keep registry pointers and stable IDs |
-| Registry names/hover flags | [Appearance registry](src/mazerunnerV5.4.3c.cpp#L2770) | Hover is cosmetic; registry size must cover max count |
-| Sprite validation | [Sprite validation](src/mazerunnerV5.4.3c.cpp#L2791) | Add new palette symbols here as well as color mapping |
-| Wall style | [Wall mesh](src/mazerunnerV5.4.3c.cpp#L2826) | Static upload, exposed faces, large-map policy |
-| Sprite and eye colors | [Palette](src/mazerunnerV5.4.3c.cpp#L2870) | Global effect across all art using a symbol |
-| World sprite size/anchor | [Sprite placement](src/mazerunnerV5.4.3c.cpp#L2895) | Camera-facing construction and wall occlusion |
-| Camera fit/tilt/zoom | [Projection](src/mazerunnerV5.4.3c.cpp#L2927) | Projection and sprite orientation must agree |
-| Route colors/thickness | [Route overlay](src/mazerunnerV5.4.3c.cpp#L2958) | Preserve monster-free/amber semantics |
-| Widget rectangles and labels | [Widgets](src/mazerunnerV5.4.3c.cpp#L3050) | Shared hit testing and keyboard order |
-| Font shapes | [Bitmap glyphs](src/mazerunnerV5.4.3c.cpp#L3175) | Seven rows, five bits; text metrics elsewhere |
-| Menu palette and layout | [UI geometry](src/mazerunnerV5.4.3c.cpp#L3389) | Labels, panels, and widgets need coordinated spacing |
-| HUD text and counters | [HUD](src/mazerunnerV5.4.3c.cpp#L3470) | Keep start prompt and counters clear of the HUD buttons |
-| Junction scan diamond | [World drawing](src/mazerunnerV5.4.3c.cpp#L3324) | Keep its direction legible and let the scan deadline control visibility. |
-| Difficulty balance | [Difficulty profiles](src/mazerunnerV5.4.3c.cpp#L131) | Re-run the calibration script after any change |
-
-## 10. Redesign path B: external texture sprites and richer animation
-
-An external sprite sheet would let a designer iterate in an image editor without rewriting C++ strings. This is a **proposed extension**, not a loader already present in V5.4.3c. A concrete initial asset contract could preserve 20×20 logical frames, transparent RGBA backgrounds, a documented foot pivot, and named clips for idle, walk, hunting, and searching. A separate manifest would map the ten stable appearance IDs to sheet regions and frame timings. Larger source art is also possible, but the logical world footprint must be chosen explicitly rather than inferred from image dimensions.
-
-Engineering work would include image decoding, texture lifetime ownership, UV coordinates in the vertex format, a texture sampler in the shader, atlas rectangles, and an asset-location policy. Nearest-neighbor sampling would preserve crisp pixel edges. Atlas gutters and careful UV boundaries would avoid neighboring-frame bleed. Transparent texels could be discarded for hard-edged pixel art while retaining depth writes; translucent effects would require an intentional blend/depth-order policy. Color-space handling should be consistent across images and vertex colors rather than relying on incidental driver defaults.
-
-Animation should live in render state and be keyed to simulation events or timestamps. Keep collision and AI on the existing grid unless the gameplay redesign explicitly changes them. Render interpolation can make movement smoother, but it should not determine whether capture occurs. Aesthetic random variations should use deterministic hashes or a separate visual PRNG, preserving the simulation RNG stream and its seeded tests. Asset failures should produce useful diagnostics and a visible fallback, and asset paths should work when launching from a different current directory.
-
-A designer handoff should specify canvas/frame size, foot pivot, intended world size, transparent margin, palette/color-space policy, direction conventions, animation durations, and the three monster-state cues (roaming, hunting, searching). Deliver an overview sheet plus isolated frames and preview both at actual small in-game scale. Those deliverables are recommendations for a future art pass; the current package supplies the existing embedded-art screenshots and source, not a new texture pipeline.
-
-## 11. Redesign path C: true 3D characters or a broader renderer change
-
-Replacing billboard actors with real models is a larger change. It requires mesh/asset import, normals, material definitions, model transforms, animation data, and lighting if the models should appear shaded. A rigged knight also needs bone transforms or another explicit animation scheme. Merely extruding current pixel quads does not create articulated character animation.
-
-Preserve the tile-centered simulation as the authoritative gameplay representation while adding a render transform for each entity. Define a shared world scale, actor origin, feet-on-floor convention, and maximum silhouette footprint. Retain a readable player marker and distinct monster silhouettes under the fixed camera. If the camera becomes rotatable or perspective, update billboard handling, projection bounds, zoom behavior, and the relationship between input directions and screen directions together.
-
-The current portable renderer targets OpenGL 3.3 core and uses GLSL 3.30. Any new shader or asset technique must fit the chosen supported platform baseline or introduce an explicitly documented alternative renderer. macOS's existing OpenGL route should be treated as a compatibility target when evaluating new effects. A backend migration would be a separate engineering project; there is no existing abstraction here that automatically converts GL draw calls to another graphics API.
-
-## 12. Validation workflow for visual changes
-
-Begin with a reproducible seed and unchanged dimensions, count, difficulty, compiler, and standard library. Compare headless simulation outputs before/after after excluding measured host compute time. An art-only edit should not change the simulation state or consume additional simulation randomness. Run the portable regression suite for sprite validity, geometry/camera invariants, all profiles, pack coordination, clue privacy, learned search choices, the release-label glyphs, and UI state. The EGL suite compares the horizontal positions of the scan diamond for left and right gazes and checks that the pixels disappear at expiry. Then run the real-GL render and injected-application suites on Linux (both run under CTest when EGL is available) and inspect the generated PNGs. A gameplay or balance change should also re-run `scripts/run_calibration.py`.
-
-Use the gallery to check that all ten appearances are distinct and visible, then inspect a naturally generated crowded map. Review whole-map and zoomed views, amber and cycling routes, player overlap/occlusion, the green exit, the start prompt and hunting/searching counters, invalid setup fields, keyboard focus, pause, and results. Rerun native-window checks on each intended release platform: offscreen rendering cannot establish native DPI behavior, compositor behavior, actual keyboard mappings, or macOS/Windows driver compatibility.
-
-For new assets or shader effects, extend tests around the changed contract rather than weakening old assertions until everything passes. A deliberate palette redesign may require updating pixel-color expectations, but depth ordering, missing actors, map aspect, input hit areas, source gameplay behavior, and GPU cleanup should remain verifiable. Store the chosen screenshots with seed/configuration and capture method so they remain useful references rather than undocumented pictures.
+Exact host time depends on allocator, cache reuse, topology, compiler and how many agents replan. In particular, the ten-step retreat cap does not bound the cost of a cold full-distance field. The balance table reports complete game outcomes and timeouts; it measures the combined policies rather than proving a human escape rate.
