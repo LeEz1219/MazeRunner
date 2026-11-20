@@ -84,8 +84,8 @@
     },
     {
       "path": "03-Graphics-Design.md",
-      "bytes": 31494,
-      "sha256": "bba1190a77f07629591a7158f271bbd8eb87b4e12c4ae06dc0081ea35698d085"
+      "bytes": 38066,
+      "sha256": "5b954d0da8b7eb8c5f5922f87f9ff30184c5cfb7925b7476eff954cae253f20b"
     },
     {
       "path": "04-Build-Test-and-Reproduce.md",
@@ -180,7 +180,7 @@
     {
       "path": "artifacts/results/documentation-audit.json",
       "bytes": 1406,
-      "sha256": "97b868ad7794014e5f514a30e17133fd5393644a896f4551fbb0f097868cad2a"
+      "sha256": "108e4901ba6235d91307dde1b282eba196580e4d4ce1015bf7edd430527b8045"
     },
     {
       "path": "artifacts/results/documentation-coverage.json",
@@ -413,14 +413,19 @@
       "sha256": "00dfafb443a79ecc98473cf96c483f9544ea77588a161d222fc9b4439b424e62"
     },
     {
+      "path": "design/MazeRunner-v5.4.4-Figma-starter.zip",
+      "bytes": 19311,
+      "sha256": "57b389280f2091d047f433ca545367fb5a52e327ae6bceff442a0a8723be6290"
+    },
+    {
       "path": "scripts/audit_documentation.py",
       "bytes": 9603,
       "sha256": "f68d8c4f985122eca4340972757ef53174d4f21a555b470200e6e4699240a426"
     },
     {
       "path": "scripts/devkit-files.txt",
-      "bytes": 3237,
-      "sha256": "d67530aa55ae7276aede1831e63741c4f34641b0bd2ee6dbae57432c3c7ba85e"
+      "bytes": 3280,
+      "sha256": "2b08965da582beee2a7120c67a4440468a48a39e43e077f3d45d521e9d3e9260"
     },
     {
       "path": "scripts/package_devkit.py",

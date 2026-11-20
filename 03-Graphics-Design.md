@@ -1,6 +1,40 @@
 # MazeRunner v5.4.4 graphics design
 
-A single OpenGL renderer turns colored geometry into stone walls, a pixel knight, ten monster silhouettes, an exit, tracking cues and a bitmap interface. Start with the existing appearance and UI below to see which visual decisions carry game information. The Figma handoff then specifies editable masters, exact export formats, a PNG-to-source converter, procedural wall parameters, font masks, hit rectangles and acceptance captures. [Production source](src/mazerunnerV5.4.4.cpp) · [Screenshot catalogue](04-Build-Test-and-Reproduce.md) · [AI behavior behind the visual cues](02-AI-Design-Deepdive.md)
+Start with the design philosophy and the first Figma task if you are contributing art. For implementation details, use the renderer and integration reference below. [Production source](src/mazerunnerV5.4.4.cpp) · [Screenshot catalogue](04-Build-Test-and-Reproduce.md)
+
+## Original design philosophy
+
+A player looking at a crowded maze needs to answer three questions quickly: Where is the knight? Which squares can it enter? What is the nearest monster doing? The original graphics guide connects each of those decisions to a drawing choice. Start your redesign by looking at the [game at fit zoom](artifacts/screenshots/game.png) and the [character gallery](artifacts/screenshots/monsters.png).
+
+**Give the maze depth while keeping its directions easy to read.** The black corridors show where the knight can walk. Raised gray walls, a brighter top edge and darker exposed sides make the solid cells legible. The fixed 25-degree tilt lets you see wall height while up, down, left and right still correspond to the maze grid. If you add stone detail, zoom out to a whole maze. A crack in a wall should still read as a mark on stone. If it looks like an opening, reduce its contrast.
+
+**“Use silhouette to distinguish creatures before relying on color.”** That principle from the original guide matters most when a character is only a few pixels across. A bat’s wings, a spider’s spread legs and a mushroom’s cap should identify them even if all three are drawn in the same ink. Leave gaps between limbs and keep the feet aligned when the character turns. The small knight and blue ring help the player find their own piece among ten distinct monsters. [Original redesign guidance](https://github.com/LeEz1219/MazeRunner/blob/70e9affae3c6ee5bdf2fc45803ad62b15ef85560/02-AI-Graphics-and-Redesign.md#9-redesign-path-a-keep-the-single-file-art-pipeline)
+
+**Give color a consistent job.** The green exit marks the destination. A monster’s gold, orange and red eyes tell the player whether it is roaming, searching or hunting. The small amber diamond beside a searching monster points down the corridor it checked. An amber line across the floor describes risk on the player’s route. In a new drawing, keep those two cues distinguishable by shape and placement. Check the same scene both at fit zoom and close up. [HUD example](artifacts/screenshots/hud.png)
+
+**Let the player trust what they see and click.** The knight’s bob and a creature’s hover give the pieces life while their positions still read as single grid cells. Keep each actor’s footprint and the player marker readable beside walls. Apply the same principle to menus: the visible button should occupy the area that responds to a click, and a keyboard player should be able to see which button has focus. The original guide includes single-file pixel art, texture sheets and 3D characters as different redesign paths. The exercise below uses the art pipeline that ships with v5.4.4.
+
+## First Figma task: redraw one goblin
+
+**Deliver one editable Figma frame and one file named `goblin.png`.** The frame lets another designer adjust your work. The PNG is the finished picture the developer converts for the game. Everything in this exercise can be done in Figma.
+
+[Download the Figma starter ZIP](design/MazeRunner-v5.4.4-Figma-starter.zip). If GitHub opens a file page, choose **Download raw file**. Unzip the download. Open `reference/goblin.png` to see the starting artwork. A *pixel* is one square of color. This picture is 20 pixels across and 20 down. The empty border counts toward those dimensions.
+
+1. **Make the canvas.** Open a Figma Design file. Press **F** for the Frame tool and draw a frame. In the right panel set **W** and **H** to **20**. Double-click the frame name in Layers and type `goblin`. Remove the frame’s background fill and enable **Clip content**. A *frame* is the box that sets the size of the exported image.
+2. **Bring in the editable drawing.** Drag `editable/goblin.svg` into the design file. In the Layers panel, drag the imported layer under `goblin` so it is indented inside the frame. Keep it at the original size. Compare the placement with `reference/goblin.png`: the top and bottom rows should be empty. If the art shifted when imported, place the reference inside the frame at X=0, Y=0, W=20, H=20, align the artwork to it, then hide the reference using its eye icon. Zoom in until you can see individual squares.
+3. **Change one feature.** Try lengthening the left ear by one green pixel. Press **R** for Rectangle, draw a square, set W=1 and H=1, and give it the same green fill as the adjoining ear pixel. Use whole-number X and Y values so the edges stay sharp. Keep the four gold eye pixels in this master. The game recolors those pixels for each monster state. Look at `examples/goblin-states.png` to see the same face roaming, searching and hunting from left to right.
+4. **Export the drawing.** In Layers select the outer **goblin** frame. Under **Export** in the right panel, add an export setting, select **PNG** and **1×**, then select **Export goblin**. Open the PNG’s file information: the expected size is **20 × 20**. A 40 × 40 export means the scale was 2×. A cropped export usually means only the artwork was selected. A solid background means a frame fill or reference layer is still visible. [Figma export help](https://help.figma.com/hc/en-us/articles/360040028114-Export-static-designs-from-Figma)
+5. **Hand it over.** Compare the PNG on both light and dark backgrounds and look at it at actual size. Copy a link to the editable frame with access for the project team. Send the link, PNG and one sentence describing the change, such as “Extended the left ear by one pixel and kept the foot position.” The developer converts the PNG into the game’s palette and checks the result in play.
+
+### If you were assigned a wall, button or letter
+
+| Asset | First exercise | What to hand over |
+|---|---|---|
+| Stone wall | Use a screenshot of one corner. Mark the north edge with an arrow, duplicate the view and make that edge brighter in the second drawing. Look at both from a distance. | Editable frame plus a PNG showing before and after, with a color swatch beside the arrow. The developer applies it to the procedural wall material. |
+| Start button | On a 1000×760 frame, place ENTER THE MAZE at X=50, Y=658, W=500, H=56. Draw four versions: ready to click, selected by keyboard, being pressed, and unavailable. Check that the label fits all four. | Frame link and proposed bounds. The starter’s `examples/start-button.csv` shows how to record the position and size. |
+| Capital A | Open `examples/glyph-A.svg`. Draw inside five columns and seven rows. Place a copy beside another letter with a one-pixel gap to check spacing. | Frame link and a transparent 5×7 PNG named `glyph-A.png`. The developer converts its filled squares into the game's font data. |
+
+For a first sprite assignment, you can stop here. The sections below preserve the renderer specification, integration instructions and longer-term redesign options for the development team.
 
 ## 1. Existing graphics implementation
 
@@ -95,11 +129,11 @@ Generation runs on a worker that owns its captured configuration and creates onl
 
 The embedded bitmap font stores seven five-bit rows per glyph. Most labels uppercase their input. The version passes a case-preserving option and supplies lowercase `a`, `b` and `c` glyphs, for historical suffixes. The current version string is `V5.4.4`. An unsupported character renders as a question mark. Advance is six pixels times scale and text positions are manually chosen. Test new labels at narrow and high-DPI sizes and keep them clear of the HUD controls.
 
-## 3. Figma production handoff
+## 3. Technical reference for the full art pipeline
 
 A contributor can replace any shipped sprite or glyph by delivering its indexed grid. Walls and menus are drawn by C++ from numeric specifications. The game opens no artwork directory at startup. Choose the deliverable in this table before drawing so that the artist and integrator agree on what can actually ship in v5.4.4.
 
-| Asset | Designer delivers | Developer integration point |
+| Asset | Full integration materials (developer prepares numeric formats) | Developer integration point |
 |---|---|---|
 | Knight, exit and ten monsters | Editable Figma components, 20×20 transparent master PNGs at 1×, matching 20-line indexed text grids | Replace the corresponding static `PixelSprite` initializer. Keep registry IDs, compile the existing static assertions and check the render fixture. |
 | Stone cap, bevels and sides | Annotated tile drawing, neutral-color swatches and numeric material recipe in JSON or CSV | Apply the numbers in `build_wall_mesh` and `WALL_HEIGHT`. The mesh bakes colors into vertices. |

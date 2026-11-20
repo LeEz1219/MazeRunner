@@ -70,6 +70,7 @@ artifacts/screenshots/setup.png
 artifacts/screenshots/showcase.png
 artifacts/screenshots/wide.png
 artifacts/screenshots/zoom.png
+design/MazeRunner-v5.4.4-Figma-starter.zip
 scripts/audit_documentation.py
 scripts/devkit-files.txt
 scripts/package_devkit.py
