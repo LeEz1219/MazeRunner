@@ -43,16 +43,47 @@ void test_suspicion_scan() {
     auto m = monster(0,game.id({12,12}),1);
     m.state = MonsterState::Searching; m.duty = PackDuty::Investigate;
     m.search_until = 5000; m.hint = {10,14,10,14,1};
+    m.target = game.id({12,14});
     game.monsters = {m};
     game.set_auto_solve(true); game.set_auto_solve(false);
     game.advance_to(1);
     auto& lead = game.monsters[0];
-    require(lead.cell == m.cell && lead.scan_until > game.now && lead.gaze >= 0 && game.junction_scans()==1,
+    require(lead.cell == m.cell && lead.scan_until > game.now && lead.gaze == 3 && game.junction_scans()==1,
             "the searcher turns toward an unchecked arm and pauses once on arrival");
     require(lead.inspected.size()==1 && lead.inspected[0].cell==m.cell, "Medium only clears physically inspected cells");
     game.advance_to(1 + game.settings.monster_move_ms * SEARCH_PACE_PERCENT / 100);
     require(game.manhattan(m.cell,lead.cell)==1 && lead.inspected.size()>1 && game.junction_scans()==1,
             "the searcher commits to a corridor after its scan");
+}
+
+// Both hunters arrive on their first action. The prediction must continue with
+// the copied pack's reserved corridors, preserving the live route until its turn.
+void test_retreat_continuation_forecast() {
+    auto game = open_maze(31,31);
+    game.set_auto_solve(true);
+    game.set_auto_solve(false);
+    for (int i = 0; i < 2; ++i) {
+        auto m = monster(i,game.id({15+i,16}),1);
+        m.state = MonsterState::Hunting;
+        m.duty = PackDuty::Withdraw;
+        m.hint = {12,16,7,11,1};
+        m.scent_until = 10000;
+        m.target = m.withdrawal_goal = game.id({15+i,17});
+        m.retreat_route = {m.target};
+        game.monsters.push_back(m);
+    }
+    const auto forecast = game.forecast_monsters(AUTO_HORIZON_MAX);
+    for (const auto& m : game.monsters)
+        require(m.retreat_route.size() == 1 && m.retreat_route.back() == m.target,
+                "forecasting leaves both live retreat orders intact");
+    for (int t = 1; t <= forecast.horizon; ++t) {
+        game.advance_to(t * AUTO_SOLVE_SPEED_MS);
+        for (std::size_t i = 0; i < game.monsters.size(); ++i)
+            require(game.monsters[i].cell == forecast.positions[t][i], "live and forecast retreat agree past arrival");
+        require(game.monsters[0].cell != game.monsters[1].cell, "retreaters occupy distinct cells");
+    }
+    for (int i = 0; i < 2; ++i)
+        require(game.monsters[i].cell != game.id({15+i,17}), "a free outward corridor permits another leg");
 }
 
 void test_observed_habits() {

@@ -78,7 +78,7 @@ int main(){try{
     test_weighted_overlay_fork();test_sound_around_walls_and_at_range();test_global_interceptor_reservations();
     test_director_radio_without_local_hearing();test_director_relief_retasks_stale_clues_and_guards();
     test_hunter_retains_radio_until_scent_fades();test_director_observes_solver_waits();
-    test_withdrawal_and_clue_privacy();test_suspicion_scan();test_observed_habits();test_learned_search_choices();
+    test_withdrawal_and_clue_privacy();test_suspicion_scan();test_retreat_continuation_forecast();test_observed_habits();test_learned_search_choices();
     test_charge_reach_bound();test_sector_circuit_evidence();test_stalker_replay();
     std::cout<<"PASS: menace hysteresis, physical withdrawal, pack jobs, suspicion scans, observed habits and deterministic replay.\n";
     std::cout<<"PASS: director radio delivery, privacy, expiry, retasking, interceptor release and complete relief cycle.\n";
