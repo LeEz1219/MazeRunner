@@ -2,7 +2,7 @@
   "package": "MazeRunner V5.4.4 Documentation and Validation",
   "release": "5.4.4",
   "previous_release": "5.4.3c",
-  "prepared_date": "2026-11-20",
+  "prepared_date": "2026-11-21",
   "source": {
     "path": "src/mazerunnerV5.4.4.cpp",
     "bytes": 211413,
@@ -84,8 +84,8 @@
     },
     {
       "path": "03-Graphics-Design.md",
-      "bytes": 38066,
-      "sha256": "5b954d0da8b7eb8c5f5922f87f9ff30184c5cfb7925b7476eff954cae253f20b"
+      "bytes": 44393,
+      "sha256": "bacb3d27c715791c167949ba562dc6d9058e42bca11838604ddbe32bf15dde0d"
     },
     {
       "path": "04-Build-Test-and-Reproduce.md",
@@ -180,7 +180,7 @@
     {
       "path": "artifacts/results/documentation-audit.json",
       "bytes": 1406,
-      "sha256": "108e4901ba6235d91307dde1b282eba196580e4d4ce1015bf7edd430527b8045"
+      "sha256": "c0e546f4813e543cc4190677557c40a35f1346c5e8a90bfa055f5dfcef1b1a3d"
     },
     {
       "path": "artifacts/results/documentation-coverage.json",
