@@ -1,6 +1,6 @@
 # MazeRunner v5.4.4 graphics design
 
-Start with the design philosophy and the first Figma task if you are contributing art. For implementation details, use the renderer and integration reference below. [Production source](src/mazerunnerV5.4.4.cpp) · [Screenshot catalogue](04-Build-Test-and-Reproduce.md)
+Start with the design philosophy and the first Figma task if you are contributing art. For implementation details, use the renderer and integration reference below. Section 8 proposes a workflow for future collaboration with Figma designers. [Production source](src/mazerunnerV5.4.4.cpp) · [Screenshot catalogue](04-Build-Test-and-Reproduce.md)
 
 ## Original design philosophy
 
@@ -282,3 +282,71 @@ Begin with a reproducible seed and unchanged dimensions, count, difficulty, comp
 Use the gallery to check that all ten appearances are distinct and visible, then inspect a naturally generated crowded map. Review whole-map and zoomed views, amber and cycling routes, player overlap/occlusion, the green exit, the start prompt and hunting/searching counters, invalid setup fields, keyboard focus, pause, and results. Rerun native-window checks on each intended release platform: offscreen rendering cannot establish native DPI behavior, compositor behavior, actual keyboard mappings, or macOS/Windows driver compatibility.
 
 For new assets or shader effects, extend tests around the changed contract rather than weakening old assertions until everything passes. A deliberate palette redesign may require updating pixel-color expectations, but depth ordering, missing actors, map aspect, input hit areas, source gameplay behavior, and GPU cleanup should remain verifiable. Store the chosen screenshots with seed/configuration and capture method so they remain useful references rather than undocumented pictures.
+
+## 8. Figma collaboration roadmap (proposed)
+
+This section proposes how future art work with Figma designers could be organized. **None of it is implemented in v5.4.4.** It keeps the current contract (20×20 indexed sprites compiled into one source file, with no artwork loaded at runtime) and removes the manual steps that are easiest to get wrong.
+
+### Where the current handoff loses time
+
+- Sprite rows are converted by the helper in section 3 and pasted by hand into the 3,929-line source.
+- Setup hit rectangles live in [`UiState::widgets`](src/mazerunnerV5.4.4.cpp#L3145), while the matching labels and panels are separate literals in [`UiRenderer::setup`](src/mazerunnerV5.4.4.cpp#L3530). A Figma layout can only be copied into one of them at a time.
+- Palette values exist in three places: [`sprite_color`](src/mazerunnerV5.4.4.cpp#L2965), section 1 of this guide and the Figma colour styles. Nothing detects drift between them.
+- The [CI workflow](.github/workflows/validate.yml) uploads only CMake logs and does not run when `design/` changes, so a designer never sees the game's own rendering of their work.
+
+### 8.1 Keep art sources in the repository and generate the code
+
+Commit each master as `design/sprites/<name>.txt`, using the 20-line indexed format from section 3, together with `design/palette.json`, `design/glyphs.json` and the `stone-style.json` recipe. A `scripts/import_art.py` script, extending the PNG helper in section 3, would rewrite only marked regions of the source, for example between `// BEGIN GENERATED ART: sprites` and `// END GENERATED ART`. The game remains a single translation unit. Run the script with `--check` in CI so that a pull request fails when the source and `design/` disagree.
+
+The importer should check that each master is 20×20, that alpha is 0 or 255, that every pixel is a palette symbol, that the foot line and horizontal centre match the existing masters, that every monster contains `E`, and that each silhouette differs from the others by a minimum number of pixels.
+
+### 8.2 Identify pixels by layer name, not exact colour
+
+The starter SVGs group pixels as `material-G`, `material-K`, `eyes` and so on, and Figma keeps those group names as layer names on import. Treat the layer name as the symbol and the fill as a visual aid, and have the importer warn when the two disagree. This removes the `E` (`#FFD43B`) versus `Y` (`#FFD46E`) confusion described in section 3 and makes the conversion independent of colour-profile conversion. Set each Figma file's colour profile to sRGB.
+
+Store the palette as Figma colour styles or variables named after the symbols, such as `palette/K` and `palette/E-roaming`, and export them to `design/palette.json` with a variables-export plugin. Figma's Variables REST API is limited to Enterprise plans.
+
+### 8.3 Show designers the game's own rendering
+
+Upload the PNGs written by the EGL render suite (roster, HUD, fit zoom and setup) as workflow artifacts, and add `design/**` to the workflow's trigger paths. For each art change, attach a before-and-after contact sheet at 1×, at 8×, and at fit zoom on a 101×101 map, where a sprite covers only a few screen pixels. Designers keep these on a **Game captures** page beside the masters.
+
+### 8.4 Give monster state a cue that does not depend on hue
+
+The roaming, searching and hunting eyes ([`E`](src/mazerunnerV5.4.4.cpp#L2983)) differ only in hue. A simulation of colour-vision deficiency (Machado, Oliveira and Fernandes 2009, full severity), measured as CIEDE2000 colour differences, gives:
+
+| Eye colours | Normal vision | Deuteranopia | Protanopia | Tritanopia |
+|---|---:|---:|---:|---:|
+| Roaming vs searching | 27.1 | 11.1 | 17.0 | 20.2 |
+| Searching vs hunting | 21.3 | 9.3 | 20.0 | 14.6 |
+| Roaming vs hunting | 48.3 | 20.3 | 36.3 | 30.7 |
+
+The eyes are only 2–4 pixels, so for players with deuteranopia, searching and hunting become hard to tell apart at fit zoom. Following "silhouette before colour", give each state its own eye shape (for example a narrow slit while hunting) or add a small head marker. Preview every state in Figma with a colour-vision simulation, and have the importer enforce a minimum simulated difference between the state colours.
+
+### 8.5 Put the interface layout in one table
+
+Before Figma can drive the menus, move the setup and HUD coordinates into a single layout table read by both `UiState::widgets` and `UiRenderer`. A 1000×760 Figma frame with layers named `widget/Start`, `label/Difficulty` and so on can then generate that table, and the existing pointer, keyboard and render tests protect the result. Keep the minimum-size, wide and portrait frames from section 3 as variants.
+
+### 8.6 Optional: pull approved frames automatically
+
+A manually triggered GitHub Action, with a Figma access token stored as a repository secret, could:
+
+- read the **Handoff** page through the Figma REST API, taking each grid from node geometry rather than from a rasterized export;
+- run the importer;
+- record the Figma version ID in the generated region;
+- open a pull request with the rendered screenshots attached.
+
+Designers would not need git, and developers review an ordinary pull request.
+
+### 8.7 Animation and models
+
+- **Animation without a texture loader.** Allow several 20×20 frames per appearance and choose one at render time from simulation time. This stays deterministic and adds no dependency. In Figma, use component variants such as `goblin/walk/0` to `goblin/walk/3`.
+- **Art larger than 20×20** needs path B (section 5). The same importer can validate an atlas and its manifest.
+- **3D models.** Figma is not a 3D tool. For path C (section 6), model in Blender and export glTF with an agreed scale, a feet-centred origin and a fixed up axis. Keep Figma for concept sheets, turnarounds and the interface.
+
+### 8.8 Optional: AI-assisted handoff
+
+A team using Claude Code can connect Figma's MCP server so the agent reads frames, variables and screenshots directly. It needs a paid Figma seat, and its code output targets web frameworks, so in this project it would only supply geometry and colours to the importer.
+
+### Suggested order
+
+Start with 8.1 and 8.2 together, then 8.3, 8.4 and 8.5. Adopt 8.6 to 8.8 as the volume of art grows.
